@@ -16,7 +16,7 @@ public final class ReflectionUtilities {
         } catch (IllegalAccessException e) {
             throw new InternalException("Access error while setting value -> " + field);
         } catch (IllegalArgumentException e) {
-            if (isNumericType(field.getType()) && isNumericType(value.getClass()))
+            if (TypeUtilities.isNumericType(field.getType()) && TypeUtilities.isNumericType(value.getClass()))
                 setNumericValue(object, field, (Number) value);
             else throw e;
         }
@@ -55,37 +55,6 @@ public final class ReflectionUtilities {
             }
         }
         return null;
-    }
-
-    public static boolean isNumericType(Class<?> type) {
-        return Number.class.isAssignableFrom(type) || isUnboxedNumeric(type);
-    }
-
-    private static boolean isUnboxedNumeric(Class<?> type) {
-        return type == long.class
-                || type == int.class
-                || type == short.class
-                || type == byte.class
-                || type == double.class
-                || type == float.class;
-    }
-
-    public static boolean isIntegral(Class<?> type) {
-        return assignableOrPrimitive(type, Long.class, long.class)
-                || assignableOrPrimitive(type, Integer.class, int.class)
-                || assignableOrPrimitive(type, Short.class, short.class)
-                || assignableOrPrimitive(type, Byte.class, byte.class);
-    }
-
-    public static boolean isPrimitiveType(Class<?> type) {
-        return isNumericType(type)
-                || assignableOrPrimitive(type, Character.class, char.class)
-                || assignableOrPrimitive(type, Boolean.class, boolean.class)
-                || String.class.isAssignableFrom(type);
-    }
-
-    private static boolean assignableOrPrimitive(Class<?> type, Class<?> boxType, Class<?> primitiveType) {
-        return boxType.isAssignableFrom(type) || type == primitiveType;
     }
 
 }

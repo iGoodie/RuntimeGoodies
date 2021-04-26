@@ -1,6 +1,6 @@
 package net.programmer.igoodie.goodies.runtime;
 
-import net.programmer.igoodie.util.ReflectionUtilities;
+import net.programmer.igoodie.util.TypeUtilities;
 
 import java.util.Objects;
 
@@ -8,7 +8,7 @@ public class GoodiePrimitive extends GoodieElement {
 
     public static GoodiePrimitive from(Object value) {
         Class<?> type = value.getClass();
-        if (ReflectionUtilities.isNumericType(type))
+        if (TypeUtilities.isNumericType(type))
             return new GoodiePrimitive(((Number) value));
         if (value instanceof String)
             return new GoodiePrimitive(((String) value));

@@ -7,6 +7,7 @@ import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 import net.programmer.igoodie.util.ReflectionUtilities;
+import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -104,7 +105,7 @@ public class GoodieObjectifier {
 
     public boolean isPrimitive(Field field) {
         Class<?> type = field.getType();
-        return ReflectionUtilities.isPrimitiveType(type);
+        return TypeUtilities.isPrimitiveType(type);
     }
 
     public boolean isList(Field field) {
