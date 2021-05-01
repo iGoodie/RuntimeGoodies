@@ -55,7 +55,6 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
     /* ------------------------------------------ */
 
     @Override
-
     public JsonObject readFromGoodie(GoodieObject goodie) {
         return convertObject(goodie);
     }

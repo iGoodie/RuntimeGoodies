@@ -1,6 +1,5 @@
 package net.programmer.igoodie.serialization;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
@@ -9,10 +8,7 @@ import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,6 +18,10 @@ public class GoodieObjectifier {
         for (Field goodieField : getGoodieFields(object)) {
             Goodie annotation = goodieField.getAnnotation(Goodie.class);
             String key = annotation.key().isEmpty() ? goodieField.getName() : annotation.key();
+
+            if (goodieField.getType().isArray()) {
+                throw new GoodieImplementationException("Goodie fields MUST not be an array type. Use List<?> type instead.", goodieField);
+            }
 
             if (isPrimitive(goodieField)) {
                 GoodiePrimitive goodiePrimitive = getGoodiePrimitive(goodieObject, key);
@@ -56,14 +56,23 @@ public class GoodieObjectifier {
     }
 
     public void fillArray(Object object, Field goodieField, GoodieArray goodieArray) {
-        // TODO
+        ParameterizedType genericType = (ParameterizedType) goodieField.getGenericType();
+        Class<?> listType = (Class<?>) genericType.getActualTypeArguments()[0];
+
+        List<Object> instancedList = new LinkedList<>();
+        // TODO: Fill from goodieArray
+        instancedList.add(123);
+        instancedList.add("ABC");
+        instancedList.removeIf(item -> !listType.isInstance(item));
+
+        ReflectionUtilities.setValue(object, goodieField, instancedList);
     }
 
     public void fillObject(Object object, Field goodieField, GoodieObject goodieObject, String key) {
         if (object.getClass() == goodieField.getType())
             throw new GoodieImplementationException("Goodies MUST NOT depend on themselves.", goodieField);
 
-        Object subObject = instanceForField(goodieField);
+        Object subObject = instanceFromType(goodieField.getType());
         GoodieObject subGoodieObject = getGoodieObject(goodieObject, key);
         fillFields(subObject, subGoodieObject);
     }
@@ -90,8 +99,7 @@ public class GoodieObjectifier {
 
     /* ----------------------------- */
 
-    public Object instanceForField(Field field) {
-        Class<?> type = field.getType();
+    public <T> T instanceFromType(Class<T> type) {
         try {
             return type.newInstance();
         } catch (InstantiationException e) {
@@ -110,7 +118,7 @@ public class GoodieObjectifier {
 
     public boolean isList(Field field) {
         Class<?> type = field.getType();
-        return List.class.isAssignableFrom(type) || type.isArray();
+        return List.class.isAssignableFrom(type);
     }
 
     /* ----------------------------- */
