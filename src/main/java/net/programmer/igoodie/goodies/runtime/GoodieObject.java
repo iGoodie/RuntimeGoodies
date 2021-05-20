@@ -34,6 +34,59 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         return elements.get(key);
     }
 
+    public GoodiePrimitive getPrimitive(String key) {
+        GoodieElement goodieElement = get(key);
+        if (goodieElement instanceof GoodiePrimitive)
+            return ((GoodiePrimitive) goodieElement);
+        else throw new IllegalArgumentException();
+    }
+
+    public GoodieArray getArray(String key) {
+        GoodieElement goodieElement = get(key);
+        if (goodieElement instanceof GoodieArray)
+            return ((GoodieArray) goodieElement);
+        else throw new IllegalArgumentException();
+    }
+
+    public GoodieObject getObject(String key) {
+        GoodieElement goodieElement = get(key);
+        if (goodieElement instanceof GoodieObject)
+            return ((GoodieObject) goodieElement);
+        else throw new IllegalArgumentException();
+    }
+
+    public boolean getBoolean(String key) {
+        return getPrimitive(key).getBoolean();
+    }
+
+    public byte getByte(String key) {
+        return getPrimitive(key).getByte();
+    }
+
+    public short getShort(String key) {
+        return getPrimitive(key).getShort();
+    }
+
+    public int getInteger(String key) {
+        return getPrimitive(key).getInteger();
+    }
+
+    public long getLong(String key) {
+        return getPrimitive(key).getLong();
+    }
+
+    public float getFloat(String key) {
+        return getPrimitive(key).getFloat();
+    }
+
+    public double getDouble(String key) {
+        return getPrimitive(key).getDouble();
+    }
+
+    public Number getNumber(String key) {
+        return getPrimitive(key).getNumber();
+    }
+
     @Override
     public GoodieElement put(String key, GoodieElement value) {
         return elements.put(key, value);
