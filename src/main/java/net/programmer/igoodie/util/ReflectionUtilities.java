@@ -57,4 +57,12 @@ public final class ReflectionUtilities {
         return null;
     }
 
+    public static <T> T newInstanceOrDefault(Class<T> type, T defaultValue) {
+        try {
+            return type.newInstance();
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
 }
