@@ -87,6 +87,14 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         return getPrimitive(key).getNumber();
     }
 
+    public String getString(String key) {
+        return getPrimitive(key).getString();
+    }
+
+    public char getCharacter(String key) {
+        return getPrimitive(key).getCharacter();
+    }
+
     @Override
     public GoodieElement put(String key, GoodieElement value) {
         return elements.put(key, value);
