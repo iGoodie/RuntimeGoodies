@@ -5,7 +5,7 @@ import net.programmer.igoodie.serialization.GoodieVirtualizer;
 
 import java.util.List;
 
-public class FillableObject {
+public class User {
 
     @Goodie
     private String firstName;
@@ -19,6 +19,9 @@ public class FillableObject {
     @Goodie
     public List<String> friendNames;
 
+    @Goodie
+    public Profession profession;
+
     public String fullName; // <-- Virtualized field
 
     @GoodieVirtualizer
@@ -28,11 +31,12 @@ public class FillableObject {
 
     @Override
     public String toString() {
-        return "{" +
+        return "User{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", age=" + age +
                 ", friendNames=" + friendNames +
+                ", profession=" + profession +
                 ", fullName='" + fullName + '\'' +
                 '}';
     }

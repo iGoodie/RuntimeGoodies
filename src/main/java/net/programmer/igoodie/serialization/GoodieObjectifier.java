@@ -23,11 +23,11 @@ public class GoodieObjectifier {
                 throw new GoodieImplementationException("Goodie fields MUST not be an array type. Use List<?> type instead.", goodieField);
             }
 
-            if (isPrimitive(goodieField)) {
+            if (TypeUtilities.isPrimitive(goodieField)) {
                 GoodiePrimitive goodiePrimitive = getGoodiePrimitive(goodieObject, key);
                 fillPrimitive(object, goodieField, goodiePrimitive);
 
-            } else if (isList(goodieField)) {
+            } else if (TypeUtilities.isList(goodieField)) {
                 GoodieArray goodieArray = getGoodieArray(goodieObject, key);
                 fillArray(object, goodieField, goodieArray);
 
@@ -60,9 +60,15 @@ public class GoodieObjectifier {
         Class<?> listType = (Class<?>) genericType.getActualTypeArguments()[0];
 
         List<Object> instancedList = new LinkedList<>();
-        // TODO: Fill from goodieArray
-        instancedList.add(123);
-        instancedList.add("ABC");
+        for (GoodieElement goodieElement : goodieArray) {
+            if (goodieElement instanceof GoodiePrimitive) {
+                instancedList.add(((GoodiePrimitive) goodieElement).get());
+            } else if (goodieElement instanceof GoodieArray) {
+                // TODO
+            } else if (goodieElement instanceof GoodieObject) {
+                instancedList.add(((GoodieObject) goodieElement).get());
+            }
+        }
         instancedList.removeIf(item -> !listType.isInstance(item));
 
         ReflectionUtilities.setValue(object, goodieField, instancedList);
@@ -72,9 +78,11 @@ public class GoodieObjectifier {
         if (object.getClass() == goodieField.getType())
             throw new GoodieImplementationException("Goodies MUST NOT depend on themselves.", goodieField);
 
-        Object subObject = instanceFromType(goodieField.getType());
+        Object subObject = createInstanceFromType(goodieField.getType());
         GoodieObject subGoodieObject = getGoodieObject(goodieObject, key);
         fillFields(subObject, subGoodieObject);
+
+        ReflectionUtilities.setValue(object, goodieField, subObject);
     }
 
     public List<Field> getGoodieFields(Object object) {
@@ -99,7 +107,7 @@ public class GoodieObjectifier {
 
     /* ----------------------------- */
 
-    public <T> T instanceFromType(Class<T> type) {
+    public <T> T createInstanceFromType(Class<T> type) {
         try {
             return type.newInstance();
         } catch (InstantiationException e) {
@@ -107,18 +115,6 @@ public class GoodieObjectifier {
         } catch (IllegalAccessException e) {
             throw new GoodieImplementationException("Goodies MUST have their default constructor accessible", e, type);
         }
-    }
-
-    /* ----------------------------- */
-
-    public boolean isPrimitive(Field field) {
-        Class<?> type = field.getType();
-        return TypeUtilities.isPrimitiveType(type);
-    }
-
-    public boolean isList(Field field) {
-        Class<?> type = field.getType();
-        return List.class.isAssignableFrom(type);
     }
 
     /* ----------------------------- */

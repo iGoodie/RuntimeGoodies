@@ -1,22 +1,23 @@
 package code;
 
 import com.google.gson.JsonObject;
-import data.FillableObject;
+import data.User;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
-import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 import net.programmer.igoodie.serialization.GoodieObjectifier;
 import org.junit.Test;
+import util.TestFiles;
+
+import java.io.IOException;
 
 public class GoodieObjectifierTests {
 
     @Test
-    public void testFilling() {
+    public void testFilling() throws IOException {
         GoodieFormat<JsonObject, GoodieObject> format = new GsonGoodieFormat();
 
-        JsonObject jsonObject = format.readFromString("{\"firstName\":\"Seda\",\"lastName\":\"Sen\",\"myAge\":21,\"friendNames\":[\"Anilcan\",\"Yasin\",\"Zahir\"]}");
+        JsonObject jsonObject = format.readFromString(TestFiles.loadData("user.json"));
         System.out.println("JSON:\t" + jsonObject);
 
         GoodieObject goodieObject = format.writeToGoodie(jsonObject);
@@ -32,7 +33,7 @@ public class GoodieObjectifierTests {
 //        goodieArray.add(new GoodiePrimitive("Zahir"));
 //        goodieObject.put("friendNames", goodieArray);
 
-        FillableObject fillableObject = new FillableObject();
+        User fillableObject = new User();
 //
         GoodieObjectifier objectifier = new GoodieObjectifier();
         objectifier.fillFields(fillableObject, goodieObject);

@@ -1,6 +1,8 @@
 package net.programmer.igoodie.util;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public final class TypeUtilities {
@@ -76,6 +78,16 @@ public final class TypeUtilities {
         return isNumericType(type)
                 || NON_NUMERIC_PRIMITIVE_TYPES.contains(type)
                 || NON_NUMERIC_WRAPPER_TYPES.stream().anyMatch(wrapperType -> wrapperType.isAssignableFrom(type));
+    }
+
+    public static boolean isPrimitive(Field field) {
+        Class<?> type = field.getType();
+        return TypeUtilities.isPrimitiveType(type);
+    }
+
+    public static boolean isList(Field field) {
+        Class<?> type = field.getType();
+        return List.class.isAssignableFrom(type);
     }
 
 }

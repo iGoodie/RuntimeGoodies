@@ -1,0 +1,14 @@
+{
+  "firstName": "Seda",
+  "lastName": "Sen",
+  "myAge": 21,
+  "friendNames": [
+    "Anilcan",
+    "Yasin",
+    "Zahir"
+  ],
+  "profession": {
+    "professionName": "Programmer",
+    "salary": 1234
+  }
+}

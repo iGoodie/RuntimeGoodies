@@ -29,6 +29,10 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         return elements.containsValue(value);
     }
 
+    public Map<String, GoodieElement> get() {
+        return elements;
+    }
+
     @Override
     public GoodieElement get(Object key) {
         return elements.get(key);
