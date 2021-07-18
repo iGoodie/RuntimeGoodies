@@ -13,7 +13,7 @@ public abstract class DataStringifier<T> implements Registrable<Class<?>> {
 
     @Override
     public Class<?> getId() {
-        Type[] genericTypes = TypeUtilities.getGenericTypes(this);
+        Type[] genericTypes = TypeUtilities.getSuperGenericTypes(this);
         if (genericTypes == null) throw new InternalError();
         return ((Class<?>) genericTypes[0]);
     }

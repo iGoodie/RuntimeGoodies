@@ -16,7 +16,7 @@ public final class ReflectionUtilities {
         } catch (IllegalAccessException e) {
             throw new InternalException("Access error while setting value -> " + field);
         } catch (IllegalArgumentException e) {
-            if (TypeUtilities.isNumericType(field.getType()) && TypeUtilities.isNumericType(value.getClass()))
+            if (TypeUtilities.isNumeric(field.getType()) && TypeUtilities.isNumeric(value.getClass()))
                 setNumericValue(object, field, (Number) value);
             else throw e;
         }

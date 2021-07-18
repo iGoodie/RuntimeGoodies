@@ -64,12 +64,20 @@ public final class TypeUtilities {
 
     private TypeUtilities() {}
 
-    public static boolean isNumericType(Class<?> type) {
+    public static boolean isNumeric(Class<?> type) {
         return Number.class.isAssignableFrom(type) || isPrimitiveNumeric(type);
+    }
+
+    public static boolean isNumeric(Field field) {
+        return TypeUtilities.isNumeric(field.getType());
     }
 
     private static boolean isPrimitiveNumeric(Class<?> type) {
         return NUMERIC_PRIMITIVE_TYPES.contains(type);
+    }
+
+    public static boolean isPrimitiveNumeric(Field field) {
+        return isPrimitiveNumeric(field.getType());
     }
 
     public static boolean isIntegral(Class<?> type) {
@@ -77,26 +85,51 @@ public final class TypeUtilities {
                 || INTEGRAL_WRAPPER_TYPES.stream().anyMatch(wrapperType -> wrapperType.isAssignableFrom(type));
     }
 
-    public static boolean isPrimitiveType(Class<?> type) {
-        return isNumericType(type)
+    public static boolean isIntegral(Field field) {
+        return isIntegral(field.getType());
+    }
+
+    public static boolean isPrimitive(Class<?> type) {
+        return isNumeric(type)
                 || NON_NUMERIC_PRIMITIVE_TYPES.contains(type)
                 || NON_NUMERIC_WRAPPER_TYPES.stream().anyMatch(wrapperType -> wrapperType.isAssignableFrom(type));
     }
 
     public static boolean isPrimitive(Field field) {
-        Class<?> type = field.getType();
-        return TypeUtilities.isPrimitiveType(type);
+        return isPrimitive(field.getType());
     }
 
-    public static Type[] getGenericTypes(Object object) {
-        Type genericSuperclass = object.getClass().getGenericSuperclass();
+    public static boolean isList(Class<?> type) {
+        return List.class.isAssignableFrom(type);
+    }
 
-        if(genericSuperclass instanceof ParameterizedType) {
+    public static boolean isList(Field field) {
+        return isList(field.getType());
+    }
+
+    public static boolean isMap(Class<?> type) {
+        return Map.class.isAssignableFrom(type);
+    }
+
+    public static boolean isMap(Field field) {
+        return isMap(field.getType());
+    }
+
+    /* -------------------------- */
+
+    public static Type[] getSuperGenericTypes(Class<?> type) {
+        Type genericSuperclass = type.getGenericSuperclass();
+
+        if (genericSuperclass instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
             return parameterizedType.getActualTypeArguments();
         }
 
         return null;
+    }
+
+    public static Type[] getSuperGenericTypes(Object object) {
+        return getSuperGenericTypes(object.getClass());
     }
 
     public static Type[] getGenericTypes(Field field) {
@@ -108,16 +141,6 @@ public final class TypeUtilities {
         }
 
         return null;
-    }
-
-    public static boolean isList(Field field) {
-        Class<?> type = field.getType();
-        return List.class.isAssignableFrom(type);
-    }
-
-    public static boolean isMap(Field field) {
-        Class<?> type = field.getType();
-        return Map.class.isAssignableFrom(type);
     }
 
 }

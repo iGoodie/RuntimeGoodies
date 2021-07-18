@@ -8,7 +8,7 @@ public class GoodiePrimitive extends GoodieElement {
 
     public static GoodiePrimitive from(Object value) {
         Class<?> type = value.getClass();
-        if (TypeUtilities.isNumericType(type))
+        if (TypeUtilities.isNumeric(type))
             return new GoodiePrimitive(((Number) value));
         if (value instanceof String)
             return new GoodiePrimitive(((String) value));

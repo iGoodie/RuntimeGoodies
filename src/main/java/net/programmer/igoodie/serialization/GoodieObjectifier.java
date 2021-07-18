@@ -2,6 +2,8 @@ package net.programmer.igoodie.serialization;
 
 import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.exception.GoodieImplementationException;
+import net.programmer.igoodie.exception.GoodieMismatchException;
+import net.programmer.igoodie.exception.YetToBeImplementedException;
 import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
@@ -22,28 +24,28 @@ import java.util.Map;
 public class GoodieObjectifier {
 
     public void fillFields(Object object, GoodieObject goodieObject) {
+        if (isCircularDepending(object))
+            throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves.");
+
         for (Field goodieField : getGoodieFields(object)) {
             Goodie annotation = goodieField.getAnnotation(Goodie.class);
             String key = annotation.key().isEmpty() ? goodieField.getName() : annotation.key();
 
-            if (goodieField.getType().isArray()) {
+            if (goodieField.getType().isArray()) { // Disallow usage of Arrays over Lists
                 throw new GoodieImplementationException("Goodie fields MUST not be an array type. Use List<?> type instead.", goodieField);
             }
 
-            if (TypeUtilities.isPrimitive(goodieField)) {
-                GoodiePrimitive goodiePrimitive = getGoodiePrimitive(goodieObject, key);
-                fillPrimitive(object, goodieField, goodiePrimitive);
+            GoodieElement goodieElement = goodieObject.get(key);
 
-            } else if (TypeUtilities.isList(goodieField)) {
-                GoodieArray goodieArray = getGoodieArray(goodieObject, key);
-                fillArray(object, goodieField, goodieArray);
+            if (goodieElement == null) {
+                ReflectionUtilities.setValue(object, goodieField, null);
 
-            } else if (TypeUtilities.isMap(goodieField)) {
-                GoodieObject goodieMapObject = getGoodieObject(goodieObject, key);
-                fillMap(object, goodieField, goodieMapObject);
+            } else try {
+                Object value = generate(goodieField, goodieElement);
+                ReflectionUtilities.setValue(object, goodieField, value);
 
-            } else {
-                fillPOJO(object, goodieField, goodieObject, key);
+            } catch (GoodieMismatchException e) {
+                throw new GoodieMismatchException("Types mismatch -> " + key, e);
             }
         }
 
@@ -62,35 +64,72 @@ public class GoodieObjectifier {
         }
     }
 
-    public void fillPrimitive(Object object, Field goodieField, GoodiePrimitive goodiePrimitive) {
-        ReflectionUtilities.setValue(object, goodieField, goodiePrimitive.get());
+    public Object generate(Field field, GoodieElement goodieElement) {
+        Class<?> generationType = field.getType();
+        DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(generationType);
+
+        if (dataStringifier != null) {
+            if (!goodieElement.isPrimitive() || !goodieElement.asPrimitive().isString())
+                throw new GoodieMismatchException("Expected string, found -> " + goodieElement);
+            return dataStringifier.objectify(goodieElement.asPrimitive().getString());
+        }
+
+        if (TypeUtilities.isPrimitive(field)) {
+            if (!goodieElement.isPrimitive())
+                throw new GoodieMismatchException("Expected primitive type, found -> " + goodieElement);
+            return generatePrimitive(generationType, goodieElement.asPrimitive());
+        }
+
+        if (TypeUtilities.isList(field)) {
+            if (!goodieElement.isArray())
+                throw new GoodieMismatchException("Expected list type, found -> " + goodieElement);
+            Type[] genericTypes = TypeUtilities.getGenericTypes(field);
+            Class<?> listType = (Class<?>) ArrayAccessor.of(genericTypes).getOrDefault(0, Object.class);
+            return generateList(listType, goodieElement.asArray());
+        }
+
+        if (TypeUtilities.isMap(generationType)) {
+            if (!goodieElement.isObject())
+                throw new GoodieMismatchException("Expected object type, found -> " + goodieElement);
+            Type[] genericTypes = TypeUtilities.getGenericTypes(field);
+            Class<?> keyType = (Class<?>) ArrayAccessor.of(genericTypes).getOrDefault(0, Object.class);
+            Class<?> valueType = (Class<?>) ArrayAccessor.of(genericTypes).getOrDefault(1, Object.class);
+            return generateMap(keyType, valueType, goodieElement.asObject());
+        }
+
+        if (!goodieElement.isObject())
+            throw new GoodieMismatchException("Expected object type, found -> " + goodieElement);
+        return generatePOJO(generationType, goodieElement.asObject());
     }
 
-    public void fillArray(Object object, Field goodieField, GoodieArray goodieArray) {
-        Type[] genericTypes = TypeUtilities.getGenericTypes(goodieField);
-        Class<?> listType = (Class<?>) ArrayAccessor.of(genericTypes).getOrDefault(0, Object.class);
+    private Object generatePrimitive(Class<?> primitiveType, GoodiePrimitive goodiePrimitive) {
+        return goodiePrimitive.get(); // TODO
+    }
 
+    private List<?> generateList(Class<?> listType, GoodieArray goodieArray) {
         List<Object> list = new LinkedList<>();
+
         for (GoodieElement goodieElement : goodieArray) {
             if (goodieElement instanceof GoodiePrimitive) {
                 list.add(((GoodiePrimitive) goodieElement).get());
+
             } else if (goodieElement instanceof GoodieArray) {
                 // TODO: Array of arrays
+                throw new YetToBeImplementedException();
+
             } else if (goodieElement instanceof GoodieObject) {
                 // TODO: Array of POJOs
                 list.add(((GoodieObject) goodieElement).get());
+                throw new YetToBeImplementedException();
             }
         }
+
         list.removeIf(item -> !listType.isInstance(item));
 
-        ReflectionUtilities.setValue(object, goodieField, list);
+        return list;
     }
 
-    public void fillMap(Object object, Field goodieField, GoodieObject goodieObject) {
-        Type[] genericTypes = TypeUtilities.getGenericTypes(goodieField);
-        Class<?> keyType = (Class<?>) ArrayAccessor.of(genericTypes).getOrDefault(0, Object.class);
-        Class<?> valueType = (Class<?>) ArrayAccessor.of(genericTypes).getOrDefault(1, Object.class);
-
+    private Map<?, ?> generateMap(Class<?> keyType, Class<?> valueType, GoodieObject goodieObject) {
         HashMap<Object, Object> map = new HashMap<>();
 
         for (Map.Entry<String, GoodieElement> goodieEntry : goodieObject.entrySet()) {
@@ -98,11 +137,12 @@ public class GoodieObjectifier {
             GoodieElement goodieValue = goodieEntry.getValue();
 
             Object key;
-            Object value = null;
+            Object value;
 
             // Generate key
             if (keyType == String.class) {
                 key = goodieKey;
+
             } else {
                 DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(keyType);
                 if (dataStringifier != null) {
@@ -112,10 +152,25 @@ public class GoodieObjectifier {
                 }
             }
 
-            // TODO: Generate value
-            if (TypeUtilities.isPrimitiveType(valueType)) {
-                if (goodieValue instanceof GoodiePrimitive) {
-                    value = ((GoodiePrimitive) goodieValue).get();
+            // Generate value
+            if (TypeUtilities.isPrimitive(valueType)) {
+                if (goodieValue.isPrimitive()) {
+                    value = goodieValue.asPrimitive().get();
+                } else {
+                    continue;
+                }
+
+            } else if (TypeUtilities.isList(valueType)) {
+                // TODO: impl
+                throw new YetToBeImplementedException();
+
+            } else if (TypeUtilities.isMap(valueType)) {
+                // TODO: impl (?)
+                throw new YetToBeImplementedException();
+
+            } else { // POJO
+                if (goodieValue.isObject()) {
+                    value = generatePOJO(valueType, goodieValue.asObject());
                 } else {
                     continue;
                 }
@@ -124,19 +179,16 @@ public class GoodieObjectifier {
             map.put(key, value);
         }
 
-        ReflectionUtilities.setValue(object, goodieField, map);
+        return map;
     }
 
-    public void fillPOJO(Object object, Field goodieField, GoodieObject goodieObject, String key) {
-        if (object.getClass() == goodieField.getType())
-            throw new GoodieImplementationException("Goodies MUST NOT depend on themselves.", goodieField);
-
-        Object subObject = createDefaultInstance(goodieField.getType());
-        GoodieObject subGoodieObject = getGoodieObject(goodieObject, key);
-        fillFields(subObject, subGoodieObject);
-
-        ReflectionUtilities.setValue(object, goodieField, subObject);
+    private Object generatePOJO(Class<?> pojoType, GoodieObject goodieObject) {
+        Object pojo = createDefaultInstance(pojoType);
+        fillFields(pojo, goodieObject);
+        return pojo;
     }
+
+    /* ----------------------------- */
 
     public List<Field> getGoodieFields(Object object) {
         LinkedList<Field> goodieFields = new LinkedList<>();
@@ -170,27 +222,8 @@ public class GoodieObjectifier {
         }
     }
 
-    /* ----------------------------- */
-
-    public GoodiePrimitive getGoodiePrimitive(GoodieObject goodieObject, String key) {
-        GoodieElement goodieElement = goodieObject.get(key);
-        if (!(goodieElement instanceof GoodiePrimitive))
-            throw new GoodieImplementationException("Excepted primitive -> " + key + ", found -> " + goodieElement);
-        return ((GoodiePrimitive) goodieElement);
-    }
-
-    public GoodieArray getGoodieArray(GoodieObject goodieObject, String key) {
-        GoodieElement goodieElement = goodieObject.get(key);
-        if (!(goodieElement instanceof GoodieArray))
-            throw new GoodieImplementationException("Excepted array -> " + key + ", found -> " + goodieElement);
-        return ((GoodieArray) goodieElement);
-    }
-
-    public GoodieObject getGoodieObject(GoodieObject goodieObject, String key) {
-        GoodieElement goodieElement = goodieObject.get(key);
-        if (!(goodieElement instanceof GoodieObject))
-            throw new GoodieImplementationException("Expected object -> " + key + ", found -> " + goodieElement);
-        return ((GoodieObject) goodieElement);
+    public boolean isCircularDepending(Object object) {
+        return false; // TODO: impl
     }
 
 }

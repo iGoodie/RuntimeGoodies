@@ -10,6 +10,9 @@ import java.util.UUID;
 public class User {
 
     @Goodie
+    private UUID uuid;
+
+    @Goodie
     private String firstName;
 
     @Goodie
@@ -40,12 +43,15 @@ public class User {
         fullName = firstName + " " + lastName;
 
         System.out.println("- Skills = " + skills);
+        System.out.println("- Websites = " + sites);
+        System.out.println("- LevelsReached = " + levelsReached);
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "firstName='" + firstName + '\'' +
+                "uuid=" + uuid +
+                ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", age=" + age +
                 ", friendNames=" + friendNames +

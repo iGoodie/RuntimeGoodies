@@ -9,7 +9,11 @@ public class RuntimeGoodies {
 
     public static Registry<Class<?>, DataStringifier<?>> DATA_STRINGIFIERS = new Registry<>(
             new UUIDStringifier(),
-            new NumberStringifier()
+            new NumberStringifier(),
+            new NumberStringifier.DoubleStringifier(),
+            new NumberStringifier.FloatStringifier(),
+            new NumberStringifier.LongStringifier(),
+            new NumberStringifier.IntegerStringifier()
     );
 
 }

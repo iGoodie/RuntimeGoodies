@@ -32,4 +32,61 @@ public class NumberStringifier extends DataStringifier<Number> {
         }
     }
 
+    public static class DoubleStringifier extends DataStringifier<Double> {
+
+        @Override
+        public String stringify(Double number) {
+            return String.valueOf(number);
+        }
+
+        @Override
+        public Double objectify(String string) {
+            return Double.parseDouble(string);
+        }
+
+    }
+
+    public static class FloatStringifier extends DataStringifier<Float> {
+
+        @Override
+        public String stringify(Float number) {
+            return String.valueOf(number);
+        }
+
+        @Override
+        public Float objectify(String string) {
+            return Float.parseFloat(string);
+        }
+
+    }
+
+    public static class LongStringifier extends DataStringifier<Long> {
+
+        @Override
+        public String stringify(Long number) {
+            return String.valueOf(number);
+        }
+
+        @Override
+        public Long objectify(String string) {
+            return Long.parseLong(string);
+        }
+
+    }
+
+    public static class IntegerStringifier extends DataStringifier<Integer> {
+
+        @Override
+        public String stringify(Integer number) {
+            return String.valueOf(number);
+        }
+
+        @Override
+        public Integer objectify(String string) {
+            return Integer.parseInt(string);
+        }
+
+    }
+
+
 }
