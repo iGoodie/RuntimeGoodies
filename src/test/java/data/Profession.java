@@ -1,6 +1,6 @@
 package data;
 
-import net.programmer.igoodie.serialization.Goodie;
+import net.programmer.igoodie.serialization.annotation.Goodie;
 
 public class Profession {
 

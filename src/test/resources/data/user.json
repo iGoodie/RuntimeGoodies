@@ -7,6 +7,26 @@
     "Yasin",
     "Zahir"
   ],
+  "skills": {
+    "78e8cc7d-fc06-4fe9-9859-ead51e350629": 1,
+    "13136b2a-bb91-4b54-b1c7-b01d4f0fe6ac": 2,
+    "4272b104-8d1c-41ab-83ef-0f8ef3f648b8": 3
+  },
+  "websites": {
+    "My Site": {
+      "domain": "mysite",
+      "extension": "com"
+    },
+    "My Site 2": {
+      "domain": "mysite2",
+      "extension": "com"
+    }
+  },
+  "levelsReached": {
+    "10": true,
+    "20": true,
+    "30": false
+  },
   "profession": {
     "professionName": "Programmer",
     "salary": 1234

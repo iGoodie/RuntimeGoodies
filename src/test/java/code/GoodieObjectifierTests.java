@@ -23,18 +23,8 @@ public class GoodieObjectifierTests {
         GoodieObject goodieObject = format.writeToGoodie(jsonObject);
         System.out.println("Goodie:\t" + goodieObject);
 
-//        GoodieObject goodieObject = new GoodieObject();
-//        goodieObject.put("firstName", "Seda");
-//        goodieObject.put("lastName", "Sen");
-//        goodieObject.put("myAge", 24l);
-//        GoodieArray goodieArray = new GoodieArray();
-//        goodieArray.add(new GoodiePrimitive("Anilcan"));
-//        goodieArray.add(new GoodiePrimitive("Yasin"));
-//        goodieArray.add(new GoodiePrimitive("Zahir"));
-//        goodieObject.put("friendNames", goodieArray);
-
         User fillableObject = new User();
-//
+
         GoodieObjectifier objectifier = new GoodieObjectifier();
         objectifier.fillFields(fillableObject, goodieObject);
         System.out.println("Object:\t" + fillableObject);

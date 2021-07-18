@@ -1,8 +1,11 @@
 package net.programmer.igoodie.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public final class TypeUtilities {
@@ -85,9 +88,36 @@ public final class TypeUtilities {
         return TypeUtilities.isPrimitiveType(type);
     }
 
+    public static Type[] getGenericTypes(Object object) {
+        Type genericSuperclass = object.getClass().getGenericSuperclass();
+
+        if(genericSuperclass instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+            return parameterizedType.getActualTypeArguments();
+        }
+
+        return null;
+    }
+
+    public static Type[] getGenericTypes(Field field) {
+        Type genericType = field.getGenericType();
+
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericType;
+            return parameterizedType.getActualTypeArguments();
+        }
+
+        return null;
+    }
+
     public static boolean isList(Field field) {
         Class<?> type = field.getType();
         return List.class.isAssignableFrom(type);
+    }
+
+    public static boolean isMap(Field field) {
+        Class<?> type = field.getType();
+        return Map.class.isAssignableFrom(type);
     }
 
 }
