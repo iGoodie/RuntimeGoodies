@@ -19,4 +19,9 @@ public abstract class GoodieFormat<E, G extends GoodieElement> {
         return writeToString(external);
     }
 
+    public G readGoodieFromString(String externalText) {
+        E externalFormat = readFromString(externalText);
+        return writeToGoodie(externalFormat);
+    }
+
 }
