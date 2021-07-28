@@ -88,5 +88,4 @@ public class NumberStringifier extends DataStringifier<Number> {
 
     }
 
-
 }

@@ -1,5 +1,6 @@
 package data;
 
+import net.programmer.igoodie.configuration.validator.annotation.IntegerValidator;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
 
@@ -16,9 +17,11 @@ public class User {
     private String firstName;
 
     @Goodie
+    @IntegerValidator(min = 18)
     private String lastName;
 
     @Goodie(key = "myAge")
+    @IntegerValidator(min = 18)
     public int age;
 
     @Goodie
