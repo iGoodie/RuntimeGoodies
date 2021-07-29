@@ -1,5 +1,3 @@
-package code;
-
 import com.google.gson.JsonObject;
 import data.User;
 import net.programmer.igoodie.goodies.format.GoodieFormat;

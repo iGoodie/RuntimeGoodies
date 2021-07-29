@@ -1,5 +1,3 @@
-package code;
-
 import data.User;
 import net.programmer.igoodie.util.GoodieTraverser;
 import org.junit.Test;
@@ -11,8 +9,8 @@ public class GoodieTraverseTests {
         User userData = new User();
         GoodieTraverser traverser = new GoodieTraverser();
 
-        traverser.traverseGoodies(userData, (object, field, goodieKey) -> {
-            System.out.println(goodieKey + " => " + field);
+        traverser.traverseGoodies(userData, (object, field, goodiePath) -> {
+            System.out.println(goodiePath + " => " + field);
         });
     }
 

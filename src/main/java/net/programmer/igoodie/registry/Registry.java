@@ -27,4 +27,9 @@ public class Registry<I, T extends Registrable<I>> {
         return registry.getOrDefault(identity, defaultValue);
     }
 
+    @Override
+    public String toString() {
+        return "Registry{" + registry + '}';
+    }
+
 }

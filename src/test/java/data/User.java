@@ -17,7 +17,6 @@ public class User {
     private String firstName;
 
     @Goodie
-    @IntegerValidator(min = 18)
     private String lastName;
 
     @Goodie(key = "myAge")

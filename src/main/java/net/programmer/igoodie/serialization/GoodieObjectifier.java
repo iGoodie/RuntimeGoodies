@@ -8,14 +8,18 @@ import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
-import net.programmer.igoodie.serialization.annotation.Goodie;
+import net.programmer.igoodie.query.GoodieQuery;
 import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
 import net.programmer.igoodie.util.ArrayAccessor;
+import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,36 +27,31 @@ import java.util.Map;
 
 public class GoodieObjectifier {
 
-    public void fillFields(Object object, GoodieObject goodieObject) {
-        if (isCircularDepending(object))
+    public void fillFields(Object fillObject, GoodieObject goodieObject) {
+        if (isCircularDepending(fillObject))
             throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves.");
 
-        for (Field goodieField : getGoodieFields(object)) {
-            Goodie annotation = goodieField.getAnnotation(Goodie.class);
-            String key = annotation.key().isEmpty() ? goodieField.getName() : annotation.key();
+        GoodieTraverser goodieTraverser = new GoodieTraverser();
 
-            if (goodieField.getType().isArray()) { // Disallow usage of Arrays over Lists
-                throw new GoodieImplementationException("Goodie fields MUST not be an array type. Use List<?> type instead.", goodieField);
-            }
-
-            GoodieElement goodieElement = goodieObject.get(key);
+        goodieTraverser.traverseGoodies(fillObject, (object, field, goodiePath) -> {
+            GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
 
             if (goodieElement == null) {
-                ReflectionUtilities.setValue(object, goodieField, null);
+                ReflectionUtilities.setValue(object, field, null);
 
             } else try {
-                Object value = generate(goodieField, goodieElement);
-                ReflectionUtilities.setValue(object, goodieField, value);
+                Object value = generate(field, goodieElement);
+                ReflectionUtilities.setValue(object, field, value);
 
             } catch (GoodieMismatchException e) {
-                throw new GoodieMismatchException("Types mismatch -> " + key, e);
+                throw new GoodieMismatchException("Types mismatch -> " + goodiePath, e);
             }
-        }
+        });
 
-        for (Method virtualizerMethod : getVirtualizerMethods(object)) {
+        for (Method virtualizerMethod : ReflectionUtilities.getMethodsWithAnnotation(fillObject, GoodieVirtualizer.class)) {
             if (virtualizerMethod != null) {
                 try {
-                    virtualizerMethod.invoke(object);
+                    virtualizerMethod.invoke(fillObject);
                 } catch (IllegalArgumentException e) {
                     throw new GoodieImplementationException("Virtualizer methods MUST accept no arguments", e, virtualizerMethod);
                 } catch (IllegalAccessException e) {
@@ -186,28 +185,6 @@ public class GoodieObjectifier {
         Object pojo = createDefaultInstance(pojoType);
         fillFields(pojo, goodieObject);
         return pojo;
-    }
-
-    /* ----------------------------- */
-
-    public List<Field> getGoodieFields(Object object) {
-        LinkedList<Field> goodieFields = new LinkedList<>();
-        for (Field field : object.getClass().getDeclaredFields()) {
-            Goodie annotation = field.getAnnotation(Goodie.class);
-            if (annotation != null) goodieFields.add(field);
-            if (Modifier.isStatic(field.getModifiers()))
-                throw new GoodieImplementationException("Goodie fields MUST NOT be static.", field);
-        }
-        return goodieFields;
-    }
-
-    public List<Method> getVirtualizerMethods(Object object) {
-        List<Method> virtualizers = new LinkedList<>();
-        for (Method method : object.getClass().getMethods()) {
-            GoodieVirtualizer annotation = method.getAnnotation(GoodieVirtualizer.class);
-            if (annotation != null) virtualizers.add(method);
-        }
-        return virtualizers;
     }
 
     /* ----------------------------- */

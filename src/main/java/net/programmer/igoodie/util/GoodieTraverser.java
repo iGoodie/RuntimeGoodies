@@ -7,21 +7,26 @@ import net.programmer.igoodie.serialization.stringify.DataStringifier;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.LinkedList;
-import java.util.List;
 
 public class GoodieTraverser {
 
     @FunctionalInterface
     public interface GoodieFieldConsumer {
-        void consume(Object object, Field field, String goodieKey);
+        void consume(Object object, Field field, String goodiePath);
     }
 
     public void traverseGoodies(Object object, GoodieFieldConsumer consumer) {
-        if (isCircularDepending(object))
+        traverseGoodies(object, consumer, "$");
+    }
+
+    private void traverseGoodies(Object object, GoodieFieldConsumer consumer, String path) {
+        if (isCircularDepending(object)) // Disallow usage of circular goodie models
             throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves.");
 
-        for (Field goodieField : getGoodieFields(object)) {
+        for (Field goodieField : ReflectionUtilities.getFieldsWithAnnotation(object, Goodie.class)) {
+            if (Modifier.isStatic(goodieField.getModifiers())) // Disallow static goodie fields
+                throw new GoodieImplementationException("Goodie fields MUST NOT be static.", goodieField);
+
             Goodie annotation = goodieField.getAnnotation(Goodie.class);
             String key = annotation.key().isEmpty() ? goodieField.getName() : annotation.key();
 
@@ -34,32 +39,19 @@ public class GoodieTraverser {
             DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(fieldType);
 
             if (dataStringifier != null) {
-                consumer.consume(object, goodieField, key);
+                consumer.consume(object, goodieField, path + "." + key);
             } else if (TypeUtilities.isPrimitive(goodieField)) {
-                consumer.consume(object, goodieField, key);
+                consumer.consume(object, goodieField, path + "." + key);
             } else if (TypeUtilities.isList(goodieField)) {
-                consumer.consume(object, goodieField, key);
+                consumer.consume(object, goodieField, path + "." + key);
             } else if (TypeUtilities.isMap(goodieField)) {
-                consumer.consume(object, goodieField, key);
+                consumer.consume(object, goodieField, path + "." + key);
             } else {
                 Object pojo = createDefaultInstance(fieldType);
                 ReflectionUtilities.setValue(object, goodieField, pojo);
-                traverseGoodies(pojo, consumer);
+                traverseGoodies(pojo, consumer, path + "." + key);
             }
         }
-    }
-
-    /* ------------------------------ */
-
-    public List<Field> getGoodieFields(Object object) {
-        LinkedList<Field> goodieFields = new LinkedList<>();
-        for (Field field : object.getClass().getDeclaredFields()) {
-            Goodie annotation = field.getAnnotation(Goodie.class);
-            if (annotation != null) goodieFields.add(field);
-            if (Modifier.isStatic(field.getModifiers()))
-                throw new GoodieImplementationException("Goodie fields MUST NOT be static.", field);
-        }
-        return goodieFields;
     }
 
     /* ------------------------------ */

@@ -2,8 +2,12 @@ package net.programmer.igoodie.util;
 
 import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 
 public final class ReflectionUtilities {
 
@@ -63,6 +67,26 @@ public final class ReflectionUtilities {
         } catch (Exception e) {
             return defaultValue;
         }
+    }
+
+    /* ----------------------------- */
+
+    public static <A extends Annotation> List<Method> getMethodsWithAnnotation(Object object, Class<A> annotationType) {
+        List<Method> methods = new LinkedList<>();
+        for (Method method : object.getClass().getMethods()) {
+            if (method.getAnnotation(annotationType) != null)
+                methods.add(method);
+        }
+        return methods;
+    }
+
+    public static <A extends Annotation> List<Field> getFieldsWithAnnotation(Object object, Class<A> annotationType) {
+        List<Field> fields = new LinkedList<>();
+        for (Field field : object.getClass().getDeclaredFields()) {
+            if (field.getAnnotation(annotationType) != null)
+                fields.add(field);
+        }
+        return fields;
     }
 
 }
