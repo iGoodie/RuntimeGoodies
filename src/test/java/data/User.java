@@ -1,6 +1,6 @@
 package data;
 
-import net.programmer.igoodie.configuration.validator.annotation.IntegerValidator;
+import net.programmer.igoodie.configuration.validator.annotation.GoodieInteger;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
 
@@ -20,25 +20,25 @@ public class User {
     private String lastName;
 
     @Goodie(key = "myAge")
-    @IntegerValidator(min = 18)
-    public int age;
+    @GoodieInteger(min = 18)
+    private int age;
 
     @Goodie
-    public List<String> friendNames;
+    private List<String> friendNames;
 
     @Goodie
-    public Map<UUID, Integer> skills;
+    private Map<UUID, Integer> skills;
 
     @Goodie(key = "websites")
-    public Map<String, Website> sites;
+    private Map<String, Website> sites;
 
     @Goodie
-    public Map<Integer, Boolean> levelsReached;
+    private Map<Integer, Boolean> levelsReached;
 
     @Goodie
-    public Profession profession;
+    private Profession profession;
 
-    public String fullName; // <-- Virtualized field
+    private String fullName; // <-- Virtualized field
 
     @GoodieVirtualizer
     public void virtualize() {

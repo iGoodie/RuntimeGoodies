@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IntegerValidator {
+public @interface GoodieInteger {
 
     int min() default Integer.MIN_VALUE;
 

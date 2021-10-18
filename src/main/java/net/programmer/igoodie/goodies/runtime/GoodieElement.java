@@ -18,6 +18,10 @@ public abstract class GoodieElement {
         return this instanceof GoodieObject;
     }
 
+    public final boolean isNull() {
+        return this instanceof GoodieNull;
+    }
+
     public final GoodiePrimitive asPrimitive() {
         return ((GoodiePrimitive) this);
     }
@@ -28,6 +32,10 @@ public abstract class GoodieElement {
 
     public final GoodieObject asObject() {
         return ((GoodieObject) this);
+    }
+
+    public final GoodieNull asNull() {
+        return ((GoodieNull) this);
     }
 
 }

@@ -60,11 +60,33 @@ public class GoodieQuery {
         }
     }
 
+    public void set(GoodieObject rootObject, GoodieElement value) {
+        GoodieElement created = rootObject;
+
+        for (GoodieQueryAccessor accessor : accessors) {
+            if (isLeaf(accessor)) {
+                accessor.accessOrCreate(created);
+                accessor.setValue(created, value);
+            } else {
+                created = accessor.accessOrCreate(created);
+            }
+        }
+    }
+
+    private boolean isLeaf(GoodieQueryAccessor accessor) {
+        return accessors.get(accessors.size() - 1) == accessor;
+    }
+
     /* ------------------------------ */
 
     public static GoodieElement query(GoodieObject goodieObject, String queryString) {
         GoodieQuery goodieQuery = new GoodieQuery(queryString);
         return goodieQuery.query(goodieObject);
+    }
+
+    public static void set(GoodieObject goodieObject, String queryString, GoodieElement value) {
+        GoodieQuery goodieQuery = new GoodieQuery(queryString);
+        goodieQuery.set(goodieObject, value);
     }
 
 }

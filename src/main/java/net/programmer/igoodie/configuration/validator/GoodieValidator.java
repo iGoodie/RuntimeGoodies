@@ -28,14 +28,15 @@ public class GoodieValidator {
                 ValidatorLogic<Annotation> validator = couple.getSecond();
 
                 if (!validator.isValidField(object, field)) {
-                    throw new GoodieImplementationException("Invalid field type for the validator.", field);
+                    String annotationName = annotation.annotationType().getSimpleName();
+                    throw new GoodieImplementationException("Invalid field type for " + annotationName + " validator.", field);
                 }
 
                 GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
 
-                if (!validator.isValidGoodie(goodieElement) || !validator.isValid(annotation, goodieElement)) {
-                    // TODO: Fix goodie object
+                if (!validator.isValidGoodie(goodieElement) || !validator.isValidValue(annotation, goodieElement)) {
                     Object defaultValue = validator.defaultValue(annotation, object, field, goodieElement);
+                    System.out.println(goodiePath + " was invalid. Gonna be replaced by value => " + defaultValue);
                     changesMade.set(true);
                 }
             }

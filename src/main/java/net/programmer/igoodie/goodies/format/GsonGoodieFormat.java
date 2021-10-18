@@ -2,10 +2,7 @@ package net.programmer.igoodie.goodies.format;
 
 import com.google.gson.*;
 import net.programmer.igoodie.exception.GoodieParseException;
-import net.programmer.igoodie.goodies.runtime.GoodieArray;
-import net.programmer.igoodie.goodies.runtime.GoodieElement;
-import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
+import net.programmer.igoodie.goodies.runtime.*;
 
 public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
 
@@ -21,6 +18,9 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
             return convertArray(jsonElement.getAsJsonArray());
         if (jsonElement.isJsonPrimitive())
             return convertPrimitive(jsonElement.getAsJsonPrimitive());
+        if (jsonElement.isJsonNull()) {
+            return new GoodieNull();
+        }
 
         return null; // <-- No corresponding Goodie type exists
     }
@@ -66,6 +66,8 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
             return convertArray((GoodieArray) goodieElement);
         if (goodieElement instanceof GoodiePrimitive)
             return convertPrimitive((GoodiePrimitive) goodieElement);
+        if (goodieElement instanceof GoodieNull)
+            return JsonNull.INSTANCE;
 
         return null; // <-- No corresponding Gson type exists
     }

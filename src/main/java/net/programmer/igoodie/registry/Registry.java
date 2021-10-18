@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Registry<I, T extends Registrable<I>> {
 
-    private Map<I, T> registry = new HashMap<>();
+    private final Map<I, T> registry = new HashMap<>();
 
     public Registry() {}
 

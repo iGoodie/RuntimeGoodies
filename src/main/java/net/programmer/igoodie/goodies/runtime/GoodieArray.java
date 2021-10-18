@@ -140,7 +140,9 @@ public class GoodieArray extends GoodieElement implements List<GoodieElement> {
 
     @Override
     public String toString() {
-        return "[" + elements.stream().map(GoodieElement::toString).collect(Collectors.joining(", ")) + "}";
+        return "[" + elements.stream()
+                .map(element -> element == null ? "null" : element.toString())
+                .collect(Collectors.joining(", ")) + "]";
     }
 
 }
