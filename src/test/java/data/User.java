@@ -1,5 +1,6 @@
 package data;
 
+import net.programmer.igoodie.configuration.ConfiGoodieJson;
 import net.programmer.igoodie.configuration.transformation.GoodieTransformer;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieInteger;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class User {
+public class User extends ConfiGoodieJson {
 
     @Goodie
     private UUID uuid;
