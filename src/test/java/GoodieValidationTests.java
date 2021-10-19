@@ -4,7 +4,7 @@ import net.programmer.igoodie.configuration.validator.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import util.TestFiles;
 
 import java.io.IOException;

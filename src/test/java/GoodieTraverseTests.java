@@ -1,6 +1,6 @@
 import data.User;
 import net.programmer.igoodie.util.GoodieTraverser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GoodieTraverseTests {
 

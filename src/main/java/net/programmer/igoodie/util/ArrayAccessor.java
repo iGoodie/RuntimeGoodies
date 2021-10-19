@@ -1,5 +1,7 @@
 package net.programmer.igoodie.util;
 
+import java.util.stream.Stream;
+
 public class ArrayAccessor<T> {
 
     private T[] array;
@@ -25,7 +27,7 @@ public class ArrayAccessor<T> {
 
     /* ----------------------------------- */
 
-    public static <T> ArrayAccessor<T> of(T[] array) {
+    public static <T> ArrayAccessor<T> of(T... array) {
         ArrayAccessor<T> accessor = new ArrayAccessor<>();
         accessor.array = array;
         return accessor;

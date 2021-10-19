@@ -1,76 +1,91 @@
 package net.programmer.igoodie.query.accessor;
 
-import net.programmer.igoodie.goodies.runtime.*;
-
-import java.util.regex.Pattern;
+import net.programmer.igoodie.exception.GoodieQueryError;
+import net.programmer.igoodie.goodies.runtime.GoodieArray;
+import net.programmer.igoodie.goodies.runtime.GoodieElement;
+import net.programmer.igoodie.goodies.runtime.GoodieNull;
+import net.programmer.igoodie.goodies.runtime.GoodieObject;
 
 public class ArrayIndexAccessor extends GoodieQueryAccessor {
 
-    public static final Pattern PATTERN = Pattern.compile("(\\w+)\\[(\\d+)]");
+    int index;
 
-    private final String arrayName;
-    private final int index;
-
-    public String getArrayName() {
-        return arrayName;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public ArrayIndexAccessor(String listName, int index) {
-        this.arrayName = listName;
+    public ArrayIndexAccessor(int index) {
         this.index = index;
     }
 
     @Override
-    public GoodieElement access(GoodieElement goodieElement) {
-        if (!goodieElement.isObject()) throw new IllegalArgumentException();
-
-        GoodieObject goodieObject = goodieElement.asObject();
-
-        GoodieArray goodieArray = goodieObject.getArray(arrayName);
-        return goodieArray.get(index);
+    public boolean canAccess(GoodieElement goodieElement) {
+        return goodieElement.isArray();
     }
 
     @Override
-    public GoodieElement accessOrCreate(GoodieElement goodieElement) {
-        if (!goodieElement.isObject()) throw new IllegalArgumentException();
+    public GoodieElement makeAccessible(GoodieElement parent, GoodieQueryAccessor parentAccessor, GoodieElement goodieElement) {
+        if (canAccess(goodieElement)) return goodieElement;
 
-        GoodieObject goodieObject = goodieElement.asObject();
+        GoodieArray newCurrent = new GoodieArray();
+        fillIndices(newCurrent);
+        GoodieNull next = new GoodieNull();
+        newCurrent.set(index, next);
 
-        if (goodieObject.containsKey(arrayName)) {
-            GoodieArray goodieArray = goodieObject.get(arrayName).asArray();
-            fillUndefinedIndices(goodieArray);
-            return goodieArray.get(index);
+        if (parent instanceof GoodieObject) {
+            GoodieObject parentObject = parent.asObject();
+            parentObject.put(((ObjectFieldAccessor) parentAccessor).fieldName, newCurrent);
         }
 
-        GoodieArray createdArray = new GoodieArray();
+        if (parent instanceof GoodieArray) {
+            GoodieArray parentArray = parent.asArray();
+            ((ArrayIndexAccessor) parentAccessor).fillIndices(parentArray);
+            parentArray.set(((ArrayIndexAccessor) parentAccessor).index, newCurrent);
+        }
 
-        fillUndefinedIndices(createdArray);
+        return newCurrent;
+    }
 
-        goodieObject.put(arrayName, createdArray);
-        return createdArray.get(index);
+    @Override
+    public GoodieElement access(GoodieElement goodieElement) {
+        if (!canAccess(goodieElement)) {
+            throw new GoodieQueryError("Cannot access indices of non-array elements");
+        }
+
+        return goodieElement.asArray().get(index);
+    }
+
+    @Override
+    public GoodieElement accessOrCreate(GoodieElement parent, GoodieQueryAccessor parentAccessor, GoodieElement goodieElement) {
+        if (!canAccess(goodieElement)) {
+            throw new GoodieQueryError("Cannot access indices of non-array elements");
+        }
+
+        GoodieArray currentArray = goodieElement.asArray();
+
+        if (index >= currentArray.size()) {
+            fillIndices(currentArray);
+        }
+
+        return currentArray.get(index);
     }
 
     @Override
     public void setValue(GoodieElement goodieElement, GoodieElement value) {
-        if (!goodieElement.isObject()) throw new IllegalArgumentException();
+        if (!canAccess(goodieElement)) {
+            throw new GoodieQueryError("Cannot set an index of non-array elements");
+        }
 
-        accessOrCreate(goodieElement);
-
-        GoodieArray array = goodieElement.asObject().getArray(arrayName);
-        fillUndefinedIndices(array);
-        array.set(index, value);
+        goodieElement.asArray().set(index, value);
     }
 
-    private void fillUndefinedIndices(GoodieArray array) {
-        if (index >= array.size()) {
-            for (int i = array.size(); i <= index; i++) {
-                array.add(new GoodieObject());
-            }
+    public void fillIndices(GoodieArray array) {
+        int fillCount = index - array.size() + 1;
+        if (fillCount <= 0) return;
+        for (int i = 0; i < fillCount; i++) {
+            array.add(new GoodieNull());
         }
+    }
+
+    @Override
+    public String toString() {
+        return "[" + index + "]";
     }
 
 }
