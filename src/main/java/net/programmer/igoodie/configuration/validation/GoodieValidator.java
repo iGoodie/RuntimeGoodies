@@ -1,7 +1,7 @@
-package net.programmer.igoodie.configuration.validator;
+package net.programmer.igoodie.configuration.validation;
 
 import net.programmer.igoodie.RuntimeGoodies;
-import net.programmer.igoodie.configuration.validator.logic.ValidatorLogic;
+import net.programmer.igoodie.configuration.validation.logic.ValidatorLogic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
@@ -25,22 +25,20 @@ public class GoodieValidator {
         goodieTraverser.traverseGoodies(validateObject, (object, field, goodiePath) -> {
             for (Couple<Annotation, ValidatorLogic<Annotation>> couple : getValidators(field)) {
                 Annotation annotation = couple.getFirst();
-                ValidatorLogic<Annotation> validator = couple.getSecond();
+                ValidatorLogic<Annotation> logic = couple.getSecond();
 
-                if (!validator.isValidField(object, field)) {
-                    String annotationName = annotation.annotationType().getSimpleName();
-                    throw new GoodieImplementationException("Invalid field type for " + annotationName + " validator.", field);
-                }
-
-                try {validator.validateAnnotationArgs(annotation);} catch (GoodieImplementationException e) {
+                try {
+                    logic.validateField(object, field);
+                    logic.validateAnnotationArgs(annotation);
+                } catch (GoodieImplementationException e) {
                     throw new GoodieImplementationException(e.getMessage(), field);
                 }
 
                 GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
 
-                if (!validator.isValidGoodie(goodieElement) || !validator.isValidValue(annotation, goodieElement)) {
-                    GoodieElement defaultValue = validator.defaultGoodie(annotation, object, field, goodieElement);
-                    GoodieQuery.set(goodieObject, goodiePath, defaultValue);
+                if (!logic.isValidGoodie(goodieElement) || !logic.isValidValue(annotation, goodieElement)) {
+                    GoodieElement fixedValue = logic.fixedGoodie(annotation, object, field, goodieElement);
+                    GoodieQuery.set(goodieObject, goodiePath, fixedValue);
                     changesMade.set(true);
                 }
             }

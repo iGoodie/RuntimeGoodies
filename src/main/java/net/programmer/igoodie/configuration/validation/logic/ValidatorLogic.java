@@ -1,4 +1,4 @@
-package net.programmer.igoodie.configuration.validator.logic;
+package net.programmer.igoodie.configuration.validation.logic;
 
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
@@ -24,12 +24,12 @@ public abstract class ValidatorLogic<A extends Annotation> implements Registrabl
 
     public abstract void validateAnnotationArgs(A annotation) throws GoodieImplementationException;
 
-    public abstract boolean isValidField(Object object, Field field);
+    public abstract void validateField(Object object, Field field);
 
     public abstract boolean isValidGoodie(GoodieElement goodie);
 
     public abstract boolean isValidValue(A annotation, GoodieElement goodie);
 
-    public abstract GoodieElement defaultGoodie(A annotation, Object object, Field field, GoodieElement goodie);
+    public abstract GoodieElement fixedGoodie(A annotation, Object object, Field field, GoodieElement goodie);
 
 }

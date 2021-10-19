@@ -1,4 +1,4 @@
-package net.programmer.igoodie.configuration.validator.annotation;
+package net.programmer.igoodie.configuration.validation.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,12 +7,12 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GoodieInteger {
+public @interface GoodieLong {
 
-    int min() default Integer.MIN_VALUE;
+    long min() default Long.MIN_VALUE;
 
-    int max() default Integer.MAX_VALUE;
+    long max() default Long.MAX_VALUE;
 
-    int defaultValue() default 0;
+    long defaultValue() default 0L;
 
 }

@@ -1,6 +1,6 @@
-package net.programmer.igoodie.configuration.validator.logic;
+package net.programmer.igoodie.configuration.validation.logic;
 
-import net.programmer.igoodie.configuration.validator.annotation.GoodieInteger;
+import net.programmer.igoodie.configuration.validation.annotation.GoodieInteger;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
@@ -20,8 +20,10 @@ public class GoodieIntegerLogic extends ValidatorLogic<GoodieInteger> {
     }
 
     @Override
-    public boolean isValidField(Object object, Field field) {
-        return field.getType() == int.class;
+    public void validateField(Object object, Field field) {
+        if (field.getType() != int.class) {
+            throw new GoodieImplementationException("Field type MUST be int");
+        }
     }
 
     @Override
@@ -40,7 +42,7 @@ public class GoodieIntegerLogic extends ValidatorLogic<GoodieInteger> {
     }
 
     @Override
-    public GoodieElement defaultGoodie(GoodieInteger annotation, Object object, Field field, GoodieElement goodie) {
+    public GoodieElement fixedGoodie(GoodieInteger annotation, Object object, Field field, GoodieElement goodie) {
         return GoodiePrimitive.from(annotation.defaultValue());
     }
 

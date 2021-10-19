@@ -105,8 +105,10 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
     /* ------------------------------------------ */
 
     @Override
-    public String writeToString(JsonObject externalFormat) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    public String writeToString(JsonObject externalFormat, boolean pretty) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        if (pretty) gsonBuilder.setPrettyPrinting();
+        Gson gson = gsonBuilder.create();
         return gson.toJson(externalFormat);
     }
 

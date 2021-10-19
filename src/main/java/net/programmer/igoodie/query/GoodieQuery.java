@@ -39,17 +39,13 @@ public class GoodieQuery {
         }
     }
 
-    public void set(GoodieElement rootElement, GoodieElement value) {
+    public GoodieElement set(GoodieElement rootElement, GoodieElement value) {
         GoodieElement parent = null;
         GoodieQueryAccessor parentAccessor = null;
         GoodieElement current = rootElement;
 
-        boolean debug = false;
-
         for (GoodieQueryAccessor accessor : accessors) {
             GoodieElement temp = current;
-
-            if (debug) System.out.print("Executing " + accessor + " ON " + current);
 
             if (!accessor.canAccess(current)) {
                 current = accessor.makeAccessible(parent, parentAccessor, current);
@@ -57,18 +53,16 @@ public class GoodieQuery {
             }
 
             if (isLeaf(accessor)) {
-                if (debug) System.out.print(" (leaf)");
                 accessor.setValue(current, value);
             } else {
-                if (debug) System.out.print(" (stem)");
                 current = accessor.accessOrCreate(parent, parentAccessor, current);
             }
-
-            if (debug) System.out.println(" = " + current);
 
             parent = temp;
             parentAccessor = accessor;
         }
+
+        return value;
     }
 
     /* --------------------------------- */
@@ -78,9 +72,9 @@ public class GoodieQuery {
         return goodieQuery.query(goodie);
     }
 
-    public static void set(GoodieElement goodie, String queryString, GoodieElement value) {
+    public static GoodieElement set(GoodieElement goodie, String queryString, GoodieElement value) {
         GoodieQuery goodieQuery = new GoodieQueryParser(queryString).parse();
-        goodieQuery.set(goodie, value);
+        return goodieQuery.set(goodie, value);
     }
 
 }

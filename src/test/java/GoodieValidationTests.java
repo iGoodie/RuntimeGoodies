@@ -1,6 +1,6 @@
 import com.google.gson.JsonObject;
 import data.User;
-import net.programmer.igoodie.configuration.validator.GoodieValidator;
+import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;

@@ -1,8 +1,11 @@
 package data;
 
-import net.programmer.igoodie.configuration.validator.annotation.GoodieInteger;
+import net.programmer.igoodie.configuration.transformation.GoodieTransformer;
+import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
+import net.programmer.igoodie.configuration.validation.annotation.GoodieInteger;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
+import transformers.Add100Transformer;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,12 @@ public class User {
     @Goodie(key = "myAge")
     @GoodieInteger(min = 18, defaultValue = 18)
     private int age;
+
+    @Goodie
+    @GoodieFloat
+    @GoodieTransformer(Add100Transformer.class)
+    @GoodieTransformer(Add100Transformer.class)
+    public float nonExistingScore;
 
     @Goodie
     private List<String> friendNames;
@@ -56,6 +65,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", age=" + age +
+                ", nonExistingScore=" + nonExistingScore +
                 ", friendNames=" + friendNames +
                 ", skills=" + skills +
                 ", sites=" + sites +

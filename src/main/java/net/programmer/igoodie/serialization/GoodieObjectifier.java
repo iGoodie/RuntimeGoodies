@@ -1,6 +1,8 @@
 package net.programmer.igoodie.serialization;
 
 import net.programmer.igoodie.RuntimeGoodies;
+import net.programmer.igoodie.configuration.transformation.GoodieTransformer;
+import net.programmer.igoodie.configuration.transformation.GoodieTransformerLogic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.exception.GoodieMismatchException;
 import net.programmer.igoodie.exception.YetToBeImplementedException;
@@ -24,6 +26,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GoodieObjectifier {
 
@@ -35,6 +39,10 @@ public class GoodieObjectifier {
 
         goodieTraverser.traverseGoodies(fillObject, (object, field, goodiePath) -> {
             GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
+
+            for (GoodieTransformerLogic transformer : getTransformers(field)) {
+                goodieElement = transformer.transform(goodieElement);
+            }
 
             if (goodieElement == null) {
                 ReflectionUtilities.setValue(object, field, null);
@@ -197,6 +205,18 @@ public class GoodieObjectifier {
         } catch (IllegalAccessException e) {
             throw new GoodieImplementationException("Goodies MUST have their default constructor accessible", e, type);
         }
+    }
+
+    private List<GoodieTransformerLogic> getTransformers(Field field) {
+        return Stream.of(field.getAnnotationsByType(GoodieTransformer.class))
+                .map(t -> {
+                    try {
+                        return t.value().newInstance();
+                    } catch (Exception ignored) {
+                        return null;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public boolean isCircularDepending(Object object) {
