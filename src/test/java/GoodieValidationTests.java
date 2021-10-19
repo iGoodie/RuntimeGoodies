@@ -18,8 +18,10 @@ public class GoodieValidationTests {
         GoodieObject goodieObject = gsonFormat.readGoodieFromString(TestFiles.loadData("user.json"));
         User user = new User();
 
+        System.out.println("Before Fix: " + goodieObject);
         GoodieValidator goodieValidator = new GoodieValidator();
         goodieValidator.validateAndFix(user, goodieObject);
+        System.out.println("After Fix:  " + goodieObject);
     }
 
 }

@@ -75,10 +75,10 @@ public class GoodieImplementationException extends GoodieException {
 
     @Override
     public String getMessage() {
-        if (targetsField()) return String.format("%s -> %s", super.getMessage(), getTargetField());
-        if (targetsMethod()) return String.format("%s -> %s", super.getMessage(), getTargetMethod());
-        if (targetsConstructor()) return String.format("%s -> %s", super.getMessage(), getTargetConstructor());
-        if (targetsClass()) return String.format("%s -> %s", super.getMessage(), getTargetClass());
+        if (targetsField()) return String.format("%s @ %s", super.getMessage(), getTargetField());
+        if (targetsMethod()) return String.format("%s @ %s", super.getMessage(), getTargetMethod());
+        if (targetsConstructor()) return String.format("%s @ %s", super.getMessage(), getTargetConstructor());
+        if (targetsClass()) return String.format("%s @ %s", super.getMessage(), getTargetClass());
         return super.getMessage();
     }
 

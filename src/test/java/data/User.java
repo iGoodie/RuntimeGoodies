@@ -20,7 +20,7 @@ public class User {
     private String lastName;
 
     @Goodie(key = "myAge")
-    @GoodieInteger(min = 18)
+    @GoodieInteger(min = 18, defaultValue = 18)
     private int age;
 
     @Goodie
