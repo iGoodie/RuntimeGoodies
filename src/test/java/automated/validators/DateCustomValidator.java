@@ -1,4 +1,4 @@
-package validators;
+package automated.validators;
 
 import net.programmer.igoodie.configuration.validation.annotation.GoodieCustomType;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;

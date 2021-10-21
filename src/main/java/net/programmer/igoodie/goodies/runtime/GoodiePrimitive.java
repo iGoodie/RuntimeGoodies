@@ -114,7 +114,7 @@ public class GoodiePrimitive extends GoodieElement {
 
     @Override
     public String toString() {
-        if (isNumber()) return value.toString() + numericAppendix();
+        if (isNumber()) return value + numericAppendix();
         if (isString()) return String.format("\"%s\"", value);
         return value.toString();
     }

@@ -7,10 +7,6 @@ public class GoodieArray extends GoodieElement implements List<GoodieElement> {
 
     private final List<GoodieElement> elements = new LinkedList<>();
 
-//    public boolean isMixed() {
-//
-//    }
-
     @Override
     public int size() {
         return elements.size();

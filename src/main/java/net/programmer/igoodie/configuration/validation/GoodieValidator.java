@@ -3,19 +3,19 @@ package net.programmer.igoodie.configuration.validation;
 import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.configuration.validation.logic.ValidatorLogic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
-import net.programmer.igoodie.goodies.runtime.GoodieElement;
-import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
+import net.programmer.igoodie.goodies.runtime.*;
 import net.programmer.igoodie.query.GoodieQuery;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
 import net.programmer.igoodie.util.Couple;
 import net.programmer.igoodie.util.GoodieTraverser;
+import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
+// TODO: Required & Optional annotations (?)
 public class GoodieValidator {
 
     private boolean changesMade;
@@ -25,26 +25,8 @@ public class GoodieValidator {
 
         goodieTraverser.traverseGoodies(validateObject, (object, field, goodiePath) -> {
             fixByDataStringifier(field, goodieObject, goodiePath);
-
-            for (Couple<Annotation, ValidatorLogic<Annotation>> couple : getValidators(field)) {
-                Annotation annotation = couple.getFirst();
-                ValidatorLogic<Annotation> logic = couple.getSecond();
-
-                try {
-                    logic.validateField(annotation, object, field);
-                    logic.validateAnnotationArgs(annotation);
-                } catch (GoodieImplementationException e) {
-                    throw new GoodieImplementationException(e.getMessage(), field);
-                }
-
-                GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
-
-                if (!logic.isValidGoodie(annotation, goodieElement) || !logic.isValidValue(annotation, goodieElement)) {
-                    GoodieElement fixedValue = logic.fixedGoodie(annotation, object, field, goodieElement);
-                    GoodieQuery.set(goodieObject, goodiePath, fixedValue);
-                    changesMade = true;
-                }
-            }
+            fixByValidators(object, field, goodieObject, goodiePath);
+            fixMissingValue(field, goodieObject, goodiePath);
         });
     }
 
@@ -59,12 +41,55 @@ public class GoodieValidator {
                     try {
                         dataStringifier.objectify(goodiePrimitive.getString());
                     } catch (Exception e) {
-                        changesMade = true;
                         GoodieQuery.set(goodieObject, goodiePath, GoodiePrimitive.from(dataStringifier.defaultStringValue()));
+                        changesMade = true;
                     }
                 }
             }
         }
+    }
+
+    public void fixByValidators(Object object, Field field, GoodieObject goodieObject, String goodiePath) {
+        for (Couple<Annotation, ValidatorLogic<Annotation>> couple : getValidators(field)) {
+            Annotation annotation = couple.getFirst();
+            ValidatorLogic<Annotation> logic = couple.getSecond();
+
+            try {
+                logic.validateField(annotation, object, field);
+                logic.validateAnnotationArgs(annotation);
+            } catch (GoodieImplementationException e) {
+                throw new GoodieImplementationException(e.getMessage(), field);
+            }
+
+            GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
+
+            if (!logic.isValidGoodie(annotation, goodieElement) || !logic.isValidValue(annotation, goodieElement)) {
+                GoodieElement fixedValue = logic.fixedGoodie(annotation, object, field, goodieElement);
+                GoodieQuery.set(goodieObject, goodiePath, fixedValue);
+                changesMade = true;
+            }
+        }
+    }
+
+    public void fixMissingValue(Field field, GoodieObject goodieObject, String goodiePath) {
+        GoodieElement query = GoodieQuery.query(goodieObject, goodiePath);
+        if (query == null) {
+            if (TypeUtilities.isPrimitive(field)) {
+                Object defaultValue = TypeUtilities.defaultValue(field.getType());
+                if (defaultValue != null) {
+                    GoodieQuery.set(goodieObject, goodiePath, GoodiePrimitive.from(defaultValue));
+                } else {
+                    GoodieQuery.set(goodieObject, goodiePath, new GoodieNull());
+                }
+            } else if (TypeUtilities.isList(field)) {
+                GoodieQuery.set(goodieObject, goodiePath, new GoodieArray());
+            } else if (TypeUtilities.isMap(field)) {
+                GoodieQuery.set(goodieObject, goodiePath, new GoodieObject());
+            } else {
+                GoodieQuery.set(goodieObject, goodiePath, new GoodieNull());
+            }
+        }
+
     }
 
     public boolean changesMade() {

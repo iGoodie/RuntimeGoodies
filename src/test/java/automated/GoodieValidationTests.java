@@ -1,6 +1,8 @@
+package automated;
+
 import com.google.gson.JsonObject;
-import data.UUIDs;
-import data.User;
+import automated.data.UUIDs;
+import automated.data.User;
 import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
@@ -28,6 +30,9 @@ public class GoodieValidationTests {
     @Test
     public void testDataStringifierFixer() throws IOException {
         GoodieFormat<JsonObject, GoodieObject> gsonFormat = new GsonGoodieFormat();
+
+        GoodieObject goodieObject = gsonFormat.readGoodieFromString(TestFiles.loadData("uuids.json"));
+        System.out.println("Goodie Object: " + goodieObject);
 
         UUIDs uuids = new UUIDs().readConfig(TestFiles.loadData("uuids.json"), fixedGoodie -> {
             System.out.println("Fixed Goodie: " + fixedGoodie);

@@ -1,4 +1,4 @@
-package data;
+package automated.data;
 
 import net.programmer.igoodie.serialization.annotation.Goodie;
 

@@ -1,9 +1,9 @@
-package data;
+package automated.data;
 
 import net.programmer.igoodie.configuration.ConfiGoodieJson;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieCustomType;
 import net.programmer.igoodie.serialization.annotation.Goodie;
-import validators.DateCustomValidator;
+import automated.validators.DateCustomValidator;
 
 import java.util.Date;
 import java.util.UUID;

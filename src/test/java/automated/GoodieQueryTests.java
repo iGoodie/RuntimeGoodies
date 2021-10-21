@@ -1,3 +1,5 @@
+package automated;
+
 import com.google.gson.JsonObject;
 import net.programmer.igoodie.exception.GoodieSyntaxException;
 import net.programmer.igoodie.goodies.format.GoodieFormat;

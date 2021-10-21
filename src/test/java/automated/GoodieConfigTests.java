@@ -1,4 +1,6 @@
-import data.User;
+package automated;
+
+import automated.data.User;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;
 

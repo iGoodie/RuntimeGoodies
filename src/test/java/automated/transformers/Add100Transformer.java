@@ -1,4 +1,4 @@
-package transformers;
+package automated.transformers;
 
 import net.programmer.igoodie.configuration.transformation.GoodieTransformerLogic;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;

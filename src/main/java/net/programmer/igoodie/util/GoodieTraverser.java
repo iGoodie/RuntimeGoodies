@@ -42,10 +42,13 @@ public class GoodieTraverser {
                 consumer.consume(object, goodieField, path + "." + key);
             } else if (TypeUtilities.isPrimitive(goodieField)) {
                 consumer.consume(object, goodieField, path + "." + key);
-            } else if (TypeUtilities.isList(goodieField)) {
+            } else if (TypeUtilities.isEnum(goodieField)) {
                 consumer.consume(object, goodieField, path + "." + key);
             } else if (TypeUtilities.isMap(goodieField)) {
                 consumer.consume(object, goodieField, path + "." + key);
+            } else if (TypeUtilities.isList(goodieField)) {
+                consumer.consume(object, goodieField, path + "." + key);
+                // TODO: Also traverse all the elements
             } else {
                 Object pojo = createDefaultInstance(fieldType);
                 ReflectionUtilities.setValue(object, goodieField, pojo);

@@ -88,7 +88,7 @@ public class GoodieObjectifier {
         if (TypeUtilities.isPrimitive(field)) {
             if (!goodieElement.isPrimitive())
                 throw new GoodieMismatchException("Expected primitive type, found -> " + goodieElement);
-            return generatePrimitive(generationType, goodieElement.asPrimitive());
+            return generatePrimitiveValue(generationType, goodieElement.asPrimitive());
         }
 
         if (TypeUtilities.isList(field)) {
@@ -108,12 +108,18 @@ public class GoodieObjectifier {
             return generateMap(keyType, valueType, goodieElement.asObject());
         }
 
+        if (TypeUtilities.isEnum(field)) {
+            if (!goodieElement.isPrimitive() && !goodieElement.asPrimitive().isString())
+                throw new GoodieMismatchException("Expected string type, found -> " + goodieElement);
+            return generateEnumValue(generationType, goodieElement.asPrimitive().getString());
+        }
+
         if (!goodieElement.isObject())
             throw new GoodieMismatchException("Expected object type, found -> " + goodieElement);
         return generatePOJO(generationType, goodieElement.asObject());
     }
 
-    private Object generatePrimitive(Class<?> primitiveType, GoodiePrimitive goodiePrimitive) {
+    private Object generatePrimitiveValue(Class<?> primitiveType, GoodiePrimitive goodiePrimitive) {
         return goodiePrimitive.get(); // TODO
     }
 
@@ -195,6 +201,16 @@ public class GoodieObjectifier {
         }
 
         return map;
+    }
+
+    private Enum<?> generateEnumValue(Class<?> enumType, String value) {
+        for (Object enumConstant : enumType.getEnumConstants()) {
+            Enum<?> enumValue = (Enum<?>) enumConstant;
+            if (enumValue.name().equalsIgnoreCase(value)) {
+                return enumValue;
+            }
+        }
+        return null;
     }
 
     private Object generatePOJO(Class<?> pojoType, GoodieObject goodieObject) {

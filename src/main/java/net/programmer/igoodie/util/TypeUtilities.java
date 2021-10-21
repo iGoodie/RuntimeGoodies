@@ -3,10 +3,7 @@ package net.programmer.igoodie.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class TypeUtilities {
 
@@ -17,6 +14,26 @@ public final class TypeUtilities {
     private static final Set<Class<?>> NUMERIC_PRIMITIVE_TYPES = new HashSet<>();
     private static final Set<Class<?>> NON_NUMERIC_PRIMITIVE_TYPES = new HashSet<>();
     private static final Set<Class<?>> PRIMITIVE_TYPES = new HashSet<>();
+
+    private static final Map<Class<?>, Object> DEFAULTS;
+
+    static {
+        Map<Class<?>, Object> map = new HashMap<>();
+        put(map, boolean.class, false);
+        put(map, char.class, '\0');
+        put(map, byte.class, (byte) 0);
+        put(map, short.class, (short) 0);
+        put(map, int.class, 0);
+        put(map, long.class, 0L);
+        put(map, float.class, 0f);
+        put(map, double.class, 0d);
+        put(map, String.class, "");
+        DEFAULTS = Collections.unmodifiableMap(map);
+    }
+
+    private static <T> void put(Map<Class<?>, Object> map, Class<T> type, T value) {
+        map.put(type, value);
+    }
 
     static {
         INTEGRAL_WRAPPER_TYPES.add(Long.class);
@@ -115,6 +132,14 @@ public final class TypeUtilities {
         return isMap(field.getType());
     }
 
+    public static boolean isEnum(Class<?> type) {
+        return type.isEnum();
+    }
+
+    public static boolean isEnum(Field field) {
+        return isEnum(field.getType());
+    }
+
     /* -------------------------- */
 
     public static Type[] getSuperGenericTypes(Class<?> type) {
@@ -141,6 +166,12 @@ public final class TypeUtilities {
         }
 
         return null;
+    }
+
+    public static <T> T defaultValue(Class<T> type) {
+        @SuppressWarnings("unchecked")
+        T t = (T) DEFAULTS.get(type);
+        return t;
     }
 
 }

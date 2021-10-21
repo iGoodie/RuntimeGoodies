@@ -1,4 +1,4 @@
-package data;
+package automated.data;
 
 import net.programmer.igoodie.configuration.ConfiGoodieJson;
 import net.programmer.igoodie.configuration.transformation.GoodieTransformer;
@@ -6,7 +6,7 @@ import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieInteger;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
-import transformers.Add100Transformer;
+import automated.transformers.Add100Transformer;
 
 import java.util.List;
 import java.util.Map;
