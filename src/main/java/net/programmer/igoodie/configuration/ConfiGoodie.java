@@ -13,18 +13,22 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
 
     public abstract F getFormat();
 
-    public <T extends ConfiGoodieJson> T readConfig(File file) {
-        return readConfig(FileUtils.readString(file), fixedGoodie -> {
+    public <T extends ConfiGoodie<F>> T readConfig(File file) {
+        return readConfig(file, fixedGoodie -> {
             // TODO: Override File
         });
     }
 
-    public <T extends ConfiGoodieJson> T readConfig(String externalFormat) {
+    public <T extends ConfiGoodie<F>> T readConfig(File file, Consumer<GoodieObject> onFixed) {
+        return readConfig(FileUtils.readString(file), onFixed);
+    }
+
+    public <T extends ConfiGoodie<F>> T readConfig(String externalFormat) {
         return readConfig(externalFormat, fixedGoodie -> {});
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ConfiGoodieJson> T readConfig(String json, Consumer<GoodieObject> onFixed) {
+    public <T extends ConfiGoodie<F>> T readConfig(String json, Consumer<GoodieObject> onFixed) {
         F format = getFormat();
         GoodieValidator goodieValidator = new GoodieValidator();
         GoodieObjectifier goodieObjectifier = new GoodieObjectifier();
