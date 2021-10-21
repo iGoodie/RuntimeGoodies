@@ -176,11 +176,11 @@ public class GoodieObjectifier {
                 }
 
             } else if (TypeUtilities.isList(valueType)) {
-                // TODO: impl
+                // TODO: Map with List values
                 throw new YetToBeImplementedException();
 
             } else if (TypeUtilities.isMap(valueType)) {
-                // TODO: impl (?)
+                // TODO: Map with Map values (?)
                 throw new YetToBeImplementedException();
 
             } else { // POJO
@@ -228,7 +228,7 @@ public class GoodieObjectifier {
     }
 
     public boolean isCircularDepending(Object object) {
-        return false; // TODO: impl
+        return false; // TODO: Circular dependency
     }
 
 }

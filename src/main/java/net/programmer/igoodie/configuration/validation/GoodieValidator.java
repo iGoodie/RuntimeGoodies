@@ -31,7 +31,7 @@ public class GoodieValidator {
                 ValidatorLogic<Annotation> logic = couple.getSecond();
 
                 try {
-                    logic.validateField(object, field);
+                    logic.validateField(annotation, object, field);
                     logic.validateAnnotationArgs(annotation);
                 } catch (GoodieImplementationException e) {
                     throw new GoodieImplementationException(e.getMessage(), field);
@@ -39,7 +39,7 @@ public class GoodieValidator {
 
                 GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
 
-                if (!logic.isValidGoodie(goodieElement) || !logic.isValidValue(annotation, goodieElement)) {
+                if (!logic.isValidGoodie(annotation, goodieElement) || !logic.isValidValue(annotation, goodieElement)) {
                     GoodieElement fixedValue = logic.fixedGoodie(annotation, object, field, goodieElement);
                     GoodieQuery.set(goodieObject, goodiePath, fixedValue);
                     changesMade = true;

@@ -127,7 +127,7 @@ public class GoodieArray extends GoodieElement implements List<GoodieElement> {
     }
 
     @Override
-    public GoodieElement deepCopy() {
+    public GoodieArray deepCopy() {
         if (elements.isEmpty()) {
             return new GoodieArray();
         }

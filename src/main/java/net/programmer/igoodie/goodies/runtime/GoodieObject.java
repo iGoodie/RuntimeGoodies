@@ -151,7 +151,7 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
     }
 
     @Override
-    public GoodieElement deepCopy() {
+    public GoodieObject deepCopy() {
         GoodieObject goodieObject = new GoodieObject();
         elements.forEach((key, value) -> {
             elements.put(key, value.deepCopy());

@@ -11,6 +11,9 @@ public class GoodieFloatLogic extends ValidatorLogic<GoodieFloat> {
 
     @Override
     public void validateAnnotationArgs(GoodieFloat annotation) throws GoodieImplementationException {
+        if (annotation.min() > annotation.max()) {
+            throw new GoodieImplementationException("'min' value cannot be more than `max` value");
+        }
         if (annotation.defaultValue() < annotation.min()) {
             throw new GoodieImplementationException("Default value cannot be less than min value.");
         }
@@ -20,14 +23,14 @@ public class GoodieFloatLogic extends ValidatorLogic<GoodieFloat> {
     }
 
     @Override
-    public void validateField(Object object, Field field) {
+    public void validateField(GoodieFloat annotation, Object object, Field field) throws GoodieImplementationException {
         if (field.getType() != float.class) {
             throw new GoodieImplementationException("Field type MUST be float");
         }
     }
 
     @Override
-    public boolean isValidGoodie(GoodieElement goodie) {
+    public boolean isValidGoodie(GoodieFloat annotation, GoodieElement goodie) {
         return goodie != null
                 && goodie.isPrimitive()
                 && goodie.asPrimitive().isNumber();

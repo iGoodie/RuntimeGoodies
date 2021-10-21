@@ -14,6 +14,9 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
         if (annotation.length() >= 0 && annotation.defaultValue().length() != annotation.length()) {
             throw new GoodieImplementationException("Length of the default value should be equals to 'length' value.");
         }
+        if (annotation.min() > annotation.max()) {
+            throw new GoodieImplementationException("'min' value cannot be more than `max` value");
+        }
         if (annotation.defaultValue().length() < annotation.min()) {
             throw new GoodieImplementationException("Default value cannot be less longer than 'min' value.");
         }
@@ -23,14 +26,14 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
     }
 
     @Override
-    public void validateField(Object object, Field field) {
+    public void validateField(GoodieString annotation, Object object, Field field) throws GoodieImplementationException {
         if (field.getType() != String.class) {
             throw new GoodieImplementationException("Field type MUST be String");
         }
     }
 
     @Override
-    public boolean isValidGoodie(GoodieElement goodie) {
+    public boolean isValidGoodie(GoodieString annotation, GoodieElement goodie) {
         return goodie != null
                 && goodie.isPrimitive()
                 && goodie.asPrimitive().isString();
@@ -40,11 +43,12 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
     public boolean isValidValue(GoodieString annotation, GoodieElement goodie) {
         String value = goodie.asPrimitive().getString();
 
-        if (annotation.length() >= 0 && value.length() != annotation.length())
-            return false;
-
         if (!annotation.matches().isEmpty() && !value.matches(annotation.matches()))
             return false;
+
+        if (annotation.length() >= 0) {
+            return value.length() != annotation.length();
+        }
 
         return value.length() >= annotation.min()
                 && value.length() <= annotation.max();

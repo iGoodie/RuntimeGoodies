@@ -67,7 +67,7 @@ public class GoodieTraverser {
     }
 
     public boolean isCircularDepending(Object object) {
-        return false; // TODO: impl
+        return false; // TODO: Circular dependency
     }
 
 }

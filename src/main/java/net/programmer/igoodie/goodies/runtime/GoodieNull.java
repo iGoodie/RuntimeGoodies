@@ -3,7 +3,7 @@ package net.programmer.igoodie.goodies.runtime;
 public class GoodieNull extends GoodieElement {
 
     @Override
-    public GoodieElement deepCopy() {
+    public GoodieNull deepCopy() {
         return new GoodieNull();
     }
 
