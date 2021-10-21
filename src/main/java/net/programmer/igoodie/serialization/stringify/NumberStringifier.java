@@ -16,6 +16,11 @@ public class NumberStringifier extends DataStringifier<Number> {
         }
     }
 
+    @Override
+    public Number defaultObjectValue() {
+        return 0.0D;
+    }
+
     private static Number parse(String str) {
         try {
             return Float.parseFloat(str);
@@ -40,8 +45,13 @@ public class NumberStringifier extends DataStringifier<Number> {
         }
 
         @Override
-        public Double objectify(String string) {
+        public Double objectify(String string) throws Exception {
             return Double.parseDouble(string);
+        }
+
+        @Override
+        public Double defaultObjectValue() {
+            return 0.0D;
         }
 
     }
@@ -54,8 +64,13 @@ public class NumberStringifier extends DataStringifier<Number> {
         }
 
         @Override
-        public Float objectify(String string) {
+        public Float objectify(String string) throws Exception {
             return Float.parseFloat(string);
+        }
+
+        @Override
+        public Float defaultObjectValue() {
+            return 0.0F;
         }
 
     }
@@ -68,8 +83,13 @@ public class NumberStringifier extends DataStringifier<Number> {
         }
 
         @Override
-        public Long objectify(String string) {
+        public Long objectify(String string) throws Exception {
             return Long.parseLong(string);
+        }
+
+        @Override
+        public Long defaultObjectValue() {
+            return 0L;
         }
 
     }
@@ -82,8 +102,13 @@ public class NumberStringifier extends DataStringifier<Number> {
         }
 
         @Override
-        public Integer objectify(String string) {
+        public Integer objectify(String string) throws Exception {
             return Integer.parseInt(string);
+        }
+
+        @Override
+        public Integer defaultObjectValue() {
+            return 0;
         }
 
     }

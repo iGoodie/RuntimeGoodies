@@ -44,7 +44,7 @@ public class GoodieObjectifier {
                 goodieElement = transformer.transform(goodieElement);
             }
 
-            if (goodieElement == null) {
+            if (goodieElement == null || goodieElement.isNull()) {
                 ReflectionUtilities.setValue(object, field, null);
 
             } else try {
@@ -78,7 +78,11 @@ public class GoodieObjectifier {
         if (dataStringifier != null) {
             if (!goodieElement.isPrimitive() || !goodieElement.asPrimitive().isString())
                 throw new GoodieMismatchException("Expected string, found -> " + goodieElement);
-            return dataStringifier.objectify(goodieElement.asPrimitive().getString());
+            try {
+                return dataStringifier.objectify(goodieElement.asPrimitive().getString());
+            } catch (Exception e) {
+                return dataStringifier.defaultObjectValue();
+            }
         }
 
         if (TypeUtilities.isPrimitive(field)) {
@@ -153,7 +157,11 @@ public class GoodieObjectifier {
             } else {
                 DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(keyType);
                 if (dataStringifier != null) {
-                    key = dataStringifier.objectify(goodieKey);
+                    try {
+                        key = dataStringifier.objectify(goodieKey);
+                    } catch (Exception e) {
+                        key = dataStringifier.defaultObjectValue();
+                    }
                 } else {
                     continue;
                 }

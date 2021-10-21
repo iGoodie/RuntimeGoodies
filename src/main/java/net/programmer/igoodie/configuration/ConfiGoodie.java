@@ -35,9 +35,9 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
 
         GoodieObject goodieObject = format.readGoodieFromString(json);
 
-        boolean fixed = goodieValidator.validateAndFix(this, goodieObject);
+        goodieValidator.validateAndFix(this, goodieObject);
 
-        if (fixed) {
+        if (goodieValidator.changesMade()) {
             onFixed.accept(goodieObject);
         }
 

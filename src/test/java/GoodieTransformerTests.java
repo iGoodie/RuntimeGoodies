@@ -28,8 +28,8 @@ public class GoodieTransformerTests {
 
         // Validate and fix the Goodie
         GoodieValidator goodieValidator = new GoodieValidator();
-        boolean fixed = goodieValidator.validateAndFix(fillableObject, goodieObject);
-        System.out.println("Is Fixed: " + fixed);
+        goodieValidator.validateAndFix(fillableObject, goodieObject);
+        System.out.println("Is Fixed: " + goodieValidator.changesMade());
         System.out.println("Fixed Goodie: " + goodieObject);
 
         Assertions.assertEquals(0f, goodieObject.getFloat("nonExistingScore"));

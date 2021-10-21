@@ -16,6 +16,12 @@ public abstract class DataStringifier<T> implements Registrable<Class<?>> {
 
     public abstract String stringify(T value);
 
-    public abstract T objectify(String string);
+    public abstract T objectify(String string) throws Exception;
+
+    public abstract T defaultObjectValue();
+
+    public String defaultStringValue() {
+        return stringify(defaultObjectValue());
+    }
 
 }

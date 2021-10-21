@@ -23,7 +23,8 @@ public class RuntimeGoodies {
             new GoodieIntegerLogic(),
             new GoodieLongLogic(),
             new GoodieFloatLogic(),
-            new GoodieDoubleLogic()
+            new GoodieDoubleLogic(),
+            new GoodieStringLogic()
     );
 
 }

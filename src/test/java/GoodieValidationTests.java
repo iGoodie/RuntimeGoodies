@@ -1,4 +1,5 @@
 import com.google.gson.JsonObject;
+import data.UUIDs;
 import data.User;
 import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
@@ -22,6 +23,17 @@ public class GoodieValidationTests {
         GoodieValidator goodieValidator = new GoodieValidator();
         goodieValidator.validateAndFix(user, goodieObject);
         System.out.println("After Fix:  " + goodieObject);
+    }
+
+    @Test
+    public void testDataStringifierFixer() throws IOException {
+        GoodieFormat<JsonObject, GoodieObject> gsonFormat = new GsonGoodieFormat();
+
+        UUIDs uuids = new UUIDs().readConfig(TestFiles.loadData("uuids.json"), fixedGoodie -> {
+            System.out.println("Fixed Goodie: " + fixedGoodie);
+        });
+
+        System.out.println(uuids);
     }
 
 }
