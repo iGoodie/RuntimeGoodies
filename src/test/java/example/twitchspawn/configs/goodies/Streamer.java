@@ -2,11 +2,13 @@ package example.twitchspawn.configs.goodies;
 
 import net.programmer.igoodie.configuration.ConfiGoodieJson;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
+import net.programmer.igoodie.configuration.validation.annotation.GoodieString;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 
 public class Streamer extends ConfiGoodieJson {
 
     @Goodie
+    @GoodieString
     public String minecraftNick;
 
     @Goodie

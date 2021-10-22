@@ -97,6 +97,10 @@ public class GoodieObjectifier {
             }
         }
 
+        if (generationType == Object.class) {
+            return generateAny(goodieElement);
+        }
+
         if (TypeUtilities.isPrimitive(field)) {
             if (!goodieElement.isPrimitive())
                 throw new GoodieMismatchException("Expected primitive type, found -> " + goodieElement);
@@ -129,6 +133,19 @@ public class GoodieObjectifier {
         if (!goodieElement.isObject())
             throw new GoodieMismatchException("Expected object type, found -> " + goodieElement);
         return generatePOJO(generationType, goodieElement.asObject());
+    }
+
+    private Object generateAny(GoodieElement element) {
+        if (element.isNull()) {
+            return null;
+        } else if (element.isPrimitive()) {
+            return element.asPrimitive().get();
+        } else if (element.isArray()) {
+            return null; //TODO
+        } else if (element.isObject()) {
+            return null; //TODO
+        }
+        return null;
     }
 
     private Object generatePrimitiveValue(Class<?> primitiveType, GoodiePrimitive goodiePrimitive) {

@@ -1,9 +1,6 @@
 package net.programmer.igoodie.configuration.validation.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -14,5 +11,7 @@ public @interface GoodieList {
     int max() default Integer.MAX_VALUE;
 
     int length() default -1;
+
+    // TODO: Validator @Each (?)
 
 }

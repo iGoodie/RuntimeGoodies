@@ -49,6 +49,8 @@ public class GoodieTraverser {
             } else if (TypeUtilities.isList(goodieField)) {
                 consumer.consume(object, goodieField, path + "." + key);
                 // TODO: Also traverse all the elements
+            } else if (goodieField.getType() == Object.class) {
+                consumer.consume(object, goodieField, path + "." + key);
             } else {
                 Object pojo = createDefaultInstance(fieldType);
                 ReflectionUtilities.setValue(object, goodieField, pojo);
