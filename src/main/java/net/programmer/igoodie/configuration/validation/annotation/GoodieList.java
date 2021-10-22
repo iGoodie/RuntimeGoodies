@@ -12,6 +12,8 @@ public @interface GoodieList {
 
     int length() default -1;
 
+    boolean allowNull() default true;
+
     // TODO: Validator @Each (?)
 
 }

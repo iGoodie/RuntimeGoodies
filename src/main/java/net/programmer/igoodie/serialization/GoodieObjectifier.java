@@ -6,10 +6,7 @@ import net.programmer.igoodie.configuration.transformation.GoodieTransformerLogi
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.exception.GoodieMismatchException;
 import net.programmer.igoodie.exception.YetToBeImplementedException;
-import net.programmer.igoodie.goodies.runtime.GoodieArray;
-import net.programmer.igoodie.goodies.runtime.GoodieElement;
-import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
+import net.programmer.igoodie.goodies.runtime.*;
 import net.programmer.igoodie.query.GoodieQuery;
 import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
@@ -147,7 +144,8 @@ public class GoodieObjectifier {
             return element.asPrimitive().get();
 
         } else if (element.isArray()) {
-            return generateList(null, element.asArray());
+            return element.asArray();
+//            return generateList(null, element.asArray());
 
         } else if (element.isObject()) {
             return element.asObject();
@@ -167,22 +165,23 @@ public class GoodieObjectifier {
         List<Object> list = new LinkedList<>();
 
         for (GoodieElement goodieElement : goodieArray) {
-            if (goodieElement instanceof GoodiePrimitive) {
+            if (goodieElement.isPrimitive()) {
                 list.add(((GoodiePrimitive) goodieElement).get());
 
-            } else if (goodieElement instanceof GoodieArray) {
+            } else if (goodieElement.isArray()) {
                 // TODO: Array of arrays
                 throw new YetToBeImplementedException();
 
-            } else if (goodieElement instanceof GoodieObject) {
-                // TODO: Array of POJOs
-                list.add(((GoodieObject) goodieElement).get());
-                throw new YetToBeImplementedException();
+            } else if (goodieElement.isObject()) {
+                list.add(generatePOJO(listType, goodieElement.asObject()));
+
+            } else if (goodieElement.isNull()) {
+                list.add(null);
             }
         }
 
         if (listType != null) {
-            list.removeIf(item -> !listType.isInstance(item));
+            list.removeIf(item -> item != null && !listType.isInstance(item));
         }
 
         return list;

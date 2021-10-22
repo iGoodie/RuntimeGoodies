@@ -8,6 +8,8 @@ import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.reflect.Field;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GoodieListLogic extends ValidatorLogic<GoodieList> {
 
@@ -20,8 +22,13 @@ public class GoodieListLogic extends ValidatorLogic<GoodieList> {
 
     @Override
     public void validateField(GoodieList annotation, Object object, Field field) throws GoodieImplementationException {
-        if (TypeUtilities.isList(field)) {
+        if (!TypeUtilities.isList(field)) {
             throw new GoodieImplementationException("Field type MUST be a List<?>");
+        }
+        if (getDefaultValue(object, field) != null) {
+            if (!TypeUtilities.isList(getDefaultValue(object, field).getClass())) {
+                throw new GoodieImplementationException("Default value MUST be a List<?>");
+            }
         }
     }
 
@@ -35,6 +42,12 @@ public class GoodieListLogic extends ValidatorLogic<GoodieList> {
     public boolean isValidValue(GoodieList annotation, GoodieElement goodie) {
         GoodieArray value = goodie.asArray();
 
+        if (!annotation.allowNull()) {
+            if (value.stream().anyMatch(GoodieElement::isNull)) {
+                return false;
+            }
+        }
+
         if (annotation.length() >= 0) {
             return value.size() != annotation.length();
         }
@@ -45,7 +58,13 @@ public class GoodieListLogic extends ValidatorLogic<GoodieList> {
 
     @Override
     public GoodieElement fixedGoodie(GoodieList annotation, Object object, Field field, GoodieElement goodie) {
-        GoodieArray value = goodie.asArray().deepCopy();
+        GoodieArray value = goodie == null
+                ? GoodieElement.fromList(getDefaultValueOr(object, field, LinkedList::new))
+                : goodie.asArray().deepCopy();
+
+        if (!annotation.allowNull()) {
+            value.removeIf(GoodieElement::isNull);
+        }
 
         if (annotation.length() >= 0) {
             if (value.size() != annotation.length()) {

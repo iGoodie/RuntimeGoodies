@@ -10,6 +10,7 @@ import net.programmer.igoodie.util.TypeUtilities;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.function.Supplier;
 
 public abstract class ValidatorLogic<A extends Annotation> implements Registrable<Class<?>> {
 
@@ -34,7 +35,17 @@ public abstract class ValidatorLogic<A extends Annotation> implements Registrabl
     public abstract GoodieElement fixedGoodie(A annotation, Object object, Field field, GoodieElement goodie);
 
     public Object getDefaultValue(Object object, Field field) {
-        return ReflectionUtilities.getValue(object, field);
+        return getDefaultValueOr(object, field, null);
+    }
+
+    public <T> T getDefaultValueOr(Object object, Field field, T defaultValue) {
+        return getDefaultValueOr(object, field, () -> defaultValue);
+    }
+
+    public <T> T getDefaultValueOr(Object object, Field field, Supplier<T> supplier) {
+        @SuppressWarnings("unchecked")
+        T value = (T) ReflectionUtilities.getValue(object, field);
+        return value == null ? supplier.get() : value;
     }
 
 }

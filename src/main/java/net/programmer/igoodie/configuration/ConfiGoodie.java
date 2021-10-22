@@ -11,6 +11,7 @@ import net.programmer.igoodie.util.ReflectionUtilities;
 
 import java.io.File;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
 
@@ -58,6 +59,10 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
         }
 
         return (T) this;
+    }
+
+    public <T> T defaultValue(Supplier<T> supplier) {
+        return supplier.get();
     }
 
 }

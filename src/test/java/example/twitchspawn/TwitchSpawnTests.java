@@ -1,6 +1,6 @@
 package example.twitchspawn;
 
-import example.twitchspawn.configs.goodies.Streamer;
+import example.twitchspawn.configs.CredentialsConfig;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.util.GoodieTraverser;
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,14 @@ public class TwitchSpawnTests {
     public void testGoodies() throws IOException {
         GsonGoodieFormat goodieFormat = new GsonGoodieFormat();
 
-        Streamer streamer = new Streamer().readConfig(TestFiles.loadData("streamer.json"), fixedGoodie -> {
+        CredentialsConfig credentialsConfig = new CredentialsConfig().readConfig(TestFiles.loadData("credentials_config.json"), fixedGoodie -> {
             System.out.println("Fixed as Goodie: " + fixedGoodie);
             System.out.println("Fixed as JSON  : " + goodieFormat.readFromGoodie(fixedGoodie));
         });
 
-        new GoodieTraverser().traverseGoodies(streamer, (object, field, goodiePath) -> {
+        new GoodieTraverser().traverseGoodies(credentialsConfig, (object, field, goodiePath) -> {
             try {
+                field.setAccessible(true);
                 System.out.println(field.getName() + " = " + field.get(object));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();

@@ -1,12 +1,11 @@
 package example.twitchspawn.configs.goodies;
 
-import net.programmer.igoodie.configuration.ConfiGoodieJson;
+import net.programmer.igoodie.configuration.JsonConfiGoodie;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieString;
-import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 
-public class Streamer extends ConfiGoodieJson {
+public class Streamer extends JsonConfiGoodie {
 
     @Goodie
     @GoodieString
@@ -31,7 +30,17 @@ public class Streamer extends ConfiGoodieJson {
     @Goodie
     public Object metadata;
 
-    @Goodie(key = "metadata")
-    public GoodieObject metadataAsGoodie;
+    @Override
+    public String toString() {
+        return "Streamer{" +
+                "minecraftNick='" + minecraftNick + '\'' +
+                ", twitchNick='" + twitchNick + '\'' +
+                ", platform=" + platform +
+                ", score=" + score +
+                ", token='" + token + '\'' +
+                ", tokenChat='" + tokenChat + '\'' +
+                ", metadata=" + metadata +
+                '}';
+    }
 
 }

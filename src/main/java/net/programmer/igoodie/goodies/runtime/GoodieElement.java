@@ -15,7 +15,9 @@ import java.util.Map;
 public abstract class GoodieElement {
 
     public static GoodieElement from(Object value) {
-        if (TypeUtilities.isPrimitive(value.getClass())) {
+        if (value == null) {
+            return new GoodieNull();
+        } else if (TypeUtilities.isPrimitive(value.getClass())) {
             return GoodiePrimitive.from(value);
         } else if (TypeUtilities.isArray(value.getClass())) {
             return fromArray(value);
