@@ -3,6 +3,7 @@ package example.twitchspawn.configs.goodies;
 import net.programmer.igoodie.configuration.ConfiGoodieJson;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieString;
+import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 
 public class Streamer extends ConfiGoodieJson {
@@ -18,9 +19,6 @@ public class Streamer extends ConfiGoodieJson {
     public Platform platform = Platform.STREAMLABS;
 
     @Goodie
-    public Object anything;
-
-    @Goodie
     @GoodieFloat
     public float score;
 
@@ -29,5 +27,11 @@ public class Streamer extends ConfiGoodieJson {
 
     @Goodie
     public String tokenChat = "YOUR_CHAT_TOKEN_HERE - Can be generated from https://twitchapps.com/tmi/";
+
+    @Goodie
+    public Object metadata;
+
+    @Goodie(key = "metadata")
+    public GoodieObject metadataAsGoodie;
 
 }

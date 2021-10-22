@@ -21,7 +21,7 @@ public class TwitchSpawnTests {
 
         new GoodieTraverser().traverseGoodies(streamer, (object, field, goodiePath) -> {
             try {
-                System.out.println(goodiePath + " = " + field.get(object));
+                System.out.println(field.getName() + " = " + field.get(object));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }

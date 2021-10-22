@@ -1,5 +1,7 @@
 package net.programmer.igoodie.util;
 
+import net.programmer.igoodie.goodies.runtime.GoodieElement;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -146,6 +148,14 @@ public final class TypeUtilities {
 
     public static boolean isEnum(Field field) {
         return isEnum(field.getType());
+    }
+
+    public static boolean isGoodie(Class<?> type) {
+        return GoodieElement.class.isAssignableFrom(type);
+    }
+
+    public static boolean isGoodie(Field field) {
+        return isGoodie(field.getType());
     }
 
     /* -------------------------- */

@@ -13,8 +13,10 @@ import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 // TODO: Required & Optional annotations (?)
 public class GoodieValidator {
@@ -24,10 +26,18 @@ public class GoodieValidator {
     public void validateAndFix(Object validateObject, GoodieObject goodieObject) {
         GoodieTraverser goodieTraverser = new GoodieTraverser();
 
+        Set<String> pathsTraversed = new HashSet<>();
+
         goodieTraverser.traverseGoodies(validateObject, (object, field, goodiePath) -> {
+            if (pathsTraversed.contains(goodiePath)) {
+                throw new GoodieImplementationException("Goodie path mapped more than once -> " + goodiePath);
+            }
+
             fixByDataStringifier(field, goodieObject, goodiePath);
             fixByValidators(object, field, goodieObject, goodiePath);
             fixMissingValue(object, field, goodieObject, goodiePath);
+
+            pathsTraversed.add(goodiePath);
         });
     }
 

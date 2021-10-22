@@ -1,5 +1,13 @@
 {
   "twitchNick": 20,
   "platform": 1,
-  "anything": 100
+  "metadata": {
+    "a": 1,
+    "b": 2,
+    "c": [
+      1,
+      2,
+      3
+    ]
+  }
 }
