@@ -124,6 +124,14 @@ public final class TypeUtilities {
         return isList(field.getType());
     }
 
+    public static boolean isArray(Class<?> type) {
+        return type.isArray();
+    }
+
+    public static boolean isArray(Field field) {
+        return isArray(field.getType());
+    }
+
     public static boolean isMap(Class<?> type) {
         return Map.class.isAssignableFrom(type);
     }

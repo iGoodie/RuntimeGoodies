@@ -13,6 +13,4 @@ public @interface GoodieInteger {
 
     int max() default Integer.MAX_VALUE;
 
-    int defaultValue() default 0;
-
 }

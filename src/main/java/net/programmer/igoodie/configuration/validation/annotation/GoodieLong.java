@@ -13,6 +13,4 @@ public @interface GoodieLong {
 
     long max() default Long.MAX_VALUE;
 
-    long defaultValue() default 0L;
-
 }

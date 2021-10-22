@@ -24,8 +24,8 @@ public class User extends ConfiGoodieJson {
     private String lastName;
 
     @Goodie(key = "myAge")
-    @GoodieInteger(min = 18, defaultValue = 18)
-    private int age;
+    @GoodieInteger(min = 18)
+    private int age = 20;
 
     @Goodie
     @GoodieFloat

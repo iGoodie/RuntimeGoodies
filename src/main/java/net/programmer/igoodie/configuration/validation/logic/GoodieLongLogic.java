@@ -14,18 +14,20 @@ public class GoodieLongLogic extends ValidatorLogic<GoodieLong> {
         if (annotation.min() > annotation.max()) {
             throw new GoodieImplementationException("'min' value cannot be more than `max` value");
         }
-        if (annotation.defaultValue() < annotation.min()) {
-            throw new GoodieImplementationException("Default value cannot be less than min value.");
-        }
-        if (annotation.defaultValue() > annotation.max()) {
-            throw new GoodieImplementationException("Default value cannot be more than max value.");
-        }
     }
 
     @Override
     public void validateField(GoodieLong annotation, Object object, Field field) throws GoodieImplementationException {
         if (field.getType() != long.class) {
             throw new GoodieImplementationException("Field type MUST be long");
+        }
+
+        long defaultValue = (long) getDefaultValue(object, field);
+        if (defaultValue < annotation.min()) {
+            throw new GoodieImplementationException("Default value cannot be less than min value.");
+        }
+        if (defaultValue > annotation.max()) {
+            throw new GoodieImplementationException("Default value cannot be more than max value.");
         }
     }
 
@@ -46,7 +48,8 @@ public class GoodieLongLogic extends ValidatorLogic<GoodieLong> {
 
     @Override
     public GoodieElement fixedGoodie(GoodieLong annotation, Object object, Field field, GoodieElement goodie) {
-        return GoodiePrimitive.from(annotation.defaultValue());
+        long defaultValue = (long) getDefaultValue(object, field);
+        return GoodiePrimitive.from(defaultValue);
     }
 
 }

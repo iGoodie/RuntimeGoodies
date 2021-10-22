@@ -13,6 +13,4 @@ public @interface GoodieDouble {
 
     double max() default Double.POSITIVE_INFINITY;
 
-    double defaultValue() default 0.0D;
-
 }

@@ -26,12 +26,24 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GoodieObjectifier {
 
+    @FunctionalInterface
+    public interface MismatchConsumer {
+        void consume(Object object, Field field, String goodiePath, Exception e);
+    }
+
     public void fillFields(Object fillObject, GoodieObject goodieObject) {
+        fillFields(fillObject, goodieObject, (object, field, goodiePath, e) -> {
+            throw new GoodieMismatchException("Types mismatch -> " + goodiePath, e);
+        });
+    }
+
+    public void fillFields(Object fillObject, GoodieObject goodieObject, MismatchConsumer onMismatch) {
         if (isCircularDepending(fillObject))
             throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves.");
 
@@ -51,8 +63,8 @@ public class GoodieObjectifier {
                 Object value = generate(field, goodieElement);
                 ReflectionUtilities.setValue(object, field, value);
 
-            } catch (GoodieMismatchException e) {
-                throw new GoodieMismatchException("Types mismatch -> " + goodiePath, e);
+            } catch (GoodieMismatchException | IllegalArgumentException e) {
+                onMismatch.consume(object, field, goodiePath, e);
             }
         });
 
@@ -210,7 +222,7 @@ public class GoodieObjectifier {
                 return enumValue;
             }
         }
-        return null;
+        throw new GoodieMismatchException("");
     }
 
     private Object generatePOJO(Class<?> pojoType, GoodieObject goodieObject) {

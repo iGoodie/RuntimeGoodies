@@ -2,9 +2,12 @@ package net.programmer.igoodie.configuration;
 
 import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
+import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
+import net.programmer.igoodie.query.GoodieQuery;
 import net.programmer.igoodie.serialization.GoodieObjectifier;
 import net.programmer.igoodie.util.FileUtils;
+import net.programmer.igoodie.util.ReflectionUtilities;
 
 import java.io.File;
 import java.util.function.Consumer;
@@ -37,11 +40,22 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
 
         goodieValidator.validateAndFix(this, goodieObject);
 
+        goodieObjectifier.fillFields(this, goodieObject, (object, field, goodiePath, e) -> {
+            // Reset value in Goodie Object
+            GoodieQuery.set(goodieObject, goodiePath, null);
+
+            // Replace reset value with default
+            goodieValidator.fixMissingValue(object, field, goodieObject, goodiePath);
+
+            // Put back the fixed/corrected value
+            GoodieElement fixedValue = GoodieQuery.query(goodieObject, goodiePath);
+            Object objectifiedValue = goodieObjectifier.generate(field, fixedValue);
+            ReflectionUtilities.setValue(object, field, objectifiedValue);
+        });
+
         if (goodieValidator.changesMade()) {
             onFixed.accept(goodieObject);
         }
-
-        goodieObjectifier.fillFields(this, goodieObject);
 
         return (T) this;
     }

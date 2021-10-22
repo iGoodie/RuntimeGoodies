@@ -3,6 +3,7 @@ package net.programmer.igoodie.configuration.validation.logic;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieString;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
+import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 
 import java.lang.reflect.Field;
@@ -11,17 +12,8 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
 
     @Override
     public void validateAnnotationArgs(GoodieString annotation) throws GoodieImplementationException {
-        if (annotation.length() >= 0 && annotation.defaultValue().length() != annotation.length()) {
-            throw new GoodieImplementationException("Length of the default value should be equals to 'length' value.");
-        }
         if (annotation.min() > annotation.max()) {
             throw new GoodieImplementationException("'min' value cannot be more than `max` value");
-        }
-        if (annotation.defaultValue().length() < annotation.min()) {
-            throw new GoodieImplementationException("Default value cannot be less longer than 'min' value.");
-        }
-        if (annotation.defaultValue().length() > annotation.max()) {
-            throw new GoodieImplementationException("Default value cannot be longer than 'max' value.");
         }
     }
 
@@ -29,6 +21,19 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
     public void validateField(GoodieString annotation, Object object, Field field) throws GoodieImplementationException {
         if (field.getType() != String.class) {
             throw new GoodieImplementationException("Field type MUST be String");
+        }
+
+        String defaultValue = (String) getDefaultValue(object, field);
+        if (defaultValue != null) {
+            if (annotation.length() >= 0 && defaultValue.length() != annotation.length()) {
+                throw new GoodieImplementationException("Length of the default value should be equals to 'length' value.");
+            }
+            if (defaultValue.length() < annotation.min()) {
+                throw new GoodieImplementationException("Default value cannot be less longer than 'min' value.");
+            }
+            if (defaultValue.length() > annotation.max()) {
+                throw new GoodieImplementationException("Default value cannot be longer than 'max' value.");
+            }
         }
     }
 
@@ -56,7 +61,9 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
 
     @Override
     public GoodieElement fixedGoodie(GoodieString annotation, Object object, Field field, GoodieElement goodie) {
-        return GoodiePrimitive.from(annotation.defaultValue());
+        String defaultValue = (String) getDefaultValue(object, field);
+        if (defaultValue == null) return new GoodieNull();
+        return GoodiePrimitive.from(defaultValue);
     }
 
 }

@@ -4,6 +4,7 @@ import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.registry.Registrable;
 import net.programmer.igoodie.util.ArrayAccessor;
+import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.annotation.Annotation;
@@ -31,5 +32,9 @@ public abstract class ValidatorLogic<A extends Annotation> implements Registrabl
     public abstract boolean isValidValue(A annotation, GoodieElement goodie);
 
     public abstract GoodieElement fixedGoodie(A annotation, Object object, Field field, GoodieElement goodie);
+
+    public Object getDefaultValue(Object object, Field field) {
+        return ReflectionUtilities.getValue(object, field);
+    }
 
 }

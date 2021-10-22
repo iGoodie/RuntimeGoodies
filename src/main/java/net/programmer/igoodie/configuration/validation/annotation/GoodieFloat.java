@@ -13,6 +13,4 @@ public @interface GoodieFloat {
 
     float max() default Float.POSITIVE_INFINITY;
 
-    float defaultValue() default 0.0F;
-
 }

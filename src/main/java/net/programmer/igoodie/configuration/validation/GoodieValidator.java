@@ -8,6 +8,7 @@ import net.programmer.igoodie.query.GoodieQuery;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
 import net.programmer.igoodie.util.Couple;
 import net.programmer.igoodie.util.GoodieTraverser;
+import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.annotation.Annotation;
@@ -26,7 +27,7 @@ public class GoodieValidator {
         goodieTraverser.traverseGoodies(validateObject, (object, field, goodiePath) -> {
             fixByDataStringifier(field, goodieObject, goodiePath);
             fixByValidators(object, field, goodieObject, goodiePath);
-            fixMissingValue(field, goodieObject, goodiePath);
+            fixMissingValue(object, field, goodieObject, goodiePath);
         });
     }
 
@@ -71,9 +72,17 @@ public class GoodieValidator {
         }
     }
 
-    public void fixMissingValue(Field field, GoodieObject goodieObject, String goodiePath) {
+    public void fixMissingValue(Object object, Field field, GoodieObject goodieObject, String goodiePath) {
         GoodieElement query = GoodieQuery.query(goodieObject, goodiePath);
         if (query == null) {
+            Object declaredDefault = ReflectionUtilities.getValue(object, field);
+
+            if (declaredDefault != null) {
+                GoodieQuery.set(goodieObject, goodiePath, GoodieElement.from(declaredDefault));
+                changesMade = true;
+                return;
+            }
+
             if (TypeUtilities.isPrimitive(field)) {
                 Object defaultValue = TypeUtilities.defaultValue(field.getType());
                 if (defaultValue != null) {
@@ -88,8 +97,8 @@ public class GoodieValidator {
             } else {
                 GoodieQuery.set(goodieObject, goodiePath, new GoodieNull());
             }
+            changesMade = true;
         }
-
     }
 
     public boolean changesMade() {
