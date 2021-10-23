@@ -24,6 +24,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
     }
 
     public <T extends ConfiGoodie<F>> T readConfig(File file, Consumer<GoodieObject> onFixed) {
+        // TODO: mkdirs and create file if does not exist
         return readConfig(FileUtils.readString(file), onFixed);
     }
 
@@ -53,6 +54,8 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
             Object objectifiedValue = goodieObjectifier.generate(field, fixedValue);
             ReflectionUtilities.setValue(object, field, objectifiedValue);
         });
+
+        // TODO: Option to trim non-existing goodie fields
 
         if (goodieValidator.changesMade()) {
             onFixed.accept(goodieObject);

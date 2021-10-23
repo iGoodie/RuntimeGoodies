@@ -17,6 +17,8 @@ public abstract class GoodieElement {
     public static GoodieElement from(Object value) {
         if (value == null) {
             return new GoodieNull();
+        } else if (value instanceof GoodieElement) {
+            return ((GoodieElement) value).deepCopy();
         } else if (TypeUtilities.isPrimitive(value.getClass())) {
             return GoodiePrimitive.from(value);
         } else if (TypeUtilities.isArray(value.getClass())) {
@@ -76,11 +78,13 @@ public abstract class GoodieElement {
         return GoodiePrimitive.from(enumeration.name());
     }
 
-    @SuppressWarnings("unchecked")
     private static <T> GoodieElement fromField(Field field, T value) {
         if (value == null) return new GoodieNull();
 
+        @SuppressWarnings("unchecked")
         Class<T> type = (Class<T>) field.getClass();
+
+        @SuppressWarnings("unchecked")
         DataStringifier<T> dataStringifier = (DataStringifier<T>) RuntimeGoodies.DATA_STRINGIFIERS.get(type);
 
         return dataStringifier != null

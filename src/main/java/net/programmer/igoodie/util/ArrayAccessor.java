@@ -1,7 +1,5 @@
 package net.programmer.igoodie.util;
 
-import java.util.stream.Stream;
-
 public class ArrayAccessor<T> {
 
     private T[] array;

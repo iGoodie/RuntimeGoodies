@@ -27,6 +27,23 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/*
+ * Object - anything
+ *
+ * GoodieElement - goodie
+ *
+ * primitive
+ * Enum<T>
+ * POJO
+ *
+ * List<T>
+ * List<List<T>>
+ * List<Map<String, T>>
+ *
+ * Map<String, T>
+ * Map<String, List<T>>
+ * Map<String, Map<String, T>>
+ */
 public class GoodieObjectifier {
 
     @FunctionalInterface
@@ -47,6 +64,10 @@ public class GoodieObjectifier {
         GoodieTraverser goodieTraverser = new GoodieTraverser();
 
         goodieTraverser.traverseGoodies(fillObject, (object, field, goodiePath) -> {
+            if (TypeUtilities.isArray(field)) { // Disallow usage of Arrays over Lists
+                throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", field);
+            }
+
             GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
 
             for (GoodieTransformerLogic transformer : getTransformers(field)) {
@@ -154,7 +175,7 @@ public class GoodieObjectifier {
     }
 
     private Object generateGoodie(GoodieElement element) {
-        return element;
+        return element.deepCopy();
     }
 
     private Object generatePrimitiveValue(Class<?> primitiveType, GoodiePrimitive goodiePrimitive) {
