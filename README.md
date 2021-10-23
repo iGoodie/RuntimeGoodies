@@ -20,6 +20,9 @@
   <a href="https://github.com/iGoodie/RuntimeGoodies/releases">
     <img src="https://img.shields.io/github/v/release/iGoodie/RuntimeGoodies?include_prereleases&label=release-snapshot"/>
   </a>
+  <a href="https://github.com/iGoodie/RuntimeGoodies">
+    <img src="https://img.shields.io/github/languages/top/iGoodie/RuntimeGoodies"/>
+  </a>
 
   <br/>
 
