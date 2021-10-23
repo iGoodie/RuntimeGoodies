@@ -12,6 +12,7 @@
 
 <!-- Badges -->
 <p align="center">
+  <img src="https://raw.githubusercontent.com/iGoodie/RuntimeGoodies/master/.github/assets/main-badge.png" height="20px"/>
   <a>
     <img src="https://img.shields.io/github/v/release/iGoodie/RuntimeGoodies"/>
   </a>
@@ -20,7 +21,7 @@
   </a>
 </p>
 <p align="center">
-  <img src="https://raw.githubusercontent.com/iGoodie/RuntimeGoodies/master/.github/assets/github-logo.png" height="20px"/>
+  <img src="https://raw.githubusercontent.com/iGoodie/RuntimeGoodies/master/.github/assets/github-badge.png" height="20px"/>
   <a>
     <img src="https://img.shields.io/github/last-commit/iGoodie/RuntimeGoodies"/>
   </a>
