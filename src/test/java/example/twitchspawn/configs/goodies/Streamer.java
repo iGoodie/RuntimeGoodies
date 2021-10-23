@@ -1,11 +1,10 @@
 package example.twitchspawn.configs.goodies;
 
-import net.programmer.igoodie.configuration.JsonConfiGoodie;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieString;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 
-public class Streamer extends JsonConfiGoodie {
+public class Streamer {
 
     @Goodie
     @GoodieString
@@ -18,7 +17,7 @@ public class Streamer extends JsonConfiGoodie {
     public Platform platform = Platform.STREAMLABS;
 
     @Goodie
-    @GoodieFloat
+    @GoodieFloat(max = 100)
     public float score;
 
     @Goodie

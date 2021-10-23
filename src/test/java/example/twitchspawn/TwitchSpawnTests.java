@@ -16,7 +16,7 @@ public class TwitchSpawnTests {
 
         CredentialsConfig credentialsConfig = new CredentialsConfig().readConfig(TestFiles.loadData("credentials_config.json"), fixedGoodie -> {
             System.out.println("Fixed as Goodie: " + fixedGoodie);
-            System.out.println("Fixed as JSON  : " + goodieFormat.readFromGoodie(fixedGoodie));
+            System.out.println("Fixed as JSON  : " + goodieFormat.writeToString(fixedGoodie, true));
         });
 
         new GoodieTraverser().traverseGoodies(credentialsConfig, (object, field, goodiePath) -> {
