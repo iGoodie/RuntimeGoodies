@@ -49,13 +49,13 @@
 
 # Description
 
-RuntimeGoodies is a library developed with Java 8 to solve a fundamental problem: reading program configurations. It
+RuntimeGoodies is a library developed with Java 8 to solve a fundamental problem: reading & maintaining program configurations. It
 attempts to load external config files into declared <a href="https://en.wikipedia.org/wiki/Plain_old_Java_object">
 POJO<a/>s with its custom annotations and validators. It even fixes the configs when necessary.
 
-Out of the box, it comes with a built-in way to represent entities universally during runtime called Goodies. Goodies
-are serializable in any format desired. They have a very similar structure
-to <a href="https://www.json.org/json-en.html">JSON<a/> elements. Goodies do not exist outside the runtime.
+Out of the box, it comes with a built-in way to universally represent entities during runtime called Goodies. Goodies
+are serializable in any format desired (with built-in [Google's GSON](https://github.com/google/gson) converters). They have a very similar structure
+to <a href="https://www.json.org/json-en.html">JSON<a/> elements. Goodies do not exist outside the runtime, they are in-memory only.
 
 # How to Use?
 
@@ -87,7 +87,7 @@ section. Alternatively, `master-SNAPSHOT` can be used to depend on the nightly v
 
 # Getting Started
 
-1. Create a POJO (ConfiGoodie) to represent the external config file. (In this example, external file is a JSON one)
+1. Create a POJO (ConfiGoodie) to represent the external config file. (In this example, external file is in JSON format)
 
 ```java
 public class ServerConfig extends JsonConfiGoodie {
@@ -127,7 +127,7 @@ public class ServerConfig extends JsonConfiGoodie {
 }
 ```
 
-2. Instance that POJO and let RuntimeGoodie read and fix for you!
+2. Instance that POJO and let RuntimeGoodie read (and fix if necessary) for you!
 
 ```java
 public static class Test {
@@ -145,7 +145,7 @@ public static class Test {
 }
 ```
 
-In order to learn more about what you else you can do, check
+In order to learn more about what else you can do, check
 the <a href="https://github.com/iGoodie/RuntimeGoodies/wiki">Wiki<a/> out!
 
 ## Facing an Issue?
