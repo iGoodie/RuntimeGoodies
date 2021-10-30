@@ -105,7 +105,7 @@ public class ServerConfig extends JsonConfiGoodie {
     int port = 3000; // You can declare default values!
 
     @Goodie
-    DBConnection mongodbConnection; // Other GoodieConfigs can be nested too!
+    DBConnection mongodbConnection; // Other ConfiGoodies/POJOs can be nested too!
 
     @Goodie
     DBConnection mysqlConnection = defaultValue(() -> {
@@ -133,7 +133,7 @@ public class ServerConfig extends JsonConfiGoodie {
 2. Instance that POJO and let RuntimeGoodie read (and fix if necessary) for you!
 
 ```java
-public static class Test {
+public class Test {
 
     public static void main(String[] args) {
         File configFile = new File("path/to/config.json");

@@ -1,6 +1,7 @@
 package example.twitchspawn;
 
 import example.twitchspawn.configs.CredentialsConfig;
+import net.programmer.igoodie.configuration.ConfiGoodieOptions;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.util.GoodieTraverser;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,14 @@ public class TwitchSpawnTests {
     public void testGoodies() throws IOException {
         GsonGoodieFormat goodieFormat = new GsonGoodieFormat();
 
-        CredentialsConfig credentialsConfig = new CredentialsConfig().readConfig(TestFiles.loadData("credentials_config.json"), fixedGoodie -> {
-            System.out.println("Fixed as Goodie: " + fixedGoodie);
-            System.out.println("Fixed as JSON  : " + goodieFormat.writeToString(fixedGoodie, true));
-        });
+        ConfiGoodieOptions options = new ConfiGoodieOptions()
+                .useText(TestFiles.loadData("credentials_config.json"))
+                .onFixed(fixedGoodie -> {
+                    System.out.println("Fixed as Goodie: " + fixedGoodie);
+                    System.out.println("Fixed as JSON  : " + goodieFormat.writeToString(fixedGoodie, true));
+                });
+
+        CredentialsConfig credentialsConfig = new CredentialsConfig().readConfig(options);
 
         new GoodieTraverser().traverseGoodies(credentialsConfig, (object, field, goodiePath) -> {
             try {

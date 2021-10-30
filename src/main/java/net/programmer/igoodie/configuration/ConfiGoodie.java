@@ -10,7 +10,7 @@ import net.programmer.igoodie.util.FileUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
 
 import java.io.File;
-import java.util.function.Consumer;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
@@ -18,27 +18,24 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
     public abstract F getFormat();
 
     public <T extends ConfiGoodie<F>> T readConfig(File file) {
-        return readConfig(file, fixedGoodie -> {
-            // TODO: Override File
-        });
+        return readConfig(new ConfiGoodieOptions().useFile(file));
     }
 
-    public <T extends ConfiGoodie<F>> T readConfig(File file, Consumer<GoodieObject> onFixed) {
-        // TODO: mkdirs and create file if does not exist
-        return readConfig(FileUtils.readString(file), onFixed);
-    }
-
-    public <T extends ConfiGoodie<F>> T readConfig(String externalFormat) {
-        return readConfig(externalFormat, fixedGoodie -> {});
+    public <T extends ConfiGoodie<F>> T readConfig(String externalText) {
+        return readConfig(new ConfiGoodieOptions().useText(externalText));
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ConfiGoodie<F>> T readConfig(String json, Consumer<GoodieObject> onFixed) {
-        F format = getFormat();
+    public <T extends ConfiGoodie<F>> T readConfig(ConfiGoodieOptions options) {
+        if (options.externalConfigText == null) {
+            throw new IllegalArgumentException("Passed options do not contain any config data...");
+        }
+
+        F goodieFormat = getFormat();
         GoodieValidator goodieValidator = new GoodieValidator();
         GoodieObjectifier goodieObjectifier = new GoodieObjectifier();
 
-        GoodieObject goodieObject = format.readGoodieFromString(json);
+        GoodieObject goodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
 
         goodieValidator.validateAndFix(this, goodieObject);
 
@@ -58,7 +55,18 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
         // TODO: Option to trim non-existing goodie fields
 
         if (goodieValidator.changesMade()) {
-            onFixed.accept(goodieObject);
+            if (options.onFixed != null) {
+                options.onFixed.accept(goodieObject);
+
+            } else if (options.externalConfigFile != null && options.renameInvalidConfig != null) {
+                String serializedGoodie = goodieFormat.writeToString(goodieObject, true);
+                if (!FileUtils.isEmpty(options.externalConfigFile)) {
+                    String movePath = options.renameInvalidConfig.accept(options.externalConfigFile, goodieObject);
+                    FileUtils.moveFile(options.externalConfigFile, new File(movePath));
+                    FileUtils.createFileIfAbsent(options.externalConfigFile);
+                }
+                FileUtils.writeString(options.externalConfigFile, serializedGoodie, StandardCharsets.UTF_8);
+            }
         }
 
         return (T) this;

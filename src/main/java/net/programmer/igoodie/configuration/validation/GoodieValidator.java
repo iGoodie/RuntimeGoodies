@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-// TODO: Required & Optional annotations (?)
 public class GoodieValidator {
 
     private boolean changesMade;
@@ -46,16 +45,24 @@ public class GoodieValidator {
 
         if (dataStringifier != null) {
             GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
+
             if (goodieElement != null && goodieElement.isPrimitive()) {
                 GoodiePrimitive goodiePrimitive = goodieElement.asPrimitive();
+
                 if (goodiePrimitive.isString()) {
                     try {
                         dataStringifier.objectify(goodiePrimitive.getString());
                     } catch (Exception e) {
-                        GoodieQuery.set(goodieObject, goodiePath, GoodiePrimitive.from(dataStringifier.defaultStringValue()));
+                        GoodiePrimitive defaultGoodieValue = GoodiePrimitive.from(dataStringifier.defaultStringValue());
+                        GoodieQuery.set(goodieObject, goodiePath, defaultGoodieValue);
                         changesMade = true;
                     }
                 }
+
+            } else {
+                GoodiePrimitive defaultGoodieValue = GoodiePrimitive.from(dataStringifier.defaultStringValue());
+                GoodieQuery.set(goodieObject, goodiePath, defaultGoodieValue);
+                changesMade = true;
             }
         }
     }

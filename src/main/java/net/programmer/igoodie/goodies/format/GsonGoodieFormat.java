@@ -117,6 +117,9 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
         try {
             JsonElement jsonElement = JsonParser.parseString(text);
 
+            if (jsonElement.isJsonNull())
+                return new JsonObject();
+
             if (!jsonElement.isJsonObject())
                 throw new GoodieParseException("Expected a JSON object, instead found -> " + jsonElement.getClass());
 
