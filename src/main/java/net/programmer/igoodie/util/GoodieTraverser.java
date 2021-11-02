@@ -2,11 +2,16 @@ package net.programmer.igoodie.util;
 
 import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.exception.GoodieImplementationException;
+import net.programmer.igoodie.goodies.runtime.GoodieArray;
+import net.programmer.igoodie.goodies.runtime.GoodieElement;
+import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GoodieTraverser {
 
@@ -15,11 +20,24 @@ public class GoodieTraverser {
         void consume(Object object, Field field, String goodiePath);
     }
 
-    public void traverseGoodies(Object object, GoodieFieldConsumer consumer) {
-        traverseGoodies(object, consumer, "$");
+    @FunctionalInterface
+    public interface GoodiePathConsumer {
+        void consume(String goodiePath);
     }
 
-    private void traverseGoodies(Object object, GoodieFieldConsumer consumer, String path) {
+    public Set<String> summarizeObject(Object object) {
+        Set<String> paths = new HashSet<>();
+        traverseGoodieFields(object, (obj, field, goodiePath) -> {
+            paths.add(goodiePath);
+        });
+        return paths;
+    }
+
+    public void traverseGoodieFields(Object object, GoodieFieldConsumer consumer) {
+        traverseGoodieFields(object, consumer, "$");
+    }
+
+    private void traverseGoodieFields(Object object, GoodieFieldConsumer consumer, String path) {
         if (isCircularDepending(object)) // Disallow usage of circular goodie models
             throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves.");
 
@@ -40,34 +58,42 @@ public class GoodieTraverser {
 
             if (dataStringifier != null) {
                 consumer.consume(object, goodieField, path + "." + key);
+
+            } else if (TypeUtilities.isGoodie(goodieField)) {
+                consumer.consume(object, goodieField, path + "." + key);
+
             } else if (TypeUtilities.isPrimitive(goodieField)) {
                 consumer.consume(object, goodieField, path + "." + key);
+
             } else if (TypeUtilities.isEnum(goodieField)) {
                 consumer.consume(object, goodieField, path + "." + key);
+
             } else if (TypeUtilities.isMap(goodieField)) {
                 consumer.consume(object, goodieField, path + "." + key);
+
             } else if (TypeUtilities.isList(goodieField)) {
                 consumer.consume(object, goodieField, path + "." + key);
-                // TODO: Also traverse all the elements
+
             } else if (goodieField.getType() == Object.class) {
                 consumer.consume(object, goodieField, path + "." + key);
+
             } else {
-                Object pojo = createDefaultInstance(fieldType);
+                Object pojo = createNullaryInstance(fieldType);
                 ReflectionUtilities.setValue(object, goodieField, pojo);
-                traverseGoodies(pojo, consumer, path + "." + key);
+                traverseGoodieFields(pojo, consumer, path + "." + key);
             }
         }
     }
 
     /* ------------------------------ */
 
-    public <T> T createDefaultInstance(Class<T> type) {
+    public <T> T createNullaryInstance(Class<T> type) {
         try {
             return type.newInstance();
         } catch (InstantiationException e) {
-            throw new GoodieImplementationException("Goodies MUST have a default constructor", e, type);
+            throw new GoodieImplementationException("Goodies MUST have a nullary constructor", e, type);
         } catch (IllegalAccessException e) {
-            throw new GoodieImplementationException("Goodies MUST have their default constructor accessible", e, type);
+            throw new GoodieImplementationException("Goodies MUST have their nullary constructor accessible", e, type);
         }
     }
 

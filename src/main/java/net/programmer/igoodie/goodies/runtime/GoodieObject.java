@@ -161,7 +161,7 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
 
     @Override
     public String toString() {
-        return map.toString();
+        return "g" + map.toString();
     }
 
 }

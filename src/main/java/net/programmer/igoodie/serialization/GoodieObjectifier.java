@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,7 +62,7 @@ public class GoodieObjectifier {
 
         GoodieTraverser goodieTraverser = new GoodieTraverser();
 
-        goodieTraverser.traverseGoodies(fillObject, (object, field, goodiePath) -> {
+        goodieTraverser.traverseGoodieFields(fillObject, (object, field, goodiePath) -> {
             if (TypeUtilities.isArray(field)) { // Disallow usage of Arrays over Lists
                 throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", field);
             }
@@ -80,6 +79,8 @@ public class GoodieObjectifier {
             } else try {
                 Object value = generate(field, goodieElement);
                 ReflectionUtilities.setValue(object, field, value);
+                System.out.println("Set field: " + field);
+                System.out.println("Set value: " + value);
 
             } catch (GoodieMismatchException | IllegalArgumentException e) {
                 onMismatch.consume(object, field, goodiePath, e);
@@ -179,15 +180,42 @@ public class GoodieObjectifier {
     }
 
     private Object generatePrimitiveValue(Class<?> primitiveType, GoodiePrimitive goodiePrimitive) {
-        return goodiePrimitive.get(); // TODO
+        try {
+            if (primitiveType == boolean.class || primitiveType == Boolean.class) {
+                return goodiePrimitive.getBoolean();
+            } else if (primitiveType == char.class || primitiveType == Character.class) {
+                return goodiePrimitive.getCharacter();
+            } else if (primitiveType == String.class) {
+                return goodiePrimitive.getString();
+            } else if (primitiveType == Long.class || primitiveType == long.class) {
+                return goodiePrimitive.getLong();
+            } else if (primitiveType == Integer.class || primitiveType == int.class) {
+                return goodiePrimitive.getInteger();
+            } else if (primitiveType == Short.class || primitiveType == short.class) {
+                return goodiePrimitive.getShort();
+            } else if (primitiveType == Byte.class || primitiveType == byte.class) {
+                return goodiePrimitive.getByte();
+            } else if (primitiveType == Double.class || primitiveType == double.class) {
+                return goodiePrimitive.getDouble();
+            } else if (primitiveType == Float.class || primitiveType == float.class) {
+                return goodiePrimitive.getFloat();
+            }
+            return null; // Was unable to generate given type from given goodie primitive
+
+        } catch (Exception e) {
+            return null; // Types mismatch :c
+        }
     }
 
     private List<?> generateList(Class<?> listType, GoodieArray goodieArray) {
         List<Object> list = new LinkedList<>();
 
+        System.out.println("\nFrom: " + goodieArray);
+
         for (GoodieElement goodieElement : goodieArray) {
             if (goodieElement.isPrimitive()) {
-                list.add(((GoodiePrimitive) goodieElement).get());
+                Object generatedValue = generatePrimitiveValue(listType, goodieElement.asPrimitive());
+                if (generatedValue != null) list.add(generatedValue);
 
             } else if (goodieElement.isArray()) {
                 // TODO: Array of arrays
@@ -201,9 +229,18 @@ public class GoodieObjectifier {
             }
         }
 
-        if (listType != null) {
-            list.removeIf(item -> item != null && !listType.isInstance(item));
-        }
+        System.out.println("Initialized: " + list);
+
+//        if (listType != null) {
+//            System.out.println("List type: " + listType);
+//            for (Object o : list) {
+//                System.out.printf("%s | %s\n", o, o.getClass());
+//                System.out.println(Number.class.isAssignableFrom(Double.class));
+//            }
+//            list.removeIf(item -> item != null && !item.getClass().isAssignableFrom(listType));
+//        }
+
+        System.out.println("Generated: " + list + "\n");
 
         return list;
     }

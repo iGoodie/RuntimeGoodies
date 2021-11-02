@@ -5,6 +5,7 @@ import net.programmer.igoodie.query.accessor.GoodieQueryAccessor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 /*
  * $
@@ -40,6 +41,15 @@ public class GoodieQuery {
     }
 
     public GoodieElement set(GoodieElement rootElement, GoodieElement value) {
+        doForLeaf(rootElement, (accessor, leafElement) -> accessor.setValue(leafElement, value));
+        return value;
+    }
+
+    public void delete(GoodieElement rootElement) {
+        doForLeaf(rootElement, GoodieQueryAccessor::delete);
+    }
+
+    private void doForLeaf(GoodieElement rootElement, BiConsumer<GoodieQueryAccessor, GoodieElement> consumer) {
         GoodieElement parent = null;
         GoodieQueryAccessor parentAccessor = null;
         GoodieElement current = rootElement;
@@ -53,7 +63,7 @@ public class GoodieQuery {
             }
 
             if (isLeaf(accessor)) {
-                accessor.setValue(current, value);
+                consumer.accept(accessor, current);
             } else {
                 current = accessor.accessOrCreate(parent, parentAccessor, current);
             }
@@ -61,8 +71,6 @@ public class GoodieQuery {
             parent = temp;
             parentAccessor = accessor;
         }
-
-        return value;
     }
 
     /* --------------------------------- */
@@ -75,6 +83,11 @@ public class GoodieQuery {
     public static GoodieElement set(GoodieElement goodie, String queryString, GoodieElement value) {
         GoodieQuery goodieQuery = new GoodieQueryParser(queryString).parse();
         return goodieQuery.set(goodie, value);
+    }
+
+    public static void delete(GoodieElement goodie, String queryString) {
+        GoodieQuery goodieQuery = new GoodieQueryParser(queryString).parse();
+        goodieQuery.delete(goodie);
     }
 
 }

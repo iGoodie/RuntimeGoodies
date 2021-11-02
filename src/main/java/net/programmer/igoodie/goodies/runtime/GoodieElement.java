@@ -31,7 +31,7 @@ public abstract class GoodieElement {
             return fromEnum((Enum<?>) value);
         } else {
             GoodieObject goodieObject = new GoodieObject();
-            new GoodieTraverser().traverseGoodies(value, (object, field, goodiePath) -> {
+            new GoodieTraverser().traverseGoodieFields(value, (object, field, goodiePath) -> {
                 Object fieldValue = ReflectionUtilities.getValue(object, field);
                 GoodieQuery.set(goodieObject, goodiePath, fromField(field, fieldValue));
             });

@@ -11,7 +11,7 @@ public class ConfiGoodieOptions {
     protected FileNameSupplier renameInvalidConfig;
     protected File externalConfigFile;
     protected String externalConfigText;
-    protected boolean trimRedundantFields;
+    protected boolean trimExcessiveFields;
 
     @FunctionalInterface
     public interface GoodieFixedConsumer {
@@ -44,8 +44,8 @@ public class ConfiGoodieOptions {
         return this;
     }
 
-    public ConfiGoodieOptions trimRedundantFields() {
-        this.trimRedundantFields = true;
+    public ConfiGoodieOptions trimExcessiveFields() {
+        this.trimExcessiveFields = true;
         return this;
     }
 

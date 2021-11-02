@@ -1,5 +1,6 @@
 package net.programmer.igoodie.goodies.runtime;
 
+import net.programmer.igoodie.util.NumberUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
 import java.util.Objects;
@@ -26,7 +27,7 @@ public class GoodiePrimitive extends GoodieElement {
     }
 
     public GoodiePrimitive(Number number) {
-        this.value = Objects.requireNonNull(number);
+        this.value = NumberUtilities.fitToLargestDatatype(Objects.requireNonNull(number));
     }
 
     public GoodiePrimitive(String string) {
@@ -114,9 +115,9 @@ public class GoodiePrimitive extends GoodieElement {
 
     @Override
     public String toString() {
-        if (isNumber()) return value + numericAppendix();
-        if (isString()) return String.format("\"%s\"", value);
-        return value.toString();
+        if (isNumber()) return "g" + value + numericAppendix();
+        if (isString()) return String.format("g\"%s\"", value);
+        return "g" + value.toString();
     }
 
     private String numericAppendix() {

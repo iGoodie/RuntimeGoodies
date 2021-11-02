@@ -11,12 +11,7 @@ public class RuntimeGoodies {
     public static Registry<Class<?>, DataStringifier<?>> DATA_STRINGIFIERS = new Registry<>(
             new DateStringifier(),
             new InstantStringifier(),
-            new UUIDStringifier(),
-            new NumberStringifier(),
-            new NumberStringifier.DoubleStringifier(),
-            new NumberStringifier.FloatStringifier(),
-            new NumberStringifier.LongStringifier(),
-            new NumberStringifier.IntegerStringifier()
+            new UUIDStringifier()
     );
 
     public static Registry<Class<?>, ValidatorLogic<? extends Annotation>> VALIDATORS = new Registry<>(

@@ -136,7 +136,7 @@ public class GoodieArray extends GoodieElement implements List<GoodieElement> {
 
     @Override
     public String toString() {
-        return "[" + elements.stream()
+        return "g[" + elements.stream()
                 .map(element -> element == null ? "null" : element.toString())
                 .collect(Collectors.joining(", ")) + "]";
     }

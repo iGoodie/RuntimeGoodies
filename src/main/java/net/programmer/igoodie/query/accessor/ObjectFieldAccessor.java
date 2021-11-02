@@ -75,6 +75,15 @@ public class ObjectFieldAccessor extends GoodieQueryAccessor {
     }
 
     @Override
+    public void delete(GoodieElement goodieElement) {
+        if (!canAccess(goodieElement)) {
+            throw new GoodieQueryError("Cannot delete a field of non-object elements");
+        }
+
+        goodieElement.asObject().remove(fieldName);
+    }
+
+    @Override
     public String toString() {
         return "." + fieldName;
     }

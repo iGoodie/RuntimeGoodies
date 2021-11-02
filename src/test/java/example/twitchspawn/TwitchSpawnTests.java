@@ -24,7 +24,7 @@ public class TwitchSpawnTests {
 
         CredentialsConfig credentialsConfig = new CredentialsConfig().readConfig(options);
 
-        new GoodieTraverser().traverseGoodies(credentialsConfig, (object, field, goodiePath) -> {
+        new GoodieTraverser().traverseGoodieFields(credentialsConfig, (object, field, goodiePath) -> {
             try {
                 field.setAccessible(true);
                 System.out.println(field.getName() + " = " + field.get(object));

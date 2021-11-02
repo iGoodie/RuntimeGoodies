@@ -9,7 +9,7 @@ public class GoodieNull extends GoodieElement {
 
     @Override
     public String toString() {
-        return "Null";
+        return "gNull";
     }
 
 }

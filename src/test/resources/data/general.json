@@ -1,0 +1,34 @@
+{
+  "primitive1": "Foo",
+  "primitive2": 123,
+  "primitive3": 123,
+  "goodie1": {
+    "foo": "bar"
+  },
+  "goodie2": [
+    1,
+    2,
+    3
+  ],
+  "goodie3": "Primitivee!",
+  "primitiveList": [
+    1,
+    2,
+    3,
+    "Invalid element"
+  ],
+  "primitiveMap": {
+    "foo": 123.45
+  },
+  "uuidMap": {
+    "00000000-0000-0000-0000-000000000000": 123.45,
+    "00000000-0000-0000-0000-000000000001": 123.45,
+    "00000000-0000-0000-0000-000000000002": 123.45
+  },
+  "pojo": {
+    "primitive1": "Foo",
+    "primitive2": 123
+  },
+  "any": null,
+  "excessive": true
+}

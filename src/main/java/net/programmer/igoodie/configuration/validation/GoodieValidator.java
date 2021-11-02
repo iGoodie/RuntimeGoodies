@@ -1,6 +1,7 @@
 package net.programmer.igoodie.configuration.validation;
 
 import net.programmer.igoodie.RuntimeGoodies;
+import net.programmer.igoodie.configuration.validation.annotation.GoodieNullable;
 import net.programmer.igoodie.configuration.validation.logic.ValidatorLogic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.*;
@@ -27,17 +28,25 @@ public class GoodieValidator {
 
         Set<String> pathsTraversed = new HashSet<>();
 
-        goodieTraverser.traverseGoodies(validateObject, (object, field, goodiePath) -> {
+        goodieTraverser.traverseGoodieFields(validateObject, (object, field, goodiePath) -> {
             if (pathsTraversed.contains(goodiePath)) {
                 throw new GoodieImplementationException("Goodie path mapped more than once -> " + goodiePath);
             }
 
+            fixByNonNullability(field, goodieObject, goodiePath);
             fixByDataStringifier(field, goodieObject, goodiePath);
             fixByValidators(object, field, goodieObject, goodiePath);
             fixMissingValue(object, field, goodieObject, goodiePath);
 
             pathsTraversed.add(goodiePath);
         });
+    }
+
+    public void fixByNonNullability(Field field, GoodieObject goodieObject, String goodiePath) {
+        GoodieElement query = GoodieQuery.query(goodieObject, goodiePath);
+        if (query != null && !isNullable(field) && query.isNull()) {
+            GoodieQuery.delete(goodieObject, goodiePath);
+        }
     }
 
     public void fixByDataStringifier(Field field, GoodieObject goodieObject, String goodiePath) {
@@ -90,10 +99,20 @@ public class GoodieValidator {
     }
 
     public void fixMissingValue(Object object, Field field, GoodieObject goodieObject, String goodiePath) {
-        GoodieElement query = GoodieQuery.query(goodieObject, goodiePath);
-        if (query == null) {
-            Object declaredDefault = ReflectionUtilities.getValue(object, field);
+        Object declaredDefault = ReflectionUtilities.getValue(object, field);
+        if (declaredDefault == null && !isNullable(field)) {
+            if (field.getType() != Object.class
+                    && !TypeUtilities.isGoodie(field)
+                    && !TypeUtilities.isPrimitive(field)
+                    && !TypeUtilities.isList(field)
+                    && !TypeUtilities.isMap(field)) {
+                throw new GoodieImplementationException("A non-nullable field should have a default value declared.", field);
+            }
+        }
 
+        GoodieElement query = GoodieQuery.query(goodieObject, goodiePath);
+
+        if (query == null) {
             if (declaredDefault != null) {
                 GoodieQuery.set(goodieObject, goodiePath, GoodieElement.from(declaredDefault));
                 changesMade = true;
@@ -105,15 +124,25 @@ public class GoodieValidator {
                 if (defaultValue != null) {
                     GoodieQuery.set(goodieObject, goodiePath, GoodiePrimitive.from(defaultValue));
                 } else {
-                    GoodieQuery.set(goodieObject, goodiePath, new GoodieNull());
+                    throw new InternalError("How the hack does a primitive not have a default value?");
                 }
+
             } else if (TypeUtilities.isList(field)) {
                 GoodieQuery.set(goodieObject, goodiePath, new GoodieArray());
+
             } else if (TypeUtilities.isMap(field)) {
                 GoodieQuery.set(goodieObject, goodiePath, new GoodieObject());
+
+            } else if (field.getType() == GoodieObject.class) {
+                GoodieQuery.set(goodieObject, goodiePath, new GoodieObject());
+
+            } else if (field.getType() == GoodieArray.class) {
+                GoodieQuery.set(goodieObject, goodiePath, new GoodieArray());
+
             } else {
                 GoodieQuery.set(goodieObject, goodiePath, new GoodieNull());
             }
+
             changesMade = true;
         }
     }
@@ -135,6 +164,11 @@ public class GoodieValidator {
             }
         }
         return annotations;
+    }
+
+    private boolean isNullable(Field field) {
+        GoodieNullable annotation = field.getAnnotation(GoodieNullable.class);
+        return annotation != null;
     }
 
 }

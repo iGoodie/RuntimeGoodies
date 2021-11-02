@@ -14,6 +14,8 @@ public abstract class GoodieQueryAccessor {
 
     public abstract void setValue(GoodieElement goodieElement, GoodieElement value);
 
+    public abstract void delete(GoodieElement goodieElement);
+
     @Override
     public abstract String toString();
 

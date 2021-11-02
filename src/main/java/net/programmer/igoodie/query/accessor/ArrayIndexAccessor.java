@@ -84,6 +84,15 @@ public class ArrayIndexAccessor extends GoodieQueryAccessor {
     }
 
     @Override
+    public void delete(GoodieElement goodieElement) {
+        if (!canAccess(goodieElement)) {
+            throw new GoodieQueryError("Cannot access indices of non-array elements");
+        }
+
+        goodieElement.asArray().remove(index);
+    }
+
+    @Override
     public String toString() {
         return "[" + index + "]";
     }
