@@ -52,21 +52,8 @@ public final class ReflectionUtilities {
         }
     }
 
-    public static Constructor<?> findDefaultConstructor(Class<?> type) {
-        for (Constructor<?> constructor : type.getConstructors()) {
-            if (constructor.getParameterCount() == 0) {
-                return constructor;
-            }
-        }
-        return null;
-    }
-
-    public static <T> T newInstanceOrDefault(Class<T> type, T defaultValue) {
-        try {
-            return type.newInstance();
-        } catch (Exception e) {
-            return defaultValue;
-        }
+    public static <T> T createNullaryInstance(Class<T> type) throws InstantiationException, IllegalAccessException {
+        return type.newInstance();
     }
 
     /* ----------------------------- */

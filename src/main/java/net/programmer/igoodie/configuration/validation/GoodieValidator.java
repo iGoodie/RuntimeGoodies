@@ -30,7 +30,7 @@ public class GoodieValidator {
 
         goodieTraverser.traverseGoodieFields(validateObject, (object, field, goodiePath) -> {
             if (pathsTraversed.contains(goodiePath)) {
-                throw new GoodieImplementationException("Goodie path mapped more than once -> " + goodiePath);
+                throw new GoodieImplementationException("Goodies MUST not have field paths mapped more than once -> " + goodiePath);
             }
 
             fixByNonNullability(field, goodieObject, goodiePath);
@@ -101,12 +101,13 @@ public class GoodieValidator {
     public void fixMissingValue(Object object, Field field, GoodieObject goodieObject, String goodiePath) {
         Object declaredDefault = ReflectionUtilities.getValue(object, field);
         if (declaredDefault == null && !isNullable(field)) {
-            if (field.getType() != Object.class
+            if (RuntimeGoodies.DATA_STRINGIFIERS.get(field.getType()) == null
+                    && field.getType() != Object.class
                     && !TypeUtilities.isGoodie(field)
                     && !TypeUtilities.isPrimitive(field)
                     && !TypeUtilities.isList(field)
                     && !TypeUtilities.isMap(field)) {
-                throw new GoodieImplementationException("A non-nullable field should have a default value declared.", field);
+                throw new GoodieImplementationException("Non-nullable Goodie fields MUST have a default value declared.", field);
             }
         }
 

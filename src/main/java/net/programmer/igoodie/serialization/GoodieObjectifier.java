@@ -15,14 +15,8 @@ import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,8 +73,6 @@ public class GoodieObjectifier {
             } else try {
                 Object value = generate(field, goodieElement);
                 ReflectionUtilities.setValue(object, field, value);
-                System.out.println("Set field: " + field);
-                System.out.println("Set value: " + value);
 
             } catch (GoodieMismatchException | IllegalArgumentException e) {
                 onMismatch.consume(object, field, goodiePath, e);
@@ -134,7 +126,7 @@ public class GoodieObjectifier {
             if (!goodieElement.isArray())
                 throw new GoodieMismatchException("Expected list type, found -> " + goodieElement);
             Type[] genericTypes = TypeUtilities.getGenericTypes(field);
-            Class<?> listType = (Class<?>) ArrayAccessor.of(genericTypes).getOrDefault(0, Object.class);
+            Type listType = ArrayAccessor.of(genericTypes).getOrDefault(0, Object.class);
             return generateList(listType, goodieElement.asArray());
         }
 
@@ -167,11 +159,11 @@ public class GoodieObjectifier {
 
         } else if (element.isArray()) {
             return element.asArray();
-//            return generateList(null, element.asArray());
 
         } else if (element.isObject()) {
             return element.asObject();
         }
+
         return null;
     }
 
@@ -199,6 +191,8 @@ public class GoodieObjectifier {
                 return goodiePrimitive.getDouble();
             } else if (primitiveType == Float.class || primitiveType == float.class) {
                 return goodiePrimitive.getFloat();
+            } else if (primitiveType == Number.class) {
+                return goodiePrimitive.getNumber();
             }
             return null; // Was unable to generate given type from given goodie primitive
 
@@ -207,45 +201,79 @@ public class GoodieObjectifier {
         }
     }
 
-    private List<?> generateList(Class<?> listType, GoodieArray goodieArray) {
+    private List<Object> generateList(Type listType, GoodieArray goodieArray) {
+        if (listType instanceof Class<?>) {
+            return generateSimpleList(((Class<?>) listType), goodieArray);
+        } else {
+            return generateComplexList(listType, goodieArray);
+        }
+    }
+
+    private List<Object> generateSimpleList(Class<?> listType, GoodieArray goodieArray) {
         List<Object> list = new LinkedList<>();
 
-        System.out.println("\nFrom: " + goodieArray);
+        DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(listType);
 
         for (GoodieElement goodieElement : goodieArray) {
-            if (goodieElement.isPrimitive()) {
-                Object generatedValue = generatePrimitiveValue(listType, goodieElement.asPrimitive());
-                if (generatedValue != null) list.add(generatedValue);
-
-            } else if (goodieElement.isArray()) {
-                // TODO: Array of arrays
-                throw new YetToBeImplementedException();
-
-            } else if (goodieElement.isObject()) {
-                list.add(generatePOJO(listType, goodieElement.asObject()));
+            if (dataStringifier != null) {
+                if (goodieElement.isPrimitive() && goodieElement.asPrimitive().isString()) {
+                    try {
+                        list.add(dataStringifier.objectify(goodieElement.asPrimitive().getString()));
+                    } catch (Exception e) {
+                        list.add(dataStringifier.defaultObjectValue()); // TODO: Throw exception (?)
+                    }
+                }
 
             } else if (goodieElement.isNull()) {
                 list.add(null);
+
+            } else if (TypeUtilities.isPrimitive(listType)) {
+                if (goodieElement.isPrimitive()) {
+                    Object generatedValue = generatePrimitiveValue(listType, goodieElement.asPrimitive());
+                    if (generatedValue != null) list.add(generatedValue);
+                }
+
+            } else if (listType == GoodieElement.class) {
+                list.add(goodieElement);
+
+            } else if (TypeUtilities.isGoodie(listType)) {
+                if (listType.isAssignableFrom(goodieElement.getClass())) {
+                    list.add(goodieElement);
+                }
+
+            } else {
+                list.add(generatePOJO(listType, goodieElement.asObject()));
             }
         }
-
-        System.out.println("Initialized: " + list);
-
-//        if (listType != null) {
-//            System.out.println("List type: " + listType);
-//            for (Object o : list) {
-//                System.out.printf("%s | %s\n", o, o.getClass());
-//                System.out.println(Number.class.isAssignableFrom(Double.class));
-//            }
-//            list.removeIf(item -> item != null && !item.getClass().isAssignableFrom(listType));
-//        }
-
-        System.out.println("Generated: " + list + "\n");
 
         return list;
     }
 
-    private Map<?, ?> generateMap(Class<?> keyType, Class<?> valueType, GoodieObject goodieObject) {
+    private List<Object> generateComplexList(Type type, GoodieArray goodieArray) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Class<?> listTypeRaw = ((Class<?>) parameterizedType.getRawType());
+
+            if (TypeUtilities.isList(listTypeRaw)) {
+                Type listType = parameterizedType.getActualTypeArguments()[0];
+                List<Object> list = new LinkedList<>();
+                for (GoodieElement goodieElement : goodieArray) {
+                    if (goodieElement.isArray()) {
+                        list.add(generateList(listType, goodieElement.asArray()));
+                    }
+                }
+                return list;
+
+            } else if (TypeUtilities.isMap(listTypeRaw)) {
+                // TODO: Array of Maps
+                throw new YetToBeImplementedException();
+            }
+        }
+
+        return null;
+    }
+
+    private Map<Object, Object> generateMap(Class<?> keyType, Class<?> valueType, GoodieObject goodieObject) {
         HashMap<Object, Object> map = new HashMap<>();
 
         for (Map.Entry<String, GoodieElement> goodieEntry : goodieObject.entrySet()) {
@@ -265,7 +293,7 @@ public class GoodieObjectifier {
                     try {
                         key = dataStringifier.objectify(goodieKey);
                     } catch (Exception e) {
-                        key = dataStringifier.defaultObjectValue();
+                        key = dataStringifier.defaultObjectValue(); // TODO: Throw exception (?)
                     }
                 } else {
                     continue;
@@ -313,22 +341,19 @@ public class GoodieObjectifier {
     }
 
     private Object generatePOJO(Class<?> pojoType, GoodieObject goodieObject) {
-        Object pojo = createDefaultInstance(pojoType);
-        fillFields(pojo, goodieObject);
-        return pojo;
+        try {
+            Object pojo = ReflectionUtilities.createNullaryInstance(pojoType);
+            fillFields(pojo, goodieObject);
+            return pojo;
+
+        } catch (InstantiationException e) {
+            throw new GoodieImplementationException("Goodies MUST have a nullary constructor", e, pojoType);
+        } catch (IllegalAccessException e) {
+            throw new GoodieImplementationException("Goodies MUST have their nullary constructor accessible", e, pojoType);
+        }
     }
 
     /* ----------------------------- */
-
-    public <T> T createDefaultInstance(Class<T> type) {
-        try {
-            return type.newInstance();
-        } catch (InstantiationException e) {
-            throw new GoodieImplementationException("Goodies MUST have a default constructor", e, type);
-        } catch (IllegalAccessException e) {
-            throw new GoodieImplementationException("Goodies MUST have their default constructor accessible", e, type);
-        }
-    }
 
     private List<GoodieTransformerLogic> getTransformers(Field field) {
         return Stream.of(field.getAnnotationsByType(GoodieTransformer.class))
