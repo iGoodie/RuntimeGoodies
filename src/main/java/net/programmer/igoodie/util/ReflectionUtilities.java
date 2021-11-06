@@ -52,6 +52,14 @@ public final class ReflectionUtilities {
         }
     }
 
+    public static <T> T createNullaryInstance(Class<T> type, T defaultValue) {
+        try {
+            return createNullaryInstance(type);
+        } catch (InstantiationException | IllegalAccessException e) {
+            return defaultValue;
+        }
+    }
+
     public static <T> T createNullaryInstance(Class<T> type) throws InstantiationException, IllegalAccessException {
         return type.newInstance();
     }
@@ -68,11 +76,24 @@ public final class ReflectionUtilities {
     }
 
     public static <A extends Annotation> List<Field> getFieldsWithAnnotation(Object object, Class<A> annotationType) {
+        return getFieldsWithAnnotation(object.getClass(), annotationType);
+    }
+
+    public static <A extends Annotation> List<Field> getFieldsWithAnnotation(Class<?> clazz, Class<A> annotationType) {
         List<Field> fields = new LinkedList<>();
-        for (Field field : object.getClass().getDeclaredFields()) {
+
+        // Collect the ones from this class
+        for (Field field : clazz.getDeclaredFields()) {
             if (field.getAnnotation(annotationType) != null)
                 fields.add(field);
         }
+
+        // Collect the ones from the super class if present
+        Class<?> superclass = clazz.getSuperclass();
+        if (superclass != null && superclass != Object.class) {
+            fields.addAll(getFieldsWithAnnotation(superclass, annotationType));
+        }
+
         return fields;
     }
 

@@ -1,6 +1,7 @@
 package net.programmer.igoodie.serialization;
 
 import net.programmer.igoodie.RuntimeGoodies;
+import net.programmer.igoodie.configuration.mixed.MixedGoodie;
 import net.programmer.igoodie.configuration.transformation.GoodieTransformer;
 import net.programmer.igoodie.configuration.transformation.GoodieTransformerLogic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
@@ -28,8 +29,10 @@ import java.util.stream.Stream;
  * primitive
  * Enum<T>
  * POJO
+ * POJO<T>
  *
  * List<T>
+ * List<ParameterizedClass<T>>
  * List<List<T>>
  * List<Map<String, T>>
  *
@@ -56,7 +59,7 @@ public class GoodieObjectifier {
 
         GoodieTraverser goodieTraverser = new GoodieTraverser();
 
-        goodieTraverser.traverseGoodieFields(fillObject, (object, field, goodiePath) -> {
+        goodieTraverser.traverseGoodieFields(fillObject, true, (object, field, goodiePath) -> {
             if (TypeUtilities.isArray(field)) { // Disallow usage of Arrays over Lists
                 throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", field);
             }
@@ -93,6 +96,8 @@ public class GoodieObjectifier {
             }
         }
     }
+
+    /* ----------------------------- */
 
     public Object generate(Field field, GoodieElement goodieElement) {
         Class<?> generationType = field.getType();
@@ -204,8 +209,15 @@ public class GoodieObjectifier {
     private List<Object> generateList(Type listType, GoodieArray goodieArray) {
         if (listType instanceof Class<?>) {
             return generateSimpleList(((Class<?>) listType), goodieArray);
+
+        } else if (listType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) listType;
+            Class<?> baseType = ((Class<?>) parameterizedType.getRawType());
+            Type[] parameterTypes = parameterizedType.getActualTypeArguments();
+            return generateParameterizedList(baseType, parameterTypes, goodieArray);
+
         } else {
-            return generateComplexList(listType, goodieArray);
+            return null;
         }
     }
 
@@ -249,28 +261,25 @@ public class GoodieObjectifier {
         return list;
     }
 
-    private List<Object> generateComplexList(Type type, GoodieArray goodieArray) {
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            Class<?> listTypeRaw = ((Class<?>) parameterizedType.getRawType());
-
-            if (TypeUtilities.isList(listTypeRaw)) {
-                Type listType = parameterizedType.getActualTypeArguments()[0];
-                List<Object> list = new LinkedList<>();
-                for (GoodieElement goodieElement : goodieArray) {
-                    if (goodieElement.isArray()) {
-                        list.add(generateList(listType, goodieElement.asArray()));
-                    }
+    private List<Object> generateParameterizedList(Class<?> baseType, Type[] parameterTypes, GoodieArray goodieArray) {
+        if (TypeUtilities.isList(baseType)) {
+            Type listType = parameterTypes[0];
+            List<Object> list = new LinkedList<>();
+            for (GoodieElement goodieElement : goodieArray) {
+                if (goodieElement.isArray()) {
+                    list.add(generateList(listType, goodieElement.asArray()));
                 }
-                return list;
-
-            } else if (TypeUtilities.isMap(listTypeRaw)) {
-                // TODO: Array of Maps
-                throw new YetToBeImplementedException();
             }
-        }
+            return list;
 
-        return null;
+        } else if (TypeUtilities.isMap(baseType)) {
+            // TODO: Array of Maps
+            throw new YetToBeImplementedException();
+
+        } else {
+            // Oopsie... It probably is a parameterized POJO
+            return null;
+        }
     }
 
     private Map<Object, Object> generateMap(Class<?> keyType, Class<?> valueType, GoodieObject goodieObject) {
@@ -342,6 +351,13 @@ public class GoodieObjectifier {
 
     private Object generatePOJO(Class<?> pojoType, GoodieObject goodieObject) {
         try {
+            if (MixedGoodie.class.isAssignableFrom(pojoType)) {
+                MixedGoodie<?> basePojo = (MixedGoodie<?>) ReflectionUtilities.createNullaryInstance(pojoType);
+                MixedGoodie<?> pojo = basePojo.instantiateDeserializedType(goodieObject);
+                fillFields(pojo, goodieObject);
+                return pojo;
+            }
+
             Object pojo = ReflectionUtilities.createNullaryInstance(pojoType);
             fillFields(pojo, goodieObject);
             return pojo;
@@ -357,13 +373,7 @@ public class GoodieObjectifier {
 
     private List<GoodieTransformerLogic> getTransformers(Field field) {
         return Stream.of(field.getAnnotationsByType(GoodieTransformer.class))
-                .map(t -> {
-                    try {
-                        return t.value().newInstance();
-                    } catch (Exception ignored) {
-                        return null;
-                    }
-                })
+                .map(transformer -> ReflectionUtilities.createNullaryInstance(transformer.value(), null))
                 .collect(Collectors.toList());
     }
 

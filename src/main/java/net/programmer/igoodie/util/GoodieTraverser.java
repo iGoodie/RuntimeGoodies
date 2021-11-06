@@ -20,24 +20,21 @@ public class GoodieTraverser {
         void consume(Object object, Field field, String goodiePath);
     }
 
-    @FunctionalInterface
-    public interface GoodiePathConsumer {
-        void consume(String goodiePath);
-    }
-
     public Set<String> summarizeObject(Object object) {
         Set<String> paths = new HashSet<>();
-        traverseGoodieFields(object, (obj, field, goodiePath) -> {
-            paths.add(goodiePath);
-        });
+        traverseGoodieFields(object, true, (obj, field, goodiePath) -> paths.add(goodiePath));
         return paths;
     }
 
     public void traverseGoodieFields(Object object, GoodieFieldConsumer consumer) {
-        traverseGoodieFields(object, consumer, "$");
+        traverseGoodieFields(object, false, consumer);
     }
 
-    private void traverseGoodieFields(Object object, GoodieFieldConsumer consumer, String path) {
+    public void traverseGoodieFields(Object object, boolean touchRoots, GoodieFieldConsumer consumer) {
+        traverseGoodieFields(object, consumer, "$", touchRoots);
+    }
+
+    private void traverseGoodieFields(Object object, GoodieFieldConsumer consumer, String path, boolean touchRoots) {
         if (isCircularDepending(object)) // Disallow usage of circular goodie models
             throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves.");
 
@@ -78,9 +75,11 @@ public class GoodieTraverser {
                 consumer.consume(object, goodieField, path + "." + key);
 
             } else {
-                Object pojo = createNullaryInstance(fieldType);
-                ReflectionUtilities.setValue(object, goodieField, pojo);
-                traverseGoodieFields(pojo, consumer, path + "." + key);
+                Object currentValue = ReflectionUtilities.getValue(object, goodieField);
+                Object pojo = currentValue != null ? currentValue : createNullaryInstance(fieldType);
+                if (currentValue == null) ReflectionUtilities.setValue(object, goodieField, pojo);
+                if (touchRoots) consumer.consume(object, goodieField, path + "." + key);
+                traverseGoodieFields(pojo, consumer, path + "." + key, touchRoots);
             }
         }
     }

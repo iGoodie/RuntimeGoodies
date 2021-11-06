@@ -1,0 +1,12 @@
+{
+  "animal1": {
+    "animalType": "animal",
+    "name": "Generic Animal Boyo"
+  },
+  "animal2": {
+    "animalType": "cat",
+    "name": "Cat Dood",
+    "color": "orange",
+    "breed": "British Short Hair"
+  }
+}

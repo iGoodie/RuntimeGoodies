@@ -14,6 +14,9 @@
 <p align="center">
   <!-- Main Badges -->
   <img src="https://raw.githubusercontent.com/iGoodie/RuntimeGoodies/master/.github/assets/main-badge.png" height="20px"/>
+  <a href="https://jitpack.io/#iGoodie/RuntimeGoodies">
+    <img src="https://jitpack.io/v/iGoodie/RuntimeGoodies.svg"/>
+  </a>
   <a href="https://github.com/iGoodie/RuntimeGoodies/releases">
     <img src="https://img.shields.io/github/v/release/iGoodie/RuntimeGoodies"/>
   </a>
@@ -52,13 +55,15 @@
 
 # Description
 
-RuntimeGoodies is a library developed with Java 8 to solve a fundamental problem: reading & maintaining program configurations. It
-attempts to load external config files into declared <a href="https://en.wikipedia.org/wiki/Plain_old_Java_object">
+RuntimeGoodies is a library developed with Java 8 to solve a fundamental problem: reading & maintaining program
+configurations. It attempts to load external config files into
+declared <a href="https://en.wikipedia.org/wiki/Plain_old_Java_object">
 POJO<a/>s with its custom annotations and validators. It even fixes the configs when necessary.
 
 Out of the box, it comes with a built-in way to universally represent entities during runtime called Goodies. Goodies
-are serializable in any format desired (with built-in [Google's GSON](https://github.com/google/gson) converters). They have a very similar structure
-to <a href="https://www.json.org/json-en.html">JSON<a/> elements. Goodies do not exist outside the runtime, they are in-memory only.
+are serializable in any format desired (with built-in [Google's GSON](https://github.com/google/gson) converters). They
+have a very similar structure to <a href="https://www.json.org/json-en.html">JSON<a/> elements. Goodies do not exist
+outside the runtime, they are in-memory only.
 
 # How to Use?
 
@@ -148,8 +153,8 @@ public class Test {
 }
 ```
 
-In order to learn more about what else you can do, check
-the <a href="https://github.com/iGoodie/RuntimeGoodies/wiki">Wiki<a/> out!
+In order to learn more about what else you can do, check the <a href="https://github.com/iGoodie/RuntimeGoodies/wiki">
+Wiki<a/> out!
 
 ## Facing an Issue?
 

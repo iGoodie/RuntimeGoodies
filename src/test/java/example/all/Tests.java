@@ -1,12 +1,18 @@
 package example.all;
 
+import example.all.configs.AnimalConfig;
 import example.all.configs.GeneralConfig;
 import example.all.configs.ListConfig;
+import example.all.goodies.Animal;
+import example.all.goodies.Cat;
+import net.programmer.igoodie.configuration.ConfiGoodieOptions;
 import net.programmer.igoodie.util.GoodieTraverser;
+import net.programmer.igoodie.util.ReflectionUtilities;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 public class Tests {
 
@@ -28,6 +34,19 @@ public class Tests {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Test
+    public void testExtendables() throws IOException, NoSuchFieldException {
+        AnimalConfig config = new AnimalConfig().readConfig(new ConfiGoodieOptions()
+                .useText(TestFiles.loadData("animals.config.json"))
+                .onFixed(System.out::println));
+
+        System.out.println(config);
+
+        new GoodieTraverser().summarizeObject(config).forEach(System.out::println);
+
+        System.out.println(config);
     }
 
 }

@@ -38,6 +38,11 @@ public class GoodieValidator {
             fixByValidators(object, field, goodieObject, goodiePath);
             fixMissingValue(object, field, goodieObject, goodiePath);
 
+            // Remove default values from non-primitive fields once validation is done
+            if (!TypeUtilities.isPrimitive(field)) {
+                ReflectionUtilities.setValue(object, field, null);
+            }
+
             pathsTraversed.add(goodiePath);
         });
     }
