@@ -1,3 +1,3 @@
 package example.all.goodies;
 
-public abstract class HornedAnimal extends Animal {}
+public class HornedAnimal extends Animal {}

@@ -8,5 +8,25 @@
     "name": "Cat Dood",
     "color": "orange",
     "breed": "British Short Hair"
-  }
+  },
+  "animals": [
+    {
+      "animalType": "deer",
+      "name": "Deer Person"
+    },
+    {
+      "animalType": "cat",
+      "name": "Cat Person"
+    }
+  ],
+  "hornedAnimals": [
+    {
+      "animalType": "deer",
+      "name": "Deer Person"
+    },
+    {
+      "animalType": "cat",
+      "name": "Cat Person"
+    }
+  ]
 }

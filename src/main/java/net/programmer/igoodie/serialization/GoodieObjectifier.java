@@ -254,7 +254,8 @@ public class GoodieObjectifier {
                 }
 
             } else {
-                list.add(generatePOJO(listType, goodieElement.asObject()));
+                Object pojo = generatePOJO(listType, goodieElement.asObject());
+                if (listType.isAssignableFrom(pojo.getClass())) list.add(pojo);
             }
         }
 

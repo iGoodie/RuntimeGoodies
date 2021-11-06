@@ -24,7 +24,9 @@ public class Animal implements MixedGoodie<Animal> {
     public Class<? extends Animal> deserializeType(GoodieObject goodieObject) {
         GoodieElement animalTypeElement = goodieObject.get("animalType");
 
-        String animalType = animalTypeElement.isPrimitive() && animalTypeElement.asPrimitive().isString()
+        String animalType = animalTypeElement != null
+                && animalTypeElement.isPrimitive()
+                && animalTypeElement.asPrimitive().isString()
                 ? animalTypeElement.asPrimitive().getString() : "animal";
 
         switch (animalType) {
