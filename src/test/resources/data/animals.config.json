@@ -25,6 +25,10 @@
       "name": "Deer Person"
     },
     {
+      "animalType": "ox",
+      "name": "Ox Person"
+    },
+    {
       "animalType": "cat",
       "name": "Cat Person"
     }

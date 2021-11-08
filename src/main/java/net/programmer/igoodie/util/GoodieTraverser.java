@@ -90,7 +90,10 @@ public class GoodieTraverser {
         try {
             return type.newInstance();
         } catch (InstantiationException e) {
-            throw new GoodieImplementationException("Goodies MUST have a nullary constructor", e, type);
+            if (Modifier.isAbstract(type.getModifiers()))
+                throw new GoodieImplementationException("Goodies MUST NOT be abstract types", e, type);
+            else
+                throw new GoodieImplementationException("Goodies MUST have a nullary constructor", e, type);
         } catch (IllegalAccessException e) {
             throw new GoodieImplementationException("Goodies MUST have their nullary constructor accessible", e, type);
         }

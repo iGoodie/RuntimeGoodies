@@ -3,10 +3,8 @@ package example.all;
 import example.all.configs.AnimalConfig;
 import example.all.configs.GeneralConfig;
 import example.all.configs.ListConfig;
-import example.all.goodies.Deer;
 import net.programmer.igoodie.configuration.ConfiGoodieOptions;
 import net.programmer.igoodie.util.GoodieTraverser;
-import net.programmer.igoodie.util.ReflectionUtilities;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;
 

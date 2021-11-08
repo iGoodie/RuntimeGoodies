@@ -278,8 +278,8 @@ public class GoodieObjectifier {
             throw new YetToBeImplementedException();
 
         } else {
-            // Oopsie... It probably is a parameterized POJO
-            return null;
+            // It probably is a parameterized POJO
+            return generateList(baseType, goodieArray);
         }
     }
 
@@ -364,7 +364,10 @@ public class GoodieObjectifier {
             return pojo;
 
         } catch (InstantiationException e) {
-            throw new GoodieImplementationException("Goodies MUST have a nullary constructor", e, pojoType);
+            if (Modifier.isAbstract(pojoType.getModifiers()))
+                throw new GoodieImplementationException("Goodies MUST NOT be abstract types", e, pojoType);
+            else
+                throw new GoodieImplementationException("Goodies MUST have a nullary constructor", e, pojoType);
         } catch (IllegalAccessException e) {
             throw new GoodieImplementationException("Goodies MUST have their nullary constructor accessible", e, pojoType);
         }
