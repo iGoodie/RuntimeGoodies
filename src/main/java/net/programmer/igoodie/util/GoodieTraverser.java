@@ -20,10 +20,17 @@ public class GoodieTraverser {
         void consume(Object object, Field field, String goodiePath);
     }
 
-    public Set<String> summarizeObject(Object object) {
+    public Set<String> summarizeObjectPaths(Object object) {
         Set<String> paths = new HashSet<>();
         traverseGoodieFields(object, true, (obj, field, goodiePath) -> paths.add(goodiePath));
         return paths;
+    }
+
+    public void debugGoodieFields(Object object) {
+        traverseGoodieFields(object, (obj, field, goodiePath) -> {
+            Object value = ReflectionUtilities.getValue(obj, field);
+            System.out.println(goodiePath + " -> " + StringUtilities.sanitizeForPrint(value));
+        });
     }
 
     public void traverseGoodieFields(Object object, GoodieFieldConsumer consumer) {
@@ -76,7 +83,7 @@ public class GoodieTraverser {
 
             } else {
                 Object currentValue = ReflectionUtilities.getValue(object, goodieField);
-                Object pojo = currentValue != null ? currentValue : createNullaryInstance(fieldType);
+                Object pojo = currentValue != null ? currentValue : GoodieUtils.createNullaryInstance(fieldType);
                 if (currentValue == null) ReflectionUtilities.setValue(object, goodieField, pojo);
                 if (touchRoots) consumer.consume(object, goodieField, path + "." + key);
                 traverseGoodieFields(pojo, consumer, path + "." + key, touchRoots);
@@ -85,19 +92,6 @@ public class GoodieTraverser {
     }
 
     /* ------------------------------ */
-
-    public <T> T createNullaryInstance(Class<T> type) {
-        try {
-            return type.newInstance();
-        } catch (InstantiationException e) {
-            if (Modifier.isAbstract(type.getModifiers()))
-                throw new GoodieImplementationException("Goodies MUST NOT be abstract types", e, type);
-            else
-                throw new GoodieImplementationException("Goodies MUST have a nullary constructor", e, type);
-        } catch (IllegalAccessException e) {
-            throw new GoodieImplementationException("Goodies MUST have their nullary constructor accessible", e, type);
-        }
-    }
 
     public boolean isCircularDepending(Object object) {
         return false; // TODO: Circular dependency

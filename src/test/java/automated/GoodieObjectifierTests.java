@@ -2,11 +2,11 @@ package automated;
 
 import com.google.gson.JsonObject;
 import automated.data.User;
-import net.programmer.igoodie.configuration.validation.GoodieValidator;
+import net.programmer.igoodie.legacy.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.serialization.GoodieObjectifier;
+import net.programmer.igoodie.legacy.GoodieObjectifier;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;
 

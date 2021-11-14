@@ -40,7 +40,7 @@ public class Tests {
 
         System.out.println(config);
 
-        new GoodieTraverser().summarizeObject(config).forEach(System.out::println);
+        new GoodieTraverser().summarizeObjectPaths(config).forEach(System.out::println);
 
         System.out.println(config);
     }

@@ -1,180 +1,90 @@
 package net.programmer.igoodie.configuration.validation;
 
-import net.programmer.igoodie.RuntimeGoodies;
-import net.programmer.igoodie.configuration.validation.annotation.GoodieNullable;
-import net.programmer.igoodie.configuration.validation.logic.ValidatorLogic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
-import net.programmer.igoodie.goodies.runtime.*;
+import net.programmer.igoodie.goodies.runtime.GoodieElement;
+import net.programmer.igoodie.goodies.runtime.GoodieNull;
+import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.query.GoodieQuery;
-import net.programmer.igoodie.serialization.stringify.DataStringifier;
-import net.programmer.igoodie.util.Couple;
+import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
 import net.programmer.igoodie.util.GoodieTraverser;
-import net.programmer.igoodie.util.ReflectionUtilities;
+import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.TypeUtilities;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class GoodieValidator {
 
-    private boolean changesMade;
-
-    public void validateAndFix(Object validateObject, GoodieObject goodieObject) {
-        GoodieTraverser goodieTraverser = new GoodieTraverser();
-
-        Set<String> pathsTraversed = new HashSet<>();
-
-        goodieTraverser.traverseGoodieFields(validateObject, (object, field, goodiePath) -> {
-            if (pathsTraversed.contains(goodiePath)) {
-                throw new GoodieImplementationException("Goodies MUST not have field paths mapped more than once -> " + goodiePath);
-            }
-
-            fixByNonNullability(field, goodieObject, goodiePath);
-            fixByDataStringifier(field, goodieObject, goodiePath);
-            fixByValidators(object, field, goodieObject, goodiePath);
-            fixMissingValue(object, field, goodieObject, goodiePath);
-
-            // Remove default values from non-primitive fields once validation is done
-            if (!TypeUtilities.isPrimitive(field)) {
-                ReflectionUtilities.setValue(object, field, null);
-            }
-
-            pathsTraversed.add(goodiePath);
-        });
-    }
-
-    public void fixByNonNullability(Field field, GoodieObject goodieObject, String goodiePath) {
-        GoodieElement query = GoodieQuery.query(goodieObject, goodiePath);
-        if (query != null && !isNullable(field) && query.isNull()) {
-            GoodieQuery.delete(goodieObject, goodiePath);
-        }
-    }
-
-    public void fixByDataStringifier(Field field, GoodieObject goodieObject, String goodiePath) {
-        DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(field.getType());
-
-        if (dataStringifier != null) {
-            GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
-
-            if (goodieElement != null && goodieElement.isPrimitive()) {
-                GoodiePrimitive goodiePrimitive = goodieElement.asPrimitive();
-
-                if (goodiePrimitive.isString()) {
-                    try {
-                        dataStringifier.objectify(goodiePrimitive.getString());
-                    } catch (Exception e) {
-                        GoodiePrimitive defaultGoodieValue = GoodiePrimitive.from(dataStringifier.defaultStringValue());
-                        GoodieQuery.set(goodieObject, goodiePath, defaultGoodieValue);
-                        changesMade = true;
-                    }
-                }
-
-            } else {
-                GoodiePrimitive defaultGoodieValue = GoodiePrimitive.from(dataStringifier.defaultStringValue());
-                GoodieQuery.set(goodieObject, goodiePath, defaultGoodieValue);
-                changesMade = true;
-            }
-        }
-    }
-
-    public void fixByValidators(Object object, Field field, GoodieObject goodieObject, String goodiePath) {
-        for (Couple<Annotation, ValidatorLogic<Annotation>> couple : getValidators(field)) {
-            Annotation annotation = couple.getFirst();
-            ValidatorLogic<Annotation> logic = couple.getSecond();
-
-            try {
-                logic.validateField(annotation, object, field);
-                logic.validateAnnotationArgs(annotation);
-            } catch (GoodieImplementationException e) {
-                throw new GoodieImplementationException(e.getMessage(), field);
-            }
-
-            GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
-
-            if (!logic.isValidGoodie(annotation, goodieElement) || !logic.isValidValue(annotation, goodieElement)) {
-                GoodieElement fixedValue = logic.fixedGoodie(annotation, object, field, goodieElement);
-                GoodieQuery.set(goodieObject, goodiePath, fixedValue);
-                changesMade = true;
-            }
-        }
-    }
-
-    public void fixMissingValue(Object object, Field field, GoodieObject goodieObject, String goodiePath) {
-        Object declaredDefault = ReflectionUtilities.getValue(object, field);
-        if (declaredDefault == null && !isNullable(field)) {
-            if (RuntimeGoodies.DATA_STRINGIFIERS.get(field.getType()) == null
-                    && field.getType() != Object.class
-                    && !TypeUtilities.isGoodie(field)
-                    && !TypeUtilities.isPrimitive(field)
-                    && !TypeUtilities.isList(field)
-                    && !TypeUtilities.isMap(field)) {
-                throw new GoodieImplementationException("Non-nullable Goodie fields MUST have a default value declared.", field);
-            }
-        }
-
-        GoodieElement query = GoodieQuery.query(goodieObject, goodiePath);
-
-        if (query == null) {
-            if (declaredDefault != null) {
-                GoodieQuery.set(goodieObject, goodiePath, GoodieElement.from(declaredDefault));
-                changesMade = true;
-                return;
-            }
-
-            if (TypeUtilities.isPrimitive(field)) {
-                Object defaultValue = TypeUtilities.defaultValue(field.getType());
-                if (defaultValue != null) {
-                    GoodieQuery.set(goodieObject, goodiePath, GoodiePrimitive.from(defaultValue));
-                } else {
-                    throw new InternalError("How the hack does a primitive not have a default value?");
-                }
-
-            } else if (TypeUtilities.isList(field)) {
-                GoodieQuery.set(goodieObject, goodiePath, new GoodieArray());
-
-            } else if (TypeUtilities.isMap(field)) {
-                GoodieQuery.set(goodieObject, goodiePath, new GoodieObject());
-
-            } else if (field.getType() == GoodieObject.class) {
-                GoodieQuery.set(goodieObject, goodiePath, new GoodieObject());
-
-            } else if (field.getType() == GoodieArray.class) {
-                GoodieQuery.set(goodieObject, goodiePath, new GoodieArray());
-
-            } else {
-                GoodieQuery.set(goodieObject, goodiePath, new GoodieNull());
-            }
-
-            changesMade = true;
-        }
-    }
+    private boolean changesMade = false;
 
     public boolean changesMade() {
         return changesMade;
     }
 
-    /* ----------------------------------- */
+    public void validateAndFix(Object root, GoodieObject goodieToFix) {
+        GoodieTraverser goodieTraverser = new GoodieTraverser();
 
-    @SuppressWarnings("unchecked")
-    private List<Couple<Annotation, ValidatorLogic<Annotation>>> getValidators(Field field) {
-        List<Couple<Annotation, ValidatorLogic<Annotation>>> annotations = new LinkedList<>();
-        for (Annotation annotation : field.getAnnotations()) {
-            Class<? extends Annotation> annotationType = annotation.annotationType();
-            ValidatorLogic<Annotation> validatorLogic = (ValidatorLogic<Annotation>) RuntimeGoodies.VALIDATORS.get(annotationType);
-            if (validatorLogic != null) {
-                annotations.add(new Couple<>(annotation, validatorLogic));
+        checkConflictingKeys(root);
+
+        // TODO: Test circular field type dept
+
+        goodieTraverser.traverseGoodieFields(root, true, (object, field, goodiePath) -> {
+            if (TypeUtilities.isArray(field)) { // Disallow usage of Arrays over Lists
+                throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", field);
             }
-        }
-        return annotations;
+
+            // TODO: Validate field's declared default value
+
+            FieldGoodiefier<?> fieldGoodiefier = GoodieUtils.findFieldGoodifier(field);
+            GoodieElement goodie = GoodieQuery.query(goodieToFix, goodiePath);
+
+            // Missing value - Initialize with null value
+            if (goodie == null) {
+                goodie = GoodieQuery.set(goodieToFix, goodiePath, new GoodieNull());
+                changesMade = true;
+            }
+
+            // Nullability violation - Replace with default goodie
+            if (goodie.isNull() && !GoodieUtils.isFieldNullable(field)) {
+                // TODO: Either used declared default, or generate fresh
+                GoodieElement defaultGoodie = fieldGoodiefier.generateDefaultGoodie(field);
+                goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultGoodie);
+                changesMade = true;
+            }
+
+            // Goodie type mismatch - Replace with default goodie
+            if (!fieldGoodiefier.canGenerateFromGoodie(field, goodie)) {
+                // TODO: Either used declared default, or generate fresh
+                GoodieElement defaultGoodie = fieldGoodiefier.generateDefaultGoodie(field);
+                goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultGoodie);
+                changesMade = true;
+            }
+
+            // TODO: Iterate through GoodieValidators
+
+            fixWithFieldGoodiefier(field, fieldGoodiefier, goodie);
+        });
     }
 
-    private boolean isNullable(Field field) {
-        GoodieNullable annotation = field.getAnnotation(GoodieNullable.class);
-        return annotation != null;
+    private void checkConflictingKeys(Object root) {
+        Set<String> pathsTraversed = new HashSet<>();
+        new GoodieTraverser().traverseGoodieFields(root, true, ((object, field, goodiePath) -> {
+            if (pathsTraversed.contains(goodiePath)) {
+                throw new GoodieImplementationException("Goodies MUST not have field paths mapped more than once -> " + goodiePath);
+            }
+            pathsTraversed.add(goodiePath);
+        }));
+    }
+
+    /* ---------------------------- */
+
+    private <G extends GoodieElement> void fixWithFieldGoodiefier(Field field, FieldGoodiefier<G> fieldGoodiefier, GoodieElement goodieElement) {
+        G goodie = fieldGoodiefier.auxGoodieElement(goodieElement);
+        G fixedGoodie = fieldGoodiefier.fixGoodie(field, goodie);
+
+        if (goodie != fixedGoodie) {
+            changesMade = true;
+        }
     }
 
 }

@@ -23,7 +23,7 @@ public class GoodieTraverseTests {
         User userData = new User();
         GoodieTraverser traverser = new GoodieTraverser();
 
-        Set<String> summary = traverser.summarizeObject(userData);
+        Set<String> summary = traverser.summarizeObjectPaths(userData);
         summary.forEach(System.out::println);
     }
 

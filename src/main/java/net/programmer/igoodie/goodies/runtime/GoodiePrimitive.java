@@ -1,6 +1,7 @@
 package net.programmer.igoodie.goodies.runtime;
 
 import net.programmer.igoodie.util.NumberUtilities;
+import net.programmer.igoodie.util.StringUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
 import java.util.Objects;
@@ -115,20 +116,7 @@ public class GoodiePrimitive extends GoodieElement {
 
     @Override
     public String toString() {
-        if (isNumber()) return "g" + value + numericAppendix();
-        if (isString()) return String.format("g\"%s\"", value);
-        return "g" + value.toString();
-    }
-
-    private String numericAppendix() {
-        Class<?> type = getType();
-        if (type == Long.class) return "l";
-        if (type == Integer.class) return "i";
-        if (type == Short.class) return "s";
-        if (type == Byte.class) return "b";
-        if (type == Float.class) return "f";
-        if (type == Double.class) return "d";
-        return "number";
+        return "g" + StringUtilities.sanitizeForPrint(value);
     }
 
     @Override

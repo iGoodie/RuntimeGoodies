@@ -2,6 +2,8 @@ package example.all.configs;
 
 import net.programmer.igoodie.serialization.annotation.Goodie;
 
+import java.util.Random;
+
 public class SubConfig {
 
     @Goodie
@@ -9,6 +11,9 @@ public class SubConfig {
 
     @Goodie
     int primitive2;
+
+    @Goodie(key = "seed")
+    Random random;
 
     @Override
     public String toString() {

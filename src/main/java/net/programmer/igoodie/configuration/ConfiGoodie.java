@@ -5,7 +5,8 @@ import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.query.GoodieQuery;
-import net.programmer.igoodie.serialization.GoodieObjectifier;
+import net.programmer.igoodie.legacy.GoodieObjectifier;
+import net.programmer.igoodie.serialization.GoodieDeserializer;
 import net.programmer.igoodie.util.FileUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
 
@@ -14,6 +15,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
+
+    private GoodieObject underlyingGoodieObject;
+
+    public GoodieObject getUnderlyingGoodieObject() {
+        return underlyingGoodieObject;
+    }
 
     public abstract F getFormat();
 
@@ -33,37 +40,26 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
 
         F goodieFormat = getFormat();
         GoodieValidator goodieValidator = new GoodieValidator();
-        GoodieObjectifier goodieObjectifier = new GoodieObjectifier();
+        GoodieDeserializer goodieDeserializer = new GoodieDeserializer();
 
         // Read goodie object from the external config format
-        GoodieObject goodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
+        underlyingGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
 
         // Validate and fix loaded goodie object
-        goodieValidator.validateAndFix(this, goodieObject);
+        goodieValidator.validateAndFix(this, underlyingGoodieObject);
 
-        // Fill the fields in this config object with (possibly) fixed goodie object
-        goodieObjectifier.fillFields(this, goodieObject, (object, field, goodiePath, e) -> {
-            // Reset value in Goodie Object
-            GoodieQuery.set(goodieObject, goodiePath, null);
-
-            // Replace reset value with default
-            goodieValidator.fixMissingValue(object, field, goodieObject, goodiePath);
-
-            // Put back the fixed/corrected value
-            GoodieElement fixedValue = GoodieQuery.query(goodieObject, goodiePath);
-            Object objectifiedValue = goodieObjectifier.generate(field, fixedValue);
-            ReflectionUtilities.setValue(object, field, objectifiedValue);
-        });
+        // Deserialize underlying goodie object into fields
+        goodieDeserializer.deserializeInto(this, underlyingGoodieObject);
 
         // If changes are made, handle the modified goodie object
         if (goodieValidator.changesMade()) {
             if (options.onFixed != null) {
-                options.onFixed.accept(goodieObject);
+                options.onFixed.accept(underlyingGoodieObject);
 
             } else if (options.externalConfigFile != null && options.renameInvalidConfig != null) {
-                String serializedGoodie = goodieFormat.writeToString(goodieObject, true);
+                String serializedGoodie = goodieFormat.writeToString(underlyingGoodieObject, true);
                 if (!FileUtils.isEmpty(options.externalConfigFile)) {
-                    String movePath = options.renameInvalidConfig.accept(options.externalConfigFile, goodieObject);
+                    String movePath = options.renameInvalidConfig.accept(options.externalConfigFile, underlyingGoodieObject);
                     FileUtils.moveFile(options.externalConfigFile, new File(movePath));
                     FileUtils.createFileIfAbsent(options.externalConfigFile);
                 }
@@ -74,7 +70,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
         return (T) this;
     }
 
-    protected  <T> T defaultValue(Supplier<T> supplier) {
+    protected <T> T defaultValue(Supplier<T> supplier) {
         return supplier.get();
     }
 

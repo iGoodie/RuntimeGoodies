@@ -12,7 +12,7 @@ public class Animal implements MixedGoodie<Animal> {
     String name = "Unnamed";
 
     @Override
-    public Animal instantiateDeserializedType(GoodieObject goodieObject) throws InstantiationException, IllegalAccessException {
+    public Animal instantiateDeserializedType(GoodieObject goodieObject) {
         if (deserializeType(goodieObject) == Animal.class) {
             return new Animal() {};
         }

@@ -1,4 +1,4 @@
-package net.programmer.igoodie.serialization;
+package net.programmer.igoodie.legacy;
 
 import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.configuration.mixed.MixedGoodie;
@@ -40,6 +40,7 @@ import java.util.stream.Stream;
  * Map<String, List<T>>
  * Map<String, Map<String, T>>
  */
+@Deprecated
 public class GoodieObjectifier {
 
     @FunctionalInterface
