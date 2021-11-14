@@ -8,6 +8,7 @@ import net.programmer.igoodie.query.GoodieQuery;
 import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
 import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.GoodieUtils;
+import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.reflect.Field;
@@ -16,9 +17,14 @@ import java.util.*;
 public class GoodieValidator {
 
     private boolean changesMade = false;
+    private Set<String> fixedPaths = new HashSet<>();
 
     public boolean changesMade() {
         return changesMade;
+    }
+
+    public Set<String> getFixedPaths() {
+        return fixedPaths;
     }
 
     public void validateAndFix(Object root, GoodieObject goodieToFix) {
@@ -33,36 +39,33 @@ public class GoodieValidator {
                 throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", field);
             }
 
-            // TODO: Validate field's declared default value
-
             FieldGoodiefier<?> fieldGoodiefier = GoodieUtils.findFieldGoodifier(field);
+
+            checkDeclaredDefault(fieldGoodiefier, object, field);
+
             GoodieElement goodie = GoodieQuery.query(goodieToFix, goodiePath);
 
             // Missing value - Initialize with null value
             if (goodie == null) {
                 goodie = GoodieQuery.set(goodieToFix, goodiePath, new GoodieNull());
-                changesMade = true;
+                markChanged(goodiePath);
             }
 
             // Nullability violation - Replace with default goodie
             if (goodie.isNull() && !GoodieUtils.isFieldNullable(field)) {
-                // TODO: Either used declared default, or generate fresh
-                GoodieElement defaultGoodie = fieldGoodiefier.generateDefaultGoodie(field);
-                goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultGoodie);
-                changesMade = true;
+                goodie = fixWithDefaultValue(fieldGoodiefier, object, field, goodieToFix, goodiePath);
             }
 
             // Goodie type mismatch - Replace with default goodie
             if (!fieldGoodiefier.canGenerateFromGoodie(field, goodie)) {
-                // TODO: Either used declared default, or generate fresh
-                GoodieElement defaultGoodie = fieldGoodiefier.generateDefaultGoodie(field);
-                goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultGoodie);
-                changesMade = true;
+                goodie = fixWithDefaultValue(fieldGoodiefier, object, field, goodieToFix, goodiePath);
             }
 
             // TODO: Iterate through GoodieValidators
 
-            fixWithFieldGoodiefier(field, fieldGoodiefier, goodie);
+            if (fixWithFieldGoodiefier(field, fieldGoodiefier, goodie)) {
+                markChanged(goodiePath);
+            }
         });
     }
 
@@ -76,15 +79,41 @@ public class GoodieValidator {
         }));
     }
 
+    private void checkDeclaredDefault(FieldGoodiefier<?> fieldGoodiefier, Object object, Field field) {
+        Object declaredDefaultValue = ReflectionUtilities.getValue(object, field);
+
+        if (declaredDefaultValue != null) {
+            if (!fieldGoodiefier.canAssignValueToField(field, declaredDefaultValue)) {
+                throw new GoodieImplementationException("Declared default value CANNOT be assigned to the field.", field);
+            }
+
+            // TODO: Iterate through GoodieValidators
+        }
+    }
+
     /* ---------------------------- */
 
-    private <G extends GoodieElement> void fixWithFieldGoodiefier(Field field, FieldGoodiefier<G> fieldGoodiefier, GoodieElement goodieElement) {
+    private void markChanged(String goodiePath) {
+        fixedPaths.add(goodiePath);
+        changesMade = true;
+    }
+
+    private <G extends GoodieElement> boolean fixWithFieldGoodiefier(Field field, FieldGoodiefier<G> fieldGoodiefier, GoodieElement goodieElement) {
         G goodie = fieldGoodiefier.auxGoodieElement(goodieElement);
         G fixedGoodie = fieldGoodiefier.fixGoodie(field, goodie);
+        return goodie != fixedGoodie;
+    }
 
-        if (goodie != fixedGoodie) {
-            changesMade = true;
-        }
+    private GoodieElement fixWithDefaultValue(FieldGoodiefier<?> fieldGoodiefier, Object object, Field field, GoodieObject goodieToFix, String goodiePath) {
+        Object declaredDefaultValue = ReflectionUtilities.getValue(object, field);
+
+        GoodieElement defaultGoodie = declaredDefaultValue != null
+                ? GoodieElement.from(declaredDefaultValue)
+                : fieldGoodiefier.generateDefaultGoodie(field);
+
+        GoodieElement fixedGoodie = GoodieQuery.set(goodieToFix, goodiePath, defaultGoodie);
+        markChanged(goodiePath);
+        return fixedGoodie;
     }
 
 }

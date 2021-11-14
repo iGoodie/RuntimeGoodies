@@ -15,6 +15,11 @@ public class PrimitiveGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
     }
 
     @Override
+    public boolean canAssignValueToField(Field field, Object value) {
+        return TypeUtilities.isPrimitive(value.getClass());
+    }
+
+    @Override
     public boolean canGenerateFromGoodie(Field field, GoodieElement goodieElement) {
         if (!goodieElement.isPrimitive()) {
             return false;
@@ -36,7 +41,6 @@ public class PrimitiveGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
 
     @Override
     public @NotNull Object generateFromGoodie(Field field, GoodiePrimitive goodie) {
-        System.out.println("Generated " + goodie.get() + " | " + goodie.get().getClass());
         return goodie.get();
     }
 

@@ -6,42 +6,42 @@ import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.util.GoodieTraverser;
 import org.junit.jupiter.api.Test;
 
-public class Primitives extends JsonConfiGoodie {
+public class PrimitivesWithDefaults extends JsonConfiGoodie {
 
     @Goodie
-    String primitiveString;
+    String primitiveString = "Foo";
 
     @Goodie
-    char primitiveChar;
+    char primitiveChar = 'S';
 
     @Goodie
-    boolean primitiveBool;
+    boolean primitiveBool = true;
 
     @Goodie
-    int primitiveInt1;
+    int primitiveInt1 = 1111;
 
     @Goodie
-    int primitiveInt2;
+    int primitiveInt2 = 2222;
 
     @Goodie
-    float primitiveFloat;
+    float primitiveFloat = 123.45f;
 
     @Goodie
-    Number number;
+    Number number = 999999;
 
     @Goodie
-    Integer boxedInteger;
+    Integer boxedInteger = 3333;
 
     @Goodie
-    Long boxedLong;
+    Long boxedLong = 4444L;
 
     @Goodie
-    Double boxedDouble;
+    Double boxedDouble = 123.45d;
 
     @Test
     public void testPrimitives() {
-        Primitives config = new Primitives().readConfig(new ConfiGoodieOptions()
-                .useText("{}")
+        PrimitivesWithDefaults config = new PrimitivesWithDefaults().readConfig(new ConfiGoodieOptions()
+                .useText("{'primitiveBool': false}")
                 .onFixed(System.out::println));
         new GoodieTraverser().debugGoodieFields(config);
 

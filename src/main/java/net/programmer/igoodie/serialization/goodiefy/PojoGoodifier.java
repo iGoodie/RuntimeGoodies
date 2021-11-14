@@ -22,6 +22,11 @@ public class PojoGoodifier extends FieldGoodiefier<GoodieObject> {
     }
 
     @Override
+    public boolean canAssignValueToField(Field field, Object value) {
+        return field.getType().isAssignableFrom(value.getClass());
+    }
+
+    @Override
     public boolean canGenerateFromGoodie(Field field, GoodieElement goodieElement) {
         return goodieElement.isObject();
     }

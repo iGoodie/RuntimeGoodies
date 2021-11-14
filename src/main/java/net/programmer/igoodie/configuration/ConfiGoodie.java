@@ -2,24 +2,26 @@ package net.programmer.igoodie.configuration;
 
 import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
-import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.query.GoodieQuery;
-import net.programmer.igoodie.legacy.GoodieObjectifier;
 import net.programmer.igoodie.serialization.GoodieDeserializer;
 import net.programmer.igoodie.util.FileUtils;
-import net.programmer.igoodie.util.ReflectionUtilities;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
 
     private GoodieObject underlyingGoodieObject;
+    private GoodieValidator underlyingValidator;
 
     public GoodieObject getUnderlyingGoodieObject() {
         return underlyingGoodieObject;
+    }
+
+    public Set<String> getFixedPaths() {
+        return underlyingValidator.getFixedPaths();
     }
 
     public abstract F getFormat();
@@ -39,20 +41,20 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
         }
 
         F goodieFormat = getFormat();
-        GoodieValidator goodieValidator = new GoodieValidator();
         GoodieDeserializer goodieDeserializer = new GoodieDeserializer();
+        underlyingValidator = new GoodieValidator();
 
         // Read goodie object from the external config format
         underlyingGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
 
         // Validate and fix loaded goodie object
-        goodieValidator.validateAndFix(this, underlyingGoodieObject);
+        underlyingValidator.validateAndFix(this, underlyingGoodieObject);
 
         // Deserialize underlying goodie object into fields
         goodieDeserializer.deserializeInto(this, underlyingGoodieObject);
 
         // If changes are made, handle the modified goodie object
-        if (goodieValidator.changesMade()) {
+        if (underlyingValidator.changesMade()) {
             if (options.onFixed != null) {
                 options.onFixed.accept(underlyingGoodieObject);
 

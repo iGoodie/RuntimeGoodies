@@ -12,6 +12,8 @@ public abstract class FieldGoodiefier<G extends GoodieElement> {
 
     public abstract boolean canGenerateForField(Field field);
 
+    public abstract boolean canAssignValueToField(Field field, Object value);
+
     public abstract boolean canGenerateFromGoodie(Field field, GoodieElement goodieElement);
 
     public abstract G auxGoodieElement(GoodieElement goodieElement);
