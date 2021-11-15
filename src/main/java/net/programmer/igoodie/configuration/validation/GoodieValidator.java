@@ -17,7 +17,7 @@ import java.util.*;
 public class GoodieValidator {
 
     private boolean changesMade = false;
-    private Set<String> fixedPaths = new HashSet<>();
+    private final Set<String> fixedPaths = new HashSet<>();
 
     public boolean changesMade() {
         return changesMade;

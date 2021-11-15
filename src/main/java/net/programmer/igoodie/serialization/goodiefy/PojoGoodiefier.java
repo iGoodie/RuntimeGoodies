@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public class PojoGoodifier extends FieldGoodiefier<GoodieObject> {
+public class PojoGoodiefier extends FieldGoodiefier<GoodieObject> {
 
     @Override
     public boolean canGenerateForField(Field field) {

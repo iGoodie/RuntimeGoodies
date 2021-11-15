@@ -48,7 +48,7 @@ public class PrimitiveGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
     public @NotNull GoodiePrimitive generateDefaultGoodie(Field field) {
         Class<?> type = field.getType();
         Object defaultValue = TypeUtilities.defaultValue(type);
-        return GoodiePrimitive.from(defaultValue);
+        return serializeValueToGoodie(defaultValue);
     }
 
     @Override
