@@ -8,6 +8,7 @@ import net.programmer.igoodie.util.TypeUtilities;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 public class GoodieElementGoodiefier extends FieldGoodiefier<GoodieElement> {
 
@@ -18,40 +19,40 @@ public class GoodieElementGoodiefier extends FieldGoodiefier<GoodieElement> {
     }
 
     @Override
-    public boolean canAssignValueToField(Field field, Object value) {
-        Class<?> fieldType = field.getType();
-        Class<?> valueType = value.getClass();
+    public boolean canAssignValueToType(Type targetType, Object value) {
+        Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
+        Class<?> valueClass = value.getClass();
 
-        if (fieldType == GoodieElement.class) {
+        if (targetClass == GoodieElement.class) {
             return true;
 
-        } else if (fieldType == GoodiePrimitive.class) {
-            return TypeUtilities.isPrimitive(valueType) || valueType == GoodiePrimitive.class;
+        } else if (targetClass == GoodiePrimitive.class) {
+            return TypeUtilities.isPrimitive(valueClass) || valueClass == GoodiePrimitive.class;
 
-        } else if (fieldType == GoodieArray.class) {
-            return TypeUtilities.isList(valueType) || valueType == GoodieArray.class;
+        } else if (targetClass == GoodieArray.class) {
+            return TypeUtilities.isList(valueClass) || valueClass == GoodieArray.class;
 
-        } else if (fieldType == GoodieObject.class) {
-            return valueType == GoodieObject.class;
+        } else if (targetClass == GoodieObject.class) {
+            return valueClass == GoodieObject.class;
         }
 
         return false;
     }
 
     @Override
-    public boolean canGenerateFromGoodie(Field field, GoodieElement goodieElement) {
-        Class<?> fieldType = field.getType();
+    public boolean canGenerateTypeFromGoodie(Type targetType, GoodieElement goodieElement) {
+        Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
 
-        if (fieldType == GoodieElement.class) {
+        if (targetClass == GoodieElement.class) {
             return true;
 
-        } else if (fieldType == GoodiePrimitive.class) {
+        } else if (targetClass == GoodiePrimitive.class) {
             return goodieElement.isPrimitive();
 
-        } else if (fieldType == GoodieArray.class) {
+        } else if (targetClass == GoodieArray.class) {
             return goodieElement.isArray();
 
-        } else if (fieldType == GoodieObject.class) {
+        } else if (targetClass == GoodieObject.class) {
             return goodieElement.isObject();
         }
 
@@ -64,21 +65,21 @@ public class GoodieElementGoodiefier extends FieldGoodiefier<GoodieElement> {
     }
 
     @Override
-    public @NotNull Object generateFromGoodie(Field field, GoodieElement goodie) {
+    public @NotNull Object generateFromGoodie(Type targetType, GoodieElement goodie) {
         return goodie.deepCopy();
     }
 
     @Override
-    public @NotNull GoodieElement generateDefaultGoodie(Field field) {
-        Class<?> fieldType = field.getType();
+    public @NotNull GoodieElement generateDefaultGoodie(Type targetType) {
+        Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
 
-        if (fieldType == GoodiePrimitive.class) {
+        if (targetClass == GoodiePrimitive.class) {
             return GoodiePrimitive.from(0);
 
-        } else if (fieldType == GoodieArray.class) {
+        } else if (targetClass == GoodieArray.class) {
             return new GoodieArray();
 
-        } else if (fieldType == GoodieObject.class) {
+        } else if (targetClass == GoodieObject.class) {
             return new GoodieObject();
 
         } else {

@@ -8,27 +8,29 @@ import net.programmer.igoodie.serialization.GoodieSerializer;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
+import net.programmer.igoodie.util.TypeUtilities;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class PojoGoodiefier extends FieldGoodiefier<GoodieObject> {
 
     @Override
     public boolean canGenerateForField(Field field) {
-        Class<?> type = field.getType();
-        List<Field> goodieFields = ReflectionUtilities.getFieldsWithAnnotation(type, Goodie.class);
+        Class<?> fieldType = field.getType();
+        List<Field> goodieFields = ReflectionUtilities.getFieldsWithAnnotation(fieldType, Goodie.class);
         return goodieFields.size() > 0;
     }
 
     @Override
-    public boolean canAssignValueToField(Field field, Object value) {
-        return field.getType().isAssignableFrom(value.getClass());
+    public boolean canAssignValueToType(Type targetType, Object value) {
+        return TypeUtilities.getBaseClass(targetType).isAssignableFrom(value.getClass());
     }
 
     @Override
-    public boolean canGenerateFromGoodie(Field field, GoodieElement goodieElement) {
+    public boolean canGenerateTypeFromGoodie(Type targetType, GoodieElement goodieElement) {
         return goodieElement.isObject();
     }
 
@@ -38,16 +40,16 @@ public class PojoGoodiefier extends FieldGoodiefier<GoodieObject> {
     }
 
     @Override
-    public @NotNull Object generateFromGoodie(Field field, GoodieObject goodie) {
-        Class<?> fieldType = field.getType();
+    public @NotNull Object generateFromGoodie(Type targetType, GoodieObject goodie) {
+        Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
 
         Object pojo;
 
-        if (MixedGoodie.class.isAssignableFrom(fieldType)) {
-            MixedGoodie<?> basePojo = (MixedGoodie<?>) GoodieUtils.createNullaryInstance(fieldType);
+        if (MixedGoodie.class.isAssignableFrom(targetClass)) {
+            MixedGoodie<?> basePojo = (MixedGoodie<?>) GoodieUtils.createNullaryInstance(targetClass);
             pojo = basePojo.instantiateDeserializedType(goodie);
         } else {
-            pojo = GoodieUtils.createNullaryInstance(fieldType);
+            pojo = GoodieUtils.createNullaryInstance(targetClass);
         }
 
         GoodieDeserializer deserializer = new GoodieDeserializer();
@@ -57,7 +59,7 @@ public class PojoGoodiefier extends FieldGoodiefier<GoodieObject> {
     }
 
     @Override
-    public @NotNull GoodieObject generateDefaultGoodie(Field field) {
+    public @NotNull GoodieObject generateDefaultGoodie(Type targetType) {
         return new GoodieObject();
     }
 

@@ -6,6 +6,7 @@ import net.programmer.igoodie.util.TypeUtilities;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 public class PrimitiveGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
 
@@ -15,23 +16,23 @@ public class PrimitiveGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
     }
 
     @Override
-    public boolean canAssignValueToField(Field field, Object value) {
+    public boolean canAssignValueToType(Type targetType, Object value) {
         return TypeUtilities.isPrimitive(value.getClass());
     }
 
     @Override
-    public boolean canGenerateFromGoodie(Field field, GoodieElement goodieElement) {
+    public boolean canGenerateTypeFromGoodie(Type targetType, GoodieElement goodieElement) {
         if (!goodieElement.isPrimitive()) {
             return false;
         }
 
-        Class<?> type = field.getType();
+        Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
         GoodiePrimitive goodiePrimitive = goodieElement.asPrimitive();
 
-        return isString(type) && goodiePrimitive.isString()
-                || isNumber(type) && goodiePrimitive.isNumber()
-                || isBoolean(type) && goodiePrimitive.isBoolean()
-                || isCharacter(type) && goodiePrimitive.isCharacter();
+        return isString(targetClass) && goodiePrimitive.isString()
+                || isNumber(targetClass) && goodiePrimitive.isNumber()
+                || isBoolean(targetClass) && goodiePrimitive.isBoolean()
+                || isCharacter(targetClass) && goodiePrimitive.isCharacter();
     }
 
     @Override
@@ -40,14 +41,14 @@ public class PrimitiveGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
     }
 
     @Override
-    public @NotNull Object generateFromGoodie(Field field, GoodiePrimitive goodie) {
+    public @NotNull Object generateFromGoodie(Type targetType, GoodiePrimitive goodie) {
         return goodie.get();
     }
 
     @Override
-    public @NotNull GoodiePrimitive generateDefaultGoodie(Field field) {
-        Class<?> type = field.getType();
-        Object defaultValue = TypeUtilities.defaultValue(type);
+    public @NotNull GoodiePrimitive generateDefaultGoodie(Type targetType) {
+        Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
+        Object defaultValue = TypeUtilities.defaultValue(targetClass);
         return serializeValueToGoodie(defaultValue);
     }
 

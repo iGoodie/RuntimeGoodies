@@ -41,6 +41,7 @@ public class GoodieValidator {
 
             checkDeclaredDefault(fieldGoodiefier, object, field);
 
+            Class<?> fieldType = field.getType();
             GoodieElement goodie = GoodieQuery.query(goodieToFix, goodiePath);
 
             // Missing value - Initialize with null value
@@ -60,7 +61,7 @@ public class GoodieValidator {
             }
 
             // Goodie type mismatch - Replace with default goodie
-            if (!goodie.isNull() && !fieldGoodiefier.canGenerateFromGoodie(field, goodie)) {
+            if (!goodie.isNull() && !fieldGoodiefier.canGenerateTypeFromGoodie(fieldType, goodie)) {
                 goodie = fixWithDefaultValue(fieldGoodiefier, object, field, goodieToFix, goodiePath);
             }
 
@@ -84,9 +85,10 @@ public class GoodieValidator {
 
     private void checkDeclaredDefault(FieldGoodiefier<?> fieldGoodiefier, Object object, Field field) {
         Object declaredDefaultValue = ReflectionUtilities.getValue(object, field);
+        Class<?> fieldType = field.getType();
 
         if (declaredDefaultValue != null) {
-            if (!fieldGoodiefier.canAssignValueToField(field, declaredDefaultValue)) {
+            if (!fieldGoodiefier.canAssignValueToType(fieldType, declaredDefaultValue)) {
                 throw new GoodieImplementationException("Declared default value CANNOT be assigned to the field.", field);
             }
 
@@ -108,11 +110,12 @@ public class GoodieValidator {
     }
 
     private GoodieElement fixWithDefaultValue(FieldGoodiefier<?> fieldGoodiefier, Object object, Field field, GoodieObject goodieToFix, String goodiePath) {
+        Class<?> fieldType = field.getType();
         Object declaredDefaultValue = ReflectionUtilities.getValue(object, field);
 
         GoodieElement defaultGoodie = declaredDefaultValue != null
                 ? GoodieElement.from(declaredDefaultValue)
-                : fieldGoodiefier.generateDefaultGoodie(field);
+                : fieldGoodiefier.generateDefaultGoodie(fieldType);
 
         GoodieElement fixedGoodie = GoodieQuery.set(goodieToFix, goodiePath, defaultGoodie);
         markChanged(goodiePath);

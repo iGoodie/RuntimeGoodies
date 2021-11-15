@@ -2,9 +2,7 @@ package net.programmer.igoodie.util;
 
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 
 public final class TypeUtilities {
@@ -200,6 +198,20 @@ public final class TypeUtilities {
         }
 
         return null;
+    }
+
+    public static Class<?> getBaseClass(Type type) {
+        if (type instanceof Class<?>) {
+            return ((Class<?>) type);
+
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            return ((Class<?>) actualTypeArguments[0]);
+
+        } else {
+            return null;
+        }
     }
 
     public static <T> T defaultValue(Class<T> type) {

@@ -7,6 +7,7 @@ import net.programmer.igoodie.util.TypeUtilities;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 public class EnumGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
 
@@ -22,13 +23,13 @@ public class EnumGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
     }
 
     @Override
-    public boolean canAssignValueToField(Field field, Object value) {
+    public boolean canAssignValueToType(Type targetType, Object value) {
         return TypeUtilities.isEnum(value.getClass())
-                && field.getType().isAssignableFrom(value.getClass());
+                && TypeUtilities.getBaseClass(targetType).isAssignableFrom(value.getClass());
     }
 
     @Override
-    public boolean canGenerateFromGoodie(Field field, GoodieElement goodieElement) {
+    public boolean canGenerateTypeFromGoodie(Type targetType, GoodieElement goodieElement) {
         if (!goodieElement.isPrimitive()) {
             return false;
         }
@@ -39,7 +40,8 @@ public class EnumGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
             return false;
         }
 
-        return getEnumConstant(field, goodiePrimitive.getString()) != null;
+        Class<?> enumClass = TypeUtilities.getBaseClass(targetType);
+        return getEnumConstant(enumClass, goodiePrimitive.getString()) != null;
     }
 
     @Override
@@ -48,13 +50,15 @@ public class EnumGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
     }
 
     @Override
-    public @NotNull Object generateFromGoodie(Field field, GoodiePrimitive goodie) {
-        return getEnumConstant(field, goodie.getString());
+    public @NotNull Object generateFromGoodie(Type targetType, GoodiePrimitive goodie) {
+        Class<?> enumClass = TypeUtilities.getBaseClass(targetType);
+        return getEnumConstant(enumClass, goodie.getString());
     }
 
     @Override
-    public @NotNull GoodiePrimitive generateDefaultGoodie(Field field) {
-        Enum<?> firstConstant = (Enum<?>) field.getType().getEnumConstants()[0];
+    public @NotNull GoodiePrimitive generateDefaultGoodie(Type targetType) {
+        Class<?> enumClass = TypeUtilities.getBaseClass(targetType);
+        Enum<?> firstConstant = (Enum<?>) enumClass.getEnumConstants()[0];
         return serializeValueToGoodie(firstConstant);
     }
 
@@ -64,8 +68,8 @@ public class EnumGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
         return new GoodiePrimitive(enumConstant.name());
     }
 
-    protected Enum<?> getEnumConstant(Field field, String string) {
-        for (Object constant : field.getType().getEnumConstants()) {
+    protected Enum<?> getEnumConstant(Class<?> enumClass, String string) {
+        for (Object constant : enumClass.getEnumConstants()) {
             Enum<?> enumConstant = (Enum<?>) constant;
             if (enumConstant.name().equalsIgnoreCase(string)) {
                 return enumConstant;

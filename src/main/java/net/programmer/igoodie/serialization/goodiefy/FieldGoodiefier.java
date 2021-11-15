@@ -5,6 +5,7 @@ import net.programmer.igoodie.util.ReflectionUtilities;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 public abstract class FieldGoodiefier<G extends GoodieElement> {
 
@@ -12,21 +13,22 @@ public abstract class FieldGoodiefier<G extends GoodieElement> {
 
     public abstract boolean canGenerateForField(Field field);
 
-    public abstract boolean canAssignValueToField(Field field, Object value);
+    public abstract boolean canAssignValueToType(Type targetType, Object value);
 
-    public abstract boolean canGenerateFromGoodie(Field field, GoodieElement goodieElement);
+    public abstract boolean canGenerateTypeFromGoodie(Type targetType, GoodieElement goodieElement);
 
     public abstract G auxGoodieElement(GoodieElement goodieElement);
 
     /* ==== { Value Generators }================== */
 
-    public abstract @NotNull Object generateFromGoodie(Field field, G goodie);
+    public abstract @NotNull Object generateFromGoodie(Type targetType, G goodie);
 
-    public abstract @NotNull G generateDefaultGoodie(Field field);
+    public abstract @NotNull G generateDefaultGoodie(Type targetType);
 
     public Object generateDefaultValue(Field field) {
-        G defaultGoodie = generateDefaultGoodie(field);
-        return generateFromGoodie(field, defaultGoodie);
+        Class<?> fieldType = field.getType();
+        G defaultGoodie = generateDefaultGoodie(fieldType);
+        return generateFromGoodie(fieldType, defaultGoodie);
     }
 
     /* =========================================== */
