@@ -2,6 +2,14 @@ package net.programmer.igoodie.util;
 
 public class StringUtilities {
 
+    public static String toString(Object value) {
+        if (value == null) {
+            return "null";
+        } else {
+            return value.toString();
+        }
+    }
+
     public static String sanitizeForPrint(Object value) {
         if (value == null) {
             return "null";

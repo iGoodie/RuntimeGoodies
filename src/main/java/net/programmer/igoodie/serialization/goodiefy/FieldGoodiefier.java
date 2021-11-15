@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 
 public abstract class FieldGoodiefier<G extends GoodieElement> {
 
-    /* ==== { Integrity Validators }============= */
+    /* ==== { Integrity Validators } ============ */
 
     public abstract boolean canGenerateForField(Field field);
 
@@ -19,7 +19,7 @@ public abstract class FieldGoodiefier<G extends GoodieElement> {
 
     public abstract G auxGoodieElement(GoodieElement goodieElement);
 
-    /* ==== { Value Generators }================== */
+    /* ==== { Value Generators } ================= */
 
     public abstract @NotNull Object generateFromGoodie(Type targetType, G goodie);
 
@@ -31,7 +31,7 @@ public abstract class FieldGoodiefier<G extends GoodieElement> {
         return generateFromGoodie(fieldType, defaultGoodie);
     }
 
-    /* =========================================== */
+    /* ===={ Goodie Generators } ================= */
 
     public abstract @NotNull G serializeValueToGoodie(Object value);
 
@@ -39,7 +39,7 @@ public abstract class FieldGoodiefier<G extends GoodieElement> {
         return serializeValueToGoodie(ReflectionUtilities.getValue(object, field));
     }
 
-    /* ==== { Fixers & Sanitizers }=============== */
+    /* ==== { Fixers & Sanitizers } ============== */
 
     public G fixGoodie(Field field, G goodie) {
         return goodie;
@@ -49,6 +49,6 @@ public abstract class FieldGoodiefier<G extends GoodieElement> {
         return goodie; // By default, a goodie is considered sanitized.
     }
 
-    /* ==== { Utility Methods }================== */
+    /* ==== { Utility Methods } ================= */
 
 }

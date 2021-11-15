@@ -2,6 +2,7 @@ package net.programmer.igoodie.registry;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Registry<I, T extends Registrable<I>> {
 
@@ -25,6 +26,10 @@ public class Registry<I, T extends Registrable<I>> {
 
     public T getOrDefault(I identity, T defaultValue) {
         return registry.getOrDefault(identity, defaultValue);
+    }
+
+    public Set<I> getKeys() {
+        return registry.keySet();
     }
 
     @Override

@@ -13,8 +13,9 @@ import java.util.List;
 public class RuntimeGoodies {
 
     public static final List<FieldGoodiefier<?>> FIELD_GOODIEFIERS = Collections.unmodifiableList(Arrays.asList(
-            new PrimitiveGoodiefier(),
+            new StringifiablesGoodifier(),
             new EnumGoodiefier(),
+            new PrimitiveGoodiefier(),
             new GoodieElementGoodiefier(),
             new PojoGoodiefier()
     ));
