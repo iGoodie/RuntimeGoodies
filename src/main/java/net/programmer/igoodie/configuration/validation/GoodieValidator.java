@@ -9,6 +9,7 @@ import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
 import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
+import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -46,6 +47,11 @@ public class GoodieValidator {
             if (goodie == null) {
                 goodie = GoodieQuery.set(goodieToFix, goodiePath, new GoodieNull());
                 markChanged(goodiePath);
+            }
+
+            // Unexpected nullability flag - Throw exception
+            if (GoodieUtils.isFieldNullable(field) && TypeUtilities.isNonWrappedPrimitive(field)) {
+                throw new GoodieImplementationException("Unexpected nullability flag", field);
             }
 
             // Nullability violation - Replace with default goodie

@@ -90,6 +90,15 @@ public final class TypeUtilities {
 
     private TypeUtilities() {}
 
+    public static boolean isNonWrappedPrimitive(Class<?> type) {
+        return NUMERIC_PRIMITIVE_TYPES.contains(type)
+                || NON_NUMERIC_PRIMITIVE_TYPES.contains(type);
+    }
+
+    public static boolean isNonWrappedPrimitive(Field field) {
+        return isNonWrappedPrimitive(field.getType());
+    }
+
     public static boolean isNumeric(Class<?> type) {
         return Number.class.isAssignableFrom(type) || isPrimitiveNumeric(type);
     }
