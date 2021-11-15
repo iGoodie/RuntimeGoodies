@@ -2,6 +2,7 @@ package configoodie.test;
 
 import net.programmer.igoodie.configuration.ConfiGoodieOptions;
 import net.programmer.igoodie.configuration.JsonConfiGoodie;
+import net.programmer.igoodie.serialization.GoodieSerializer;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.util.GoodieTraverser;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,9 @@ public class Primitives extends JsonConfiGoodie {
 
         System.out.println("\nFixed those:");
         System.out.println(config.getFixedPaths());
+
+        System.out.println("\nSerialized back:");
+        System.out.println(new GoodieSerializer().serializeFrom(config));
     }
 
 }

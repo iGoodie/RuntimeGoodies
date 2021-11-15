@@ -4,6 +4,7 @@ import net.programmer.igoodie.configuration.mixed.MixedGoodie;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.serialization.GoodieDeserializer;
+import net.programmer.igoodie.serialization.GoodieSerializer;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
@@ -62,7 +63,7 @@ public class PojoGoodiefier extends FieldGoodiefier<GoodieObject> {
 
     @Override
     public @NotNull GoodieObject serializeValueToGoodie(Object value) {
-        return null; // TODO: Return new GoodieSerializer().serialize(...) once implemented
+        return new GoodieSerializer().serializeFrom(value);
     }
 
 }
