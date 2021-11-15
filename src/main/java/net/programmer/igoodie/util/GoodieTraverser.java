@@ -1,15 +1,10 @@
 package net.programmer.igoodie.util;
 
 import net.programmer.igoodie.RuntimeGoodies;
-import net.programmer.igoodie.exception.GoodieImplementationException;
-import net.programmer.igoodie.goodies.runtime.GoodieArray;
-import net.programmer.igoodie.goodies.runtime.GoodieElement;
-import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,12 +37,10 @@ public class GoodieTraverser {
     }
 
     private void traverseGoodieFields(Object object, GoodieFieldConsumer consumer, String path, boolean touchRoots) {
-        if (isCircularDepending(object)) // Disallow usage of circular goodie models
-            throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves.");
+        GoodieUtils.disallowCircularDependency(object);
 
         for (Field goodieField : ReflectionUtilities.getFieldsWithAnnotation(object, Goodie.class)) {
-            if (Modifier.isStatic(goodieField.getModifiers())) // Disallow static goodie fields
-                throw new GoodieImplementationException("Goodie fields MUST NOT be static.", goodieField);
+            GoodieUtils.disallowStaticGoodieFields(goodieField);
 
             Goodie annotation = goodieField.getAnnotation(Goodie.class);
             String key = annotation.key().isEmpty() ? goodieField.getName() : annotation.key();
@@ -87,12 +80,6 @@ public class GoodieTraverser {
                 traverseGoodieFields(pojo, consumer, path + "." + key, touchRoots);
             }
         }
-    }
-
-    /* ------------------------------ */
-
-    public boolean isCircularDepending(Object object) {
-        return false; // TODO: Circular dependency
     }
 
 }

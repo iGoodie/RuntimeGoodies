@@ -1,6 +1,5 @@
 package net.programmer.igoodie.configuration.validation;
 
-import net.programmer.igoodie.configuration.validation.circularity.GoodieCircularityTest;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieNull;
@@ -10,10 +9,10 @@ import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
 import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
-import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GoodieValidator {
 
@@ -30,8 +29,8 @@ public class GoodieValidator {
 
     public void validateAndFix(Object root, GoodieObject goodieToFix) {
         GoodieTraverser goodieTraverser = new GoodieTraverser();
+        GoodieUtils.disallowCircularDependency(root);
 
-        checkCircularity(root);
         checkConflictingKeys(root);
 
         goodieTraverser.traverseGoodieFields(root, true, (object, field, goodiePath) -> {
@@ -55,23 +54,16 @@ public class GoodieValidator {
             }
 
             // Goodie type mismatch - Replace with default goodie
-            if (!fieldGoodiefier.canGenerateFromGoodie(field, goodie)) {
+            if (!goodie.isNull() && !fieldGoodiefier.canGenerateFromGoodie(field, goodie)) {
                 goodie = fixWithDefaultValue(fieldGoodiefier, object, field, goodieToFix, goodiePath);
             }
 
             // TODO: Iterate through GoodieValidators
 
-            if (fixWithFieldGoodiefier(field, fieldGoodiefier, goodie)) {
+            if (!goodie.isNull() && fixWithFieldGoodiefier(field, fieldGoodiefier, goodie)) {
                 markChanged(goodiePath);
             }
         });
-    }
-
-    private void checkCircularity(Object root) {
-        GoodieCircularityTest circularityTest = new GoodieCircularityTest(root);
-        if (circularityTest.test()) { // Disallow usage of circular goodie models
-            throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves or other goodies.");
-        }
     }
 
     private void checkConflictingKeys(Object root) {

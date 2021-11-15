@@ -2,6 +2,7 @@ package net.programmer.igoodie.util;
 
 import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieNullable;
+import net.programmer.igoodie.configuration.validation.circularity.GoodieCircularityTest;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
 
@@ -13,6 +14,19 @@ public class GoodieUtils {
     public static void disallowArrayGoodieFields(Field field) {
         if (field.getType().isArray()) { // Disallow usage of Arrays over Lists
             throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", field);
+        }
+    }
+
+    public static void disallowStaticGoodieFields(Field field) {
+        if (Modifier.isStatic(field.getModifiers())) { // Disallow static goodie fields
+            throw new GoodieImplementationException("Goodie fields MUST NOT be static.", field);
+        }
+    }
+
+    public static void disallowCircularDependency(Object object) {
+        GoodieCircularityTest circularityTest = new GoodieCircularityTest(object);
+        if (circularityTest.test()) { // Disallow usage of circular goodie models
+            throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves or other goodies.");
         }
     }
 

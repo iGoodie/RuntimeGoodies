@@ -3,7 +3,9 @@ package net.programmer.igoodie.util;
 public class StringUtilities {
 
     public static String sanitizeForPrint(Object value) {
-        if (value instanceof String) {
+        if (value == null) {
+            return "null";
+        } else if (value instanceof String) {
             return "\"" + value + "\"";
         } else if (value instanceof Character) {
             return "'" + value + "'";
