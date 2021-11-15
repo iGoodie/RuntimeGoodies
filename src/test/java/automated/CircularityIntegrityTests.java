@@ -29,7 +29,7 @@ public class CircularityIntegrityTests {
     public void testCircularityTestIntegrity() {
         Assertions.assertTrue(new GoodieCircularityTest(CircularityIntegrityTests.class).test());
         Assertions.assertTrue(new GoodieCircularityTest(SubTypeA.class).test());
-        Assertions.assertFalse(new GoodieCircularityTest(SubTypeC.class).test());
+        Assertions.assertFalse(new GoodieCircularityTest(SubTypeB.class).test());
     }
 
     @Test

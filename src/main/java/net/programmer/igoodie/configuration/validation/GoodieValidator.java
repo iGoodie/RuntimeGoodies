@@ -1,5 +1,6 @@
 package net.programmer.igoodie.configuration.validation;
 
+import net.programmer.igoodie.configuration.validation.circularity.GoodieCircularityTest;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieNull;
@@ -30,14 +31,11 @@ public class GoodieValidator {
     public void validateAndFix(Object root, GoodieObject goodieToFix) {
         GoodieTraverser goodieTraverser = new GoodieTraverser();
 
+        checkCircularity(root);
         checkConflictingKeys(root);
 
-        // TODO: Test circular field type dept
-
         goodieTraverser.traverseGoodieFields(root, true, (object, field, goodiePath) -> {
-            if (TypeUtilities.isArray(field)) { // Disallow usage of Arrays over Lists
-                throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", field);
-            }
+            GoodieUtils.disallowArrayGoodieFields(field);
 
             FieldGoodiefier<?> fieldGoodiefier = GoodieUtils.findFieldGoodifier(field);
 
@@ -67,6 +65,13 @@ public class GoodieValidator {
                 markChanged(goodiePath);
             }
         });
+    }
+
+    private void checkCircularity(Object root) {
+        GoodieCircularityTest circularityTest = new GoodieCircularityTest(root);
+        if (circularityTest.test()) { // Disallow usage of circular goodie models
+            throw new GoodieImplementationException("Goodies MUST NOT circularly depend on themselves or other goodies.");
+        }
     }
 
     private void checkConflictingKeys(Object root) {

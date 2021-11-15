@@ -54,9 +54,7 @@ public class GoodieTraverser {
 
             Class<?> fieldType = goodieField.getType();
 
-            if (fieldType.isArray()) { // Disallow usage of Arrays over Lists
-                throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", goodieField);
-            }
+            GoodieUtils.disallowArrayGoodieFields(goodieField);
 
             DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(fieldType);
 

@@ -10,6 +10,12 @@ import java.lang.reflect.Modifier;
 
 public class GoodieUtils {
 
+    public static void disallowArrayGoodieFields(Field field) {
+        if (field.getType().isArray()) { // Disallow usage of Arrays over Lists
+            throw new GoodieImplementationException("Goodie fields MUST not be an array fieldType. Use List<?> fieldType instead.", field);
+        }
+    }
+
     public static boolean isFieldNullable(Field field) {
         return field.getAnnotation(GoodieNullable.class) != null;
     }

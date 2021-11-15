@@ -23,7 +23,7 @@ public class GoodieCircularityTest {
         for (Field field : ReflectionUtilities.getFieldsWithAnnotation(root, Goodie.class)) {
             Class<?> fieldType = field.getType();
 
-            if (TypeUtilities.isArray(fieldType)) {
+            if (TypeUtilities.isList(fieldType)) {
                 // TODO
 
             } else if (TypeUtilities.isMap(fieldType)) {
