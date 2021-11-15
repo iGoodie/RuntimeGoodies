@@ -3,7 +3,7 @@ package net.programmer.igoodie.serialization;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.query.GoodieQuery;
-import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
+import net.programmer.igoodie.serialization.goodiefy.DataGoodiefier;
 import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
@@ -15,20 +15,19 @@ public class GoodieDeserializer {
     public void deserializeInto(Object root, GoodieObject goodieObject) {
         new GoodieTraverser().traverseGoodieFields(root, true, (object, field, goodiePath) -> {
             GoodieElement goodieElement = GoodieQuery.query(goodieObject, goodiePath);
-            FieldGoodiefier<?> fieldGoodiefier = GoodieUtils.findFieldGoodifier(field);
+            DataGoodiefier<?> dataGoodifier = GoodieUtils.findDataGoodifier(field.getGenericType());
 
-            Object value = deserializeWithGoodiefier(field, fieldGoodiefier, goodieElement);
+            Object value = deserializeWithGoodiefier(field, dataGoodifier, goodieElement);
             ReflectionUtilities.setValue(object, field, value);
         });
 
         // TODO: Virtualization
     }
 
-    private <G extends GoodieElement> Object deserializeWithGoodiefier(Field field, FieldGoodiefier<G> fieldGoodiefier, GoodieElement goodieElement) {
+    private <G extends GoodieElement> Object deserializeWithGoodiefier(Field field, DataGoodiefier<G> dataGoodifier, GoodieElement goodieElement) {
         if (goodieElement.isNull()) return null;
-        Class<?> fieldType = field.getType();
-        G goodie = fieldGoodiefier.auxGoodieElement(goodieElement);
-        return fieldGoodiefier.generateFromGoodie(fieldType, goodie);
+        G goodie = dataGoodifier.auxGoodieElement(goodieElement);
+        return dataGoodifier.generateFromGoodie(field.getGenericType(), goodie);
     }
 
 }

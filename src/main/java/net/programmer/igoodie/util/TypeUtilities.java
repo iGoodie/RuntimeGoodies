@@ -206,12 +206,19 @@ public final class TypeUtilities {
 
         } else if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
-            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-            return ((Class<?>) actualTypeArguments[0]);
+            return ((Class<?>) parameterizedType.getRawType());
 
         } else {
             return null;
         }
+    }
+
+    public static Type getListType(Type listType) {
+        if (!(listType instanceof ParameterizedType)) {
+            throw new IllegalArgumentException("Expected a List<?> type");
+        }
+        ParameterizedType parameterizedType = (ParameterizedType) listType;
+        return parameterizedType.getActualTypeArguments()[0]; // List <[Type]>
     }
 
     public static <T> T defaultValue(Class<T> type) {

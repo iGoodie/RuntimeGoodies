@@ -4,10 +4,11 @@ import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieNullable;
 import net.programmer.igoodie.configuration.validation.circularity.GoodieCircularityTest;
 import net.programmer.igoodie.exception.GoodieImplementationException;
-import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
+import net.programmer.igoodie.serialization.goodiefy.DataGoodiefier;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 
 public class GoodieUtils {
 
@@ -43,17 +44,17 @@ public class GoodieUtils {
             else
                 throw new GoodieImplementationException("Goodies MUST have a nullary constructor", e, type);
         } catch (IllegalAccessException e) {
-            throw new GoodieImplementationException("Goodies MUST have their nullary constructor accessible", e, type);
+            throw new GoodieImplementationException("Goodies MUST have their nullary constructor accessible (public)", e, type);
         }
     }
 
-    public static FieldGoodiefier<?> findFieldGoodifier(Field field) {
-        for (FieldGoodiefier<?> fieldGoodiefier : RuntimeGoodies.FIELD_GOODIEFIERS) {
-            if (fieldGoodiefier.canGenerateForField(field)) {
-                return fieldGoodiefier;
+    public static DataGoodiefier<?> findDataGoodifier(Type targetType) {
+        for (DataGoodiefier<?> dataGoodiefier : RuntimeGoodies.DATA_GOODIEFIERS) {
+            if (dataGoodiefier.canGenerateForFieldType(targetType)) {
+                return dataGoodiefier;
             }
         }
-        throw new GoodieImplementationException("Unsupported goodie field type", field);
+        throw new GoodieImplementationException("Goodifier does not exist for type", targetType);
     }
 
 }

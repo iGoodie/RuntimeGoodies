@@ -5,14 +5,14 @@ import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 import net.programmer.igoodie.util.TypeUtilities;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
-public class PrimitiveGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
+public class PrimitiveGoodiefier extends DataGoodiefier<GoodiePrimitive> {
 
     @Override
-    public boolean canGenerateForField(Field field) {
-        return TypeUtilities.isPrimitive(field);
+    public boolean canGenerateForFieldType(Type fieldType) {
+        Class<?> fieldClass = TypeUtilities.getBaseClass(fieldType);
+        return TypeUtilities.isPrimitive(fieldClass);
     }
 
     @Override

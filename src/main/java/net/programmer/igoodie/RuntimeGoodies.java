@@ -12,11 +12,12 @@ import java.util.List;
 
 public class RuntimeGoodies {
 
-    public static final List<FieldGoodiefier<?>> FIELD_GOODIEFIERS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<DataGoodiefier<?>> DATA_GOODIEFIERS = Collections.unmodifiableList(Arrays.asList(
             new StringifiablesGoodifier(),
             new EnumGoodiefier(),
             new PrimitiveGoodiefier(),
             new GoodieElementGoodiefier(),
+            new ListGoodiefier(),
             new PojoGoodiefier()
     ));
 

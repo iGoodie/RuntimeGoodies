@@ -7,11 +7,11 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
-public abstract class FieldGoodiefier<G extends GoodieElement> {
+public abstract class DataGoodiefier<G extends GoodieElement> {
 
     /* ==== { Integrity Validators } ============ */
 
-    public abstract boolean canGenerateForField(Field field);
+    public abstract boolean canGenerateForFieldType(Type fieldType);
 
     public abstract boolean canAssignValueToType(Type targetType, Object value);
 
@@ -38,17 +38,5 @@ public abstract class FieldGoodiefier<G extends GoodieElement> {
     public G serializeValueToGoodie(Object object, Field field) {
         return serializeValueToGoodie(ReflectionUtilities.getValue(object, field));
     }
-
-    /* ==== { Fixers & Sanitizers } ============== */
-
-    public G fixGoodie(Field field, G goodie) {
-        return goodie;
-    }
-
-    public G sanitizeGoodie(G goodie) {
-        return goodie; // By default, a goodie is considered sanitized.
-    }
-
-    /* ==== { Utility Methods } ================= */
 
 }

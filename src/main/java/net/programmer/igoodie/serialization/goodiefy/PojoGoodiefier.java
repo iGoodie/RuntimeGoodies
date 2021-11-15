@@ -15,12 +15,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class PojoGoodiefier extends FieldGoodiefier<GoodieObject> {
+public class PojoGoodiefier extends DataGoodiefier<GoodieObject> {
 
     @Override
-    public boolean canGenerateForField(Field field) {
-        Class<?> fieldType = field.getType();
-        List<Field> goodieFields = ReflectionUtilities.getFieldsWithAnnotation(fieldType, Goodie.class);
+    public boolean canGenerateForFieldType(Type fieldType) {
+        Class<?> fieldClass = TypeUtilities.getBaseClass(fieldType);
+        List<Field> goodieFields = ReflectionUtilities.getFieldsWithAnnotation(fieldClass, Goodie.class);
         return goodieFields.size() > 0;
     }
 

@@ -3,6 +3,7 @@ package net.programmer.igoodie.exception;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 public class GoodieImplementationException extends GoodieException {
 
@@ -25,7 +26,7 @@ public class GoodieImplementationException extends GoodieException {
         this(reason, throwable, ((Object) target));
     }
 
-    public GoodieImplementationException(String reason, Throwable throwable, Class<?> target) {
+    public GoodieImplementationException(String reason, Throwable throwable, Type target) {
         this(reason, throwable, ((Object) target));
     }
 
@@ -34,6 +35,10 @@ public class GoodieImplementationException extends GoodieException {
     }
 
     public GoodieImplementationException(String reason, Method target) {
+        this(reason, null, target);
+    }
+
+    public GoodieImplementationException(String reason, Type target) {
         this(reason, null, target);
     }
 
@@ -53,8 +58,8 @@ public class GoodieImplementationException extends GoodieException {
         return target instanceof Constructor<?>;
     }
 
-    public boolean targetsClass() {
-        return target instanceof Class<?>;
+    public boolean targetsType() {
+        return target instanceof Type;
     }
 
     public Field getTargetField() {
@@ -69,8 +74,8 @@ public class GoodieImplementationException extends GoodieException {
         return ((Constructor<?>) target);
     }
 
-    public Class<?> getTargetClass() {
-        return ((Class<?>) target);
+    public Type getTargetType() {
+        return ((Type) target);
     }
 
     @Override
@@ -78,7 +83,7 @@ public class GoodieImplementationException extends GoodieException {
         if (targetsField()) return String.format("%s @ %s", super.getMessage(), getTargetField());
         if (targetsMethod()) return String.format("%s @ %s", super.getMessage(), getTargetMethod());
         if (targetsConstructor()) return String.format("%s @ %s", super.getMessage(), getTargetConstructor());
-        if (targetsClass()) return String.format("%s @ %s", super.getMessage(), getTargetClass());
+        if (targetsType()) return String.format("%s @ %s", super.getMessage(), getTargetType());
         return super.getMessage();
     }
 

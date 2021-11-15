@@ -7,15 +7,14 @@ import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 import net.programmer.igoodie.util.TypeUtilities;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
-public class GoodieElementGoodiefier extends FieldGoodiefier<GoodieElement> {
+public class GoodieElementGoodiefier extends DataGoodiefier<GoodieElement> {
 
     @Override
-    public boolean canGenerateForField(Field field) {
-        Class<?> fieldType = field.getType();
-        return GoodieElement.class.isAssignableFrom(fieldType);
+    public boolean canGenerateForFieldType(Type fieldType) {
+        Class<?> fieldClass = TypeUtilities.getBaseClass(fieldType);
+        return GoodieElement.class.isAssignableFrom(fieldClass);
     }
 
     @Override

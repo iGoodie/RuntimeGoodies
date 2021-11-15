@@ -6,16 +6,16 @@ import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 import net.programmer.igoodie.util.TypeUtilities;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
-public class EnumGoodiefier extends FieldGoodiefier<GoodiePrimitive> {
+public class EnumGoodiefier extends DataGoodiefier<GoodiePrimitive> {
 
     @Override
-    public boolean canGenerateForField(Field field) {
-        if (TypeUtilities.isEnum(field)) {
-            if (field.getType().getEnumConstants().length == 0) {
-                throw new GoodieImplementationException("Goodie fields CANNOT have an enum type with no enum constants", field);
+    public boolean canGenerateForFieldType(Type fieldType) {
+        Class<?> fieldClass = TypeUtilities.getBaseClass(fieldType);
+        if (TypeUtilities.isEnum(fieldClass)) {
+            if (fieldClass.getEnumConstants().length == 0) {
+                throw new GoodieImplementationException("Goodie fields CANNOT have an enum type with no enum constants", fieldClass);
             }
             return true;
         }

@@ -4,7 +4,7 @@ import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.query.GoodieQuery;
-import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
+import net.programmer.igoodie.serialization.goodiefy.DataGoodiefier;
 import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
@@ -15,12 +15,12 @@ public class GoodieSerializer {
         GoodieObject goodieObject = new GoodieObject();
 
         new GoodieTraverser().traverseGoodieFields(root, true, (object, field, goodiePath) -> {
-            FieldGoodiefier<?> fieldGoodiefier = GoodieUtils.findFieldGoodifier(field);
+            DataGoodiefier<?> dataGoodifier = GoodieUtils.findDataGoodifier(field.getGenericType());
             Object value = ReflectionUtilities.getValue(object, field);
 
             GoodieElement serializedValue = value == null
                     ? new GoodieNull()
-                    : fieldGoodiefier.serializeValueToGoodie(value);
+                    : dataGoodifier.serializeValueToGoodie(value);
 
             GoodieQuery.set(goodieObject, goodiePath, serializedValue);
         });
