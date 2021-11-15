@@ -2,10 +2,7 @@ package net.programmer.igoodie;
 
 import net.programmer.igoodie.configuration.validation.logic.*;
 import net.programmer.igoodie.registry.Registry;
-import net.programmer.igoodie.serialization.goodiefy.EnumGoodiefier;
-import net.programmer.igoodie.serialization.goodiefy.FieldGoodiefier;
-import net.programmer.igoodie.serialization.goodiefy.PojoGoodiefier;
-import net.programmer.igoodie.serialization.goodiefy.PrimitiveGoodiefier;
+import net.programmer.igoodie.serialization.goodiefy.*;
 import net.programmer.igoodie.serialization.stringify.*;
 
 import java.lang.annotation.Annotation;
@@ -18,6 +15,7 @@ public class RuntimeGoodies {
     public static final List<FieldGoodiefier<?>> FIELD_GOODIEFIERS = Collections.unmodifiableList(Arrays.asList(
             new PrimitiveGoodiefier(),
             new EnumGoodiefier(),
+            new GoodieElementGoodiefier(),
             new PojoGoodiefier()
     ));
 

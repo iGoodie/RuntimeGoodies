@@ -24,7 +24,7 @@ public class Enums extends JsonConfiGoodie {
     MyEnum valueWithDefault = MyEnum.CONST_3;
 
     @Test
-    public void testSubtypes() {
+    public void testEnums() {
         Enums config = new Enums().readConfig(new ConfiGoodieOptions()
                 .useText("{'value2':'CONST_4'}")
                 .onFixed(System.out::println));
