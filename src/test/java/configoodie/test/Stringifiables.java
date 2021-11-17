@@ -1,11 +1,9 @@
 package configoodie.test;
 
-import net.programmer.igoodie.configuration.ConfiGoodieOptions;
 import net.programmer.igoodie.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.serialization.GoodieSerializer;
 import net.programmer.igoodie.serialization.annotation.Goodie;
-import net.programmer.igoodie.util.GoodieTraverser;
 import org.junit.jupiter.api.Test;
+import util.TestUtils;
 
 import java.time.Instant;
 import java.util.Date;
@@ -31,16 +29,7 @@ public class Stringifiables extends JsonConfiGoodie {
 
     @Test
     public void testStringifiables() {
-        Stringifiables config = new Stringifiables().readConfig(new ConfiGoodieOptions()
-                .useText("{'seed_2': 123}")
-                .onFixed(System.out::println));
-        new GoodieTraverser().debugGoodieFields(config);
-
-        System.out.println("\nFixed those:");
-        System.out.println(config.getFixedPaths());
-
-        System.out.println("\nSerialized back:");
-        System.out.println(new GoodieSerializer().serializeFrom(config));
+        TestUtils.standardConfiGoodieTest(new Stringifiables(), "{'seed_2': 123}");
     }
 
 }

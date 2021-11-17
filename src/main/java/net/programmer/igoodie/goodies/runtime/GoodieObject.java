@@ -33,9 +33,19 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         return map;
     }
 
+    public boolean has(String key) {
+        return get(key) != null;
+    }
+
     @Override
     public GoodieElement get(Object key) {
         return map.get(key);
+    }
+
+    public boolean hasPrimitive(String key) {
+        if (!has(key)) return false;
+        GoodieElement goodieElement = get(key);
+        return goodieElement.isPrimitive();
     }
 
     public GoodiePrimitive getPrimitive(String key) {
@@ -45,11 +55,23 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         else throw new IllegalArgumentException();
     }
 
+    public boolean hasArray(String key) {
+        if (!has(key)) return false;
+        GoodieElement goodieElement = get(key);
+        return goodieElement.isArray();
+    }
+
     public GoodieArray getArray(String key) {
         GoodieElement goodieElement = get(key);
         if (goodieElement instanceof GoodieArray)
             return ((GoodieArray) goodieElement);
         else throw new IllegalArgumentException();
+    }
+
+    public boolean hasObject(String key) {
+        if (!has(key)) return false;
+        GoodieElement goodieElement = get(key);
+        return goodieElement.isObject();
     }
 
     public GoodieObject getObject(String key) {
@@ -59,8 +81,18 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         else throw new IllegalArgumentException();
     }
 
+    public boolean hasBoolean(String key) {
+        if (!hasPrimitive(key)) return false;
+        return getPrimitive(key).isBoolean();
+    }
+
     public boolean getBoolean(String key) {
         return getPrimitive(key).getBoolean();
+    }
+
+    public boolean hasNumber(String key) {
+        if (!hasPrimitive(key)) return false;
+        return getPrimitive(key).isNumber();
     }
 
     public byte getByte(String key) {
@@ -91,8 +123,18 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         return getPrimitive(key).getNumber();
     }
 
+    public boolean hasString(String key) {
+        if (!hasPrimitive(key)) return false;
+        return getPrimitive(key).isString();
+    }
+
     public String getString(String key) {
         return getPrimitive(key).getString();
+    }
+
+    public boolean hasCharacter(String key) {
+        if (!hasPrimitive(key)) return false;
+        return getPrimitive(key).isCharacter();
     }
 
     public char getCharacter(String key) {

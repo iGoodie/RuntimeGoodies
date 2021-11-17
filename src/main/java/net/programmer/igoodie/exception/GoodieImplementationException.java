@@ -1,9 +1,8 @@
 package net.programmer.igoodie.exception;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class GoodieImplementationException extends GoodieException {
 
@@ -78,13 +77,34 @@ public class GoodieImplementationException extends GoodieException {
         return ((Type) target);
     }
 
+    public String getCauseMessage() {
+        return super.getMessage();
+    }
+
     @Override
     public String getMessage() {
         if (targetsField()) return String.format("%s @ %s", super.getMessage(), getTargetField());
         if (targetsMethod()) return String.format("%s @ %s", super.getMessage(), getTargetMethod());
         if (targetsConstructor()) return String.format("%s @ %s", super.getMessage(), getTargetConstructor());
-        if (targetsType()) return String.format("%s @ %s", super.getMessage(), getTargetType());
+        if (targetsType()) return String.format("%s @ %s", super.getMessage(), getTypeMessage(getTargetType()));
         return super.getMessage();
+    }
+
+    private String getTypeMessage(Type type) {
+        if (type instanceof Class<?>) {
+            return ((Class<?>) type).getSimpleName();
+
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type baseType = parameterizedType.getRawType();
+            return String.format("%s<%s>", getTypeMessage(baseType),
+                    Arrays.stream(parameterizedType.getActualTypeArguments())
+                            .map(this::getTypeMessage)
+                            .collect(Collectors.joining(", ")));
+
+        } else {
+            return type.toString();
+        }
     }
 
 }
