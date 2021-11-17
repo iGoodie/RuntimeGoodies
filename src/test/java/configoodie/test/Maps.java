@@ -16,7 +16,7 @@ public class Maps extends JsonConfiGoodie {
 
     public static class InvalidMaps extends JsonConfiGoodie {
         @Goodie
-        Map<String, Map<Integer, Integer>> invalid;
+        Map<String, Map<Object, Integer>> invalid;
     }
 
     @Goodie
@@ -31,9 +31,20 @@ public class Maps extends JsonConfiGoodie {
     @Goodie
     Map<UUID, List<Integer>> intBucket;
 
+    @Goodie
+    Map<Random, Map<String, Integer>> complex;
+
+    @Goodie
+    Map<Random, Map<String, List<Integer>>> complex2;
+
     @Test
     public void testMaps() {
-        TestUtils.standardConfiGoodieTest(new Maps(), "{}");
+        TestUtils.standardConfiGoodieTest(new Maps(), "{" +
+                "'numbers':{'A':1, 'B':2}," +
+                "'intBucket': {'123e4567-e89b-12d3-a456-426614174000': [1, 2, 3]}," +
+                "'complex': {0: {'A':null, 'B':2}, 1: {'A':1, 'B':2}}," +
+                "'complex2': {0: {'A':[1], 'B':[2,2]}, 1: {'A':[3,3,3], 'B':[4,4,4,4]}}" +
+                "}");
     }
 
     @Test

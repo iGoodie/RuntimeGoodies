@@ -2,6 +2,7 @@ package net.programmer.igoodie.serialization.goodiefy;
 
 import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
+import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.TypeUtilities;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListGoodiefier extends DataGoodiefier<GoodieArray> {
+
+    @Override
+    public void validateFieldDeclaration(Type fieldType) {
+        if (!canGenerateForFieldType(fieldType)) return;
+        Type listType = TypeUtilities.getListType(fieldType);
+        DataGoodiefier<?> dataGoodifier = GoodieUtils.findDataGoodifier(listType);
+        dataGoodifier.validateFieldDeclaration(listType);
+    }
 
     @Override
     public boolean canGenerateForFieldType(Type fieldType) {
@@ -58,7 +67,7 @@ public class ListGoodiefier extends DataGoodiefier<GoodieArray> {
         List<Object> list = new ArrayList<>();
 
         for (GoodieElement goodieElement : goodie) {
-            Object value = generateFromGoodiefier(dataGoodifier, listType, goodieElement);
+            Object value = goodieElement.isNull() ? null : generateFromGoodiefier(dataGoodifier, listType, goodieElement);
             list.add(value);
         }
 
@@ -81,9 +90,13 @@ public class ListGoodiefier extends DataGoodiefier<GoodieArray> {
         List<?> listValue = (List<?>) value;
 
         for (Object element : listValue) {
-            Class<?> elementClass = element.getClass();
-            DataGoodiefier<?> dataGoodifier = GoodieUtils.findDataGoodifier(elementClass);
-            goodieArray.add(dataGoodifier.serializeValueToGoodie(element));
+            if (element == null) {
+                goodieArray.add(GoodieNull.INSTANCE);
+            } else {
+                Class<?> elementClass = element.getClass();
+                DataGoodiefier<?> dataGoodifier = GoodieUtils.findDataGoodifier(elementClass);
+                goodieArray.add(dataGoodifier.serializeValueToGoodie(element));
+            }
         }
 
         return goodieArray;

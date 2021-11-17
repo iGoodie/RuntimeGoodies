@@ -2,7 +2,9 @@ package net.programmer.igoodie.util;
 
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 
 public final class TypeUtilities {
@@ -219,6 +221,22 @@ public final class TypeUtilities {
         }
         ParameterizedType parameterizedType = (ParameterizedType) listType;
         return parameterizedType.getActualTypeArguments()[0]; // List <[Type]>
+    }
+
+    public static Type getMapKeyType(Type mapType) {
+        if (!(mapType instanceof ParameterizedType)) {
+            throw new IllegalArgumentException("Expected a Map<?, ?> type");
+        }
+        ParameterizedType parameterizedType = (ParameterizedType) mapType;
+        return parameterizedType.getActualTypeArguments()[0]; // Map <[KeyType], [ValueType]>
+    }
+
+    public static Type getMapValueType(Type mapType) {
+        if (!(mapType instanceof ParameterizedType)) {
+            throw new IllegalArgumentException("Expected a Map<?, ?> type");
+        }
+        ParameterizedType parameterizedType = (ParameterizedType) mapType;
+        return parameterizedType.getActualTypeArguments()[1]; // Map <[KeyType], [ValueType]>
     }
 
     public static <T> T defaultValue(Class<T> type) {

@@ -1,13 +1,22 @@
 package configoodie.test;
 
 import net.programmer.igoodie.configuration.JsonConfiGoodie;
+import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.serialization.annotation.Goodie;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import util.TestUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Lists extends JsonConfiGoodie {
+
+    public static class InvalidLists extends JsonConfiGoodie {
+        @Goodie
+        List<List<Object>> invalid;
+    }
 
     @Goodie
     List<String> primitives;
@@ -56,6 +65,19 @@ public class Lists extends JsonConfiGoodie {
                 "'stringLists': [['A', 'B'], ['C', 'D']]," +
                 "'stringListLists': [[['A'], ['B']], [['C'], ['D']]]" +
                 " }");
+    }
+
+    @Test
+    public void testInvalidNestedLists() {
+        TestUtils.standardConfiGoodieTest(new Lists(), "{ " +
+                "'stringLists': [[null, 1, 'A', 'B'], ['C', 'D']]" +
+                " }");
+    }
+
+    @Test
+    public void testInvalidLists() {
+        Assertions.assertThrows(GoodieImplementationException.class,
+                () -> TestUtils.standardConfiGoodieTest(new InvalidLists(), "{}"));
     }
 
 }

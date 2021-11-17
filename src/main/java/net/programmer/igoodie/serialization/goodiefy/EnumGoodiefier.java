@@ -24,8 +24,10 @@ public class EnumGoodiefier extends DataGoodiefier<GoodiePrimitive> {
 
     @Override
     public boolean canAssignValueToType(Type targetType, Object value) {
-        return TypeUtilities.isEnum(value.getClass())
-                && TypeUtilities.getBaseClass(targetType).isAssignableFrom(value.getClass());
+        Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
+        Class<?> valueClass = value.getClass();
+        return TypeUtilities.isEnum(valueClass)
+                && targetClass.isAssignableFrom(valueClass);
     }
 
     @Override

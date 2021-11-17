@@ -1,5 +1,6 @@
 package net.programmer.igoodie.configuration;
 
+import net.programmer.igoodie.configuration.validation.FixReason;
 import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
@@ -8,7 +9,7 @@ import net.programmer.igoodie.util.FileUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
+import java.util.Collection;
 import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
@@ -20,8 +21,8 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
         return underlyingGoodieObject;
     }
 
-    public Set<String> getFixedPaths() {
-        return underlyingValidator.getFixedPaths();
+    public Collection<FixReason> getFixesDone() {
+        return underlyingValidator.getFixesDone();
     }
 
     public abstract F getFormat();
@@ -42,13 +43,13 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
 
         F goodieFormat = getFormat();
         GoodieDeserializer goodieDeserializer = new GoodieDeserializer();
-        underlyingValidator = new GoodieValidator();
 
         // Read goodie object from the external config format
         underlyingGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
 
         // Validate and fix loaded goodie object
-        underlyingValidator.validateAndFix(this, underlyingGoodieObject);
+        underlyingValidator = new GoodieValidator(this, underlyingGoodieObject);
+        underlyingValidator.validateAndFix();
 
         // Deserialize underlying goodie object into fields
         goodieDeserializer.deserializeInto(this, underlyingGoodieObject);

@@ -11,6 +11,8 @@ public abstract class DataGoodiefier<G extends GoodieElement> {
 
     /* ==== { Integrity Validators } ============ */
 
+    public void validateFieldDeclaration(Type fieldType) {}
+
     public abstract boolean canGenerateForFieldType(Type fieldType);
 
     public abstract boolean canAssignValueToType(Type targetType, Object value);

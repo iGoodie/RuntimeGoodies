@@ -13,10 +13,10 @@ import java.util.List;
 public class RuntimeGoodies {
 
     public static final List<DataGoodiefier<?>> DATA_GOODIEFIERS = Collections.unmodifiableList(Arrays.asList(
-            new StringifiablesGoodifier(),
-            new EnumGoodiefier(),
-            new PrimitiveGoodiefier(),
             new GoodieElementGoodiefier(),
+            new EnumGoodiefier(),
+            new StringifiablesGoodifier(),
+            new PrimitiveGoodiefier(),
             new ListGoodiefier(),
             new MapGoodiefier(),
             new PojoGoodiefier()

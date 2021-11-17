@@ -21,20 +21,18 @@ public class StringifiablesGoodifier extends DataGoodiefier<GoodiePrimitive> {
 
     @Override
     public boolean canAssignValueToType(Type targetType, Object value) {
-        if (!(value instanceof String)) return false;
         Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
-        DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(targetClass);
-        try {
-            dataStringifier.objectify(StringUtilities.toString(value));
-            return true;
-        } catch (Exception ignored) {
-            return false; // Malformed value
-        }
+        Class<?> valueClass = value.getClass();
+        return targetClass.isAssignableFrom(valueClass);
     }
 
     @Override
     public boolean canGenerateTypeFromGoodie(Type targetType, GoodieElement goodieElement) {
-        return goodieElement.isPrimitive();
+        if (!goodieElement.isPrimitive()) return false;
+        Class<?> targetClass = TypeUtilities.getBaseClass(targetType);
+        DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(targetClass);
+        String stringValue = StringUtilities.toString(goodieElement.asPrimitive().get());
+        return dataStringifier != null && dataStringifier.canObjectify(stringValue);
     }
 
     @Override

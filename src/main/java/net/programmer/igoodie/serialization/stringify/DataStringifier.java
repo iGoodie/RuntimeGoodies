@@ -18,6 +18,15 @@ public abstract class DataStringifier<T> implements Registrable<Class<?>> {
 
     public abstract T objectify(String string) throws Exception;
 
+    public boolean canObjectify(String string) {
+        try {
+            objectify(string);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public abstract T defaultObjectValue();
 
     public String defaultStringValue() {

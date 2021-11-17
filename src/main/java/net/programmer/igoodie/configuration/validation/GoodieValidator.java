@@ -1,5 +1,6 @@
 package net.programmer.igoodie.configuration.validation;
 
+import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
@@ -7,6 +8,7 @@ import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.query.GoodieQuery;
 import net.programmer.igoodie.serialization.goodiefy.DataGoodiefier;
+import net.programmer.igoodie.serialization.stringify.DataStringifier;
 import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
@@ -14,43 +16,52 @@ import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class GoodieValidator {
 
     private boolean changesMade = false;
-    private final Set<String> fixedPaths = new HashSet<>();
+    private final Map<String, FixReason> fixesDone = new HashMap<>();
+
+    private final Object root;
+    private GoodieObject goodieToFix;
+
+    public GoodieValidator(Object root, GoodieObject goodieToFix) {
+        this.root = root;
+        this.goodieToFix = goodieToFix;
+    }
 
     public boolean changesMade() {
         return changesMade;
     }
 
-    public Set<String> getFixedPaths() {
-        return fixedPaths;
+    public Collection<FixReason> getFixesDone() {
+        return fixesDone.values();
     }
 
-    public void validateAndFix(Object root, GoodieObject goodieToFix) {
+    public void validateAndFix() {
         GoodieTraverser goodieTraverser = new GoodieTraverser();
         GoodieUtils.disallowCircularDependency(root);
 
         checkConflictingKeys(root);
 
         goodieTraverser.traverseGoodieFields(root, true, (object, field, goodiePath) -> {
+            Type fieldType = field.getGenericType();
+
             GoodieUtils.disallowArrayGoodieFields(field);
 
-            DataGoodiefier<?> dataGoodifier = GoodieUtils.findDataGoodifier(field.getGenericType());
+            DataGoodiefier<?> dataGoodifier = GoodieUtils.findDataGoodifier(fieldType);
 
+            // Check field declaration and default value declaration
+            dataGoodifier.validateFieldDeclaration(fieldType);
             checkDeclaredDefault(dataGoodifier, object, field);
 
-            Class<?> fieldType = field.getType();
             GoodieElement goodie = GoodieQuery.query(goodieToFix, goodiePath);
 
             // Missing value - Initialize with null value
             if (goodie == null) {
                 goodie = GoodieQuery.set(goodieToFix, goodiePath, GoodieNull.INSTANCE);
-                markChanged(goodiePath);
+                markChanged(goodiePath, "Value was missing");
             }
 
             // Unexpected nullability flag - Throw exception
@@ -60,23 +71,38 @@ public class GoodieValidator {
 
             // Nullability violation - Replace with default goodie
             if (goodie.isNull() && !GoodieUtils.isFieldNullable(field)) {
-                goodie = fixWithDefaultValue(dataGoodifier, object, field, goodieToFix, goodiePath);
+                GoodieElement defaultValue = generateDefaultValue(dataGoodifier, object, field);
+                goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultValue);
+                markChanged(goodiePath, "Nullability violation");
             }
 
             // Goodie type mismatch - Replace with default goodie
             if (!goodie.isNull() && !dataGoodifier.canGenerateTypeFromGoodie(fieldType, goodie)) {
-                goodie = fixWithDefaultValue(dataGoodifier, object, field, goodieToFix, goodiePath);
+                GoodieElement defaultValue = generateDefaultValue(dataGoodifier, object, field);
+                goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultValue);
+                markChanged(goodiePath, "Goodie type mismatch");
             }
 
-            // Field is a List - Validate each element (ignoring nullability)
-            if (field.getType() == List.class) {
-                validateAndFixArray(field.getGenericType(), goodie.asArray(), goodiePath);
-            }
-
-            // TODO: Validate if Map
+            validateAndFix(fieldType, goodie, goodiePath);
 
             // TODO: Iterate through GoodieValidators
         });
+    }
+
+    public void validateAndFix(Type type, GoodieElement goodie, String goodiePath) {
+        if (goodie == null || goodie.isNull()) {
+            return;
+        }
+
+        // Field is a List - Validate each element (ignoring nullability)
+        if (TypeUtilities.getBaseClass(type) == List.class) {
+            validateAndFixArray(type, goodie.asArray(), goodiePath);
+        }
+
+        // Field is a Map - Validate each element (ignoring nullability)
+        if (TypeUtilities.getBaseClass(type) == Map.class) {
+            validateAndFixMap(type, goodie.asObject(), goodiePath);
+        }
     }
 
     public void validateAndFixArray(Type targetType, GoodieArray goodieArray, String goodiePath) {
@@ -85,11 +111,48 @@ public class GoodieValidator {
 
         for (int i = goodieArray.size() - 1; i >= 0; i--) {
             GoodieElement goodieElement = goodieArray.get(i);
-            if (!dataGoodifier.canGenerateTypeFromGoodie(listType, goodieElement)) {
+
+            if (!goodieElement.isNull() && !dataGoodifier.canGenerateTypeFromGoodie(listType, goodieElement)) {
                 goodieArray.remove(i);
-                markChanged(goodiePath);
+                markChanged(goodiePath + "[" + i + "]", "Could not generate element for type -> " + listType);
             }
+
+            validateAndFix(listType, goodieElement, goodiePath + "[" + i + "]");
         }
+    }
+
+    public void validateAndFixMap(Type targetType, GoodieObject goodieObject, String goodiePath) {
+        Type keyType = TypeUtilities.getMapKeyType(targetType);
+        Type valueType = TypeUtilities.getMapValueType(targetType);
+        DataStringifier<?> keyStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
+        DataGoodiefier<?> valueGoodiefier = GoodieUtils.findDataGoodifier(valueType);
+
+        if (keyType != String.class && keyStringifier == null) {
+            throw new GoodieImplementationException("Key type of Maps MUST be either String or a stringifiable type (e.g UUID)", targetType);
+        }
+
+        goodieObject.entrySet().removeIf(entry -> {
+            String mapKey = entry.getKey();
+            GoodieElement mapValue = entry.getValue();
+
+            if (keyType != String.class) {
+                try {
+                    keyStringifier.objectify(mapKey);
+                } catch (Exception ignored) {
+                    markChanged(goodiePath + "." + mapKey, "Map key cannot be deserialized");
+                    return true;
+                }
+            }
+
+            if (!mapValue.isNull() && !valueGoodiefier.canGenerateTypeFromGoodie(valueType, mapValue)) {
+                markChanged(goodiePath + "." + mapKey, "Map value cannot be deserialized");
+                return true;
+            }
+
+            validateAndFix(valueType, mapValue, goodiePath + "." + mapKey);
+
+            return false;
+        });
     }
 
     private void checkConflictingKeys(Object root) {
@@ -117,22 +180,18 @@ public class GoodieValidator {
 
     /* ---------------------------- */
 
-    private void markChanged(String goodiePath) {
-        fixedPaths.add(goodiePath);
+    private void markChanged(String goodiePath, String reason) {
+        fixesDone.putIfAbsent(goodiePath, new FixReason(goodiePath, reason));
         changesMade = true;
     }
 
-    private GoodieElement fixWithDefaultValue(DataGoodiefier<?> dataGoodifier, Object object, Field field, GoodieObject goodieToFix, String goodiePath) {
+    private GoodieElement generateDefaultValue(DataGoodiefier<?> dataGoodifier, Object object, Field field) {
         Class<?> fieldType = field.getType();
         Object declaredDefaultValue = ReflectionUtilities.getValue(object, field);
 
-        GoodieElement defaultGoodie = declaredDefaultValue != null
+        return declaredDefaultValue != null
                 ? GoodieElement.from(declaredDefaultValue)
                 : dataGoodifier.generateDefaultGoodie(fieldType);
-
-        GoodieElement fixedGoodie = GoodieQuery.set(goodieToFix, goodiePath, defaultGoodie);
-        markChanged(goodiePath);
-        return fixedGoodie;
     }
 
 }
