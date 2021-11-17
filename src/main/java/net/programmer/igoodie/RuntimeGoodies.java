@@ -18,6 +18,7 @@ public class RuntimeGoodies {
             new PrimitiveGoodiefier(),
             new GoodieElementGoodiefier(),
             new ListGoodiefier(),
+            new MapGoodiefier(),
             new PojoGoodiefier()
     ));
 

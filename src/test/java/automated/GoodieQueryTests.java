@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import util.TestFiles;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class GoodieQueryTests {
 
@@ -48,7 +49,7 @@ public class GoodieQueryTests {
     }
 
     @Test
-    public void testMutators() {
+    public void testMutators() throws NoSuchElementException {
         GoodieObject goodieObject = new GoodieObject();
 
         GoodieQuery.set(goodieObject, "$.a", GoodiePrimitive.from(1));
@@ -69,9 +70,9 @@ public class GoodieQueryTests {
         GoodieQuery.set(goodieObject, "$.arrayValue[2].val", GoodiePrimitive.from(1));
         System.out.println("6 -> " + goodieObject);
 
-        GoodieQuery.set(goodieObject.getArray("arrayValue"), "$[0]", GoodiePrimitive.from(2));
+        GoodieQuery.set(goodieObject.getArray("arrayValue").get(), "$[0]", GoodiePrimitive.from(2));
         System.out.println(goodieObject);
-        System.out.println("Query: " + GoodieQuery.query(goodieObject.getArray("arrayValue"), "$[0]"));
+        System.out.println("Query: " + GoodieQuery.query(goodieObject.getArray("arrayValue").get(), "$[0]"));
 
         GoodieQuery.set(goodieObject, "$.arrayValue[2]", GoodiePrimitive.from(1));
         System.out.println("7 -> " + goodieObject);

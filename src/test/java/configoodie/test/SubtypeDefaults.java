@@ -18,7 +18,7 @@ public class SubtypeDefaults extends JsonConfiGoodie {
 
         @Override
         public @NotNull Class<? extends Animal> deserializeType(GoodieObject goodieObject) {
-            goodieObject.
+//            goodieObject.
             return Cat.class;
         }
 

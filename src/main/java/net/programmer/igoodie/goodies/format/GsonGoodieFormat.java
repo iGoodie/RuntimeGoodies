@@ -19,7 +19,7 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
         if (jsonElement.isJsonPrimitive())
             return convertPrimitive(jsonElement.getAsJsonPrimitive());
         if (jsonElement.isJsonNull()) {
-            return new GoodieNull();
+            return GoodieNull.INSTANCE;
         }
 
         return null; // <-- No corresponding Goodie type exists

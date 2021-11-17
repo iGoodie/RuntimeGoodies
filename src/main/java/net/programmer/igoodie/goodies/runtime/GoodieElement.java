@@ -16,7 +16,7 @@ public abstract class GoodieElement {
 
     public static GoodieElement from(Object value) {
         if (value == null) {
-            return new GoodieNull();
+            return GoodieNull.INSTANCE;
         } else if (value instanceof GoodieElement) {
             return ((GoodieElement) value).deepCopy();
         } else if (TypeUtilities.isPrimitive(value.getClass())) {
@@ -79,7 +79,7 @@ public abstract class GoodieElement {
     }
 
     private static <T> GoodieElement fromField(Field field, T value) {
-        if (value == null) return new GoodieNull();
+        if (value == null) return GoodieNull.INSTANCE;
 
         @SuppressWarnings("unchecked")
         Class<T> type = (Class<T>) field.getClass();

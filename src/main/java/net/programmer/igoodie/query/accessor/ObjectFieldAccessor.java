@@ -24,7 +24,7 @@ public class ObjectFieldAccessor extends GoodieQueryAccessor {
         if (canAccess(goodieElement)) return goodieElement;
 
         GoodieObject newCurrent = new GoodieObject();
-        GoodieNull next = new GoodieNull();
+        GoodieNull next = GoodieNull.INSTANCE;
         newCurrent.put(fieldName, next);
 
         if (parent instanceof GoodieObject) {
@@ -59,7 +59,7 @@ public class ObjectFieldAccessor extends GoodieQueryAccessor {
         GoodieObject currentObject = goodieElement.asObject();
 
         if (!currentObject.containsKey(fieldName)) {
-            currentObject.put(fieldName, new GoodieNull());
+            currentObject.put(fieldName, GoodieNull.INSTANCE);
         }
 
         return currentObject.get(fieldName);

@@ -25,7 +25,7 @@ public class ArrayIndexAccessor extends GoodieQueryAccessor {
 
         GoodieArray newCurrent = new GoodieArray();
         fillIndices(newCurrent);
-        GoodieNull next = new GoodieNull();
+        GoodieNull next = GoodieNull.INSTANCE;
         newCurrent.set(index, next);
 
         if (parent instanceof GoodieObject) {
@@ -79,7 +79,7 @@ public class ArrayIndexAccessor extends GoodieQueryAccessor {
         int fillCount = index - array.size() + 1;
         if (fillCount <= 0) return;
         for (int i = 0; i < fillCount; i++) {
-            array.add(new GoodieNull());
+            array.add(GoodieNull.INSTANCE);
         }
     }
 

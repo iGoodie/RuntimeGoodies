@@ -160,7 +160,7 @@ public class GoodieValidator {
                 GoodieQuery.set(goodieObject, goodiePath, new GoodieArray());
 
             } else {
-                GoodieQuery.set(goodieObject, goodiePath, new GoodieNull());
+                GoodieQuery.set(goodieObject, goodiePath, GoodieNull.INSTANCE);
             }
 
             changesMade = true;

@@ -13,7 +13,6 @@ import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +49,7 @@ public class GoodieValidator {
 
             // Missing value - Initialize with null value
             if (goodie == null) {
-                goodie = GoodieQuery.set(goodieToFix, goodiePath, new GoodieNull());
+                goodie = GoodieQuery.set(goodieToFix, goodiePath, GoodieNull.INSTANCE);
                 markChanged(goodiePath);
             }
 

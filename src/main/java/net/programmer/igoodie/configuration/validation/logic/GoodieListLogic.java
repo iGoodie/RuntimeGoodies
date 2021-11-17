@@ -9,7 +9,6 @@ import net.programmer.igoodie.util.TypeUtilities;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
-import java.util.List;
 
 public class GoodieListLogic extends ValidatorLogic<GoodieList> {
 
@@ -88,7 +87,7 @@ public class GoodieListLogic extends ValidatorLogic<GoodieList> {
             }
         } else if (array.size() < size) {
             while (array.size() != size) {
-                array.add(new GoodieNull());
+                array.add(GoodieNull.INSTANCE);
             }
         }
     }

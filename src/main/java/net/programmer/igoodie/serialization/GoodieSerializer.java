@@ -19,7 +19,7 @@ public class GoodieSerializer {
             Object value = ReflectionUtilities.getValue(object, field);
 
             GoodieElement serializedValue = value == null
-                    ? new GoodieNull()
+                    ? GoodieNull.INSTANCE
                     : dataGoodifier.serializeValueToGoodie(value);
 
             GoodieQuery.set(goodieObject, goodiePath, serializedValue);

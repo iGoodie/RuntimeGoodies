@@ -62,7 +62,7 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
     @Override
     public GoodieElement fixedGoodie(GoodieString annotation, Object object, Field field, GoodieElement goodie) {
         String defaultValue = (String) getDefaultValue(object, field);
-        if (defaultValue == null) return new GoodieNull();
+        if (defaultValue == null) return GoodieNull.INSTANCE;
         return GoodiePrimitive.from(defaultValue);
     }
 

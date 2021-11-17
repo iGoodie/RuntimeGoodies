@@ -1,9 +1,6 @@
 package net.programmer.igoodie.goodies.runtime;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GoodieObject extends GoodieElement implements Map<String, GoodieElement> {
 
@@ -48,24 +45,10 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         return goodieElement.isPrimitive();
     }
 
-    public GoodiePrimitive getPrimitive(String key) {
-        GoodieElement goodieElement = get(key);
-        if (goodieElement instanceof GoodiePrimitive)
-            return ((GoodiePrimitive) goodieElement);
-        else throw new IllegalArgumentException();
-    }
-
     public boolean hasArray(String key) {
         if (!has(key)) return false;
         GoodieElement goodieElement = get(key);
         return goodieElement.isArray();
-    }
-
-    public GoodieArray getArray(String key) {
-        GoodieElement goodieElement = get(key);
-        if (goodieElement instanceof GoodieArray)
-            return ((GoodieArray) goodieElement);
-        else throw new IllegalArgumentException();
     }
 
     public boolean hasObject(String key) {
@@ -74,71 +57,90 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
         return goodieElement.isObject();
     }
 
-    public GoodieObject getObject(String key) {
-        GoodieElement goodieElement = get(key);
-        if (goodieElement instanceof GoodieObject)
-            return ((GoodieObject) goodieElement);
-        else throw new IllegalArgumentException();
-    }
-
     public boolean hasBoolean(String key) {
         if (!hasPrimitive(key)) return false;
-        return getPrimitive(key).isBoolean();
-    }
-
-    public boolean getBoolean(String key) {
-        return getPrimitive(key).getBoolean();
+        return getPrimitive(key).map(GoodiePrimitive::isBoolean).orElse(false);
     }
 
     public boolean hasNumber(String key) {
         if (!hasPrimitive(key)) return false;
-        return getPrimitive(key).isNumber();
-    }
-
-    public byte getByte(String key) {
-        return getPrimitive(key).getByte();
-    }
-
-    public short getShort(String key) {
-        return getPrimitive(key).getShort();
-    }
-
-    public int getInteger(String key) {
-        return getPrimitive(key).getInteger();
-    }
-
-    public long getLong(String key) {
-        return getPrimitive(key).getLong();
-    }
-
-    public float getFloat(String key) {
-        return getPrimitive(key).getFloat();
-    }
-
-    public double getDouble(String key) {
-        return getPrimitive(key).getDouble();
-    }
-
-    public Number getNumber(String key) {
-        return getPrimitive(key).getNumber();
+        return getPrimitive(key).map(GoodiePrimitive::isNumber).orElse(false);
     }
 
     public boolean hasString(String key) {
         if (!hasPrimitive(key)) return false;
-        return getPrimitive(key).isString();
-    }
-
-    public String getString(String key) {
-        return getPrimitive(key).getString();
+        return getPrimitive(key).map(GoodiePrimitive::isString).orElse(false);
     }
 
     public boolean hasCharacter(String key) {
         if (!hasPrimitive(key)) return false;
-        return getPrimitive(key).isCharacter();
+        return getPrimitive(key).map(GoodiePrimitive::isCharacter).orElse(false);
     }
 
-    public char getCharacter(String key) {
-        return getPrimitive(key).getCharacter();
+    public Optional<GoodiePrimitive> getPrimitive(String key) {
+        return hasObject(key)
+                ? Optional.of(get(key).asPrimitive())
+                : Optional.empty();
+    }
+
+    public Optional<GoodieArray> getArray(String key) {
+        return hasObject(key)
+                ? Optional.of(get(key).asArray())
+                : Optional.empty();
+    }
+
+    public Optional<GoodieObject> getObject(String key) {
+        return hasObject(key)
+                ? Optional.of(get(key).asObject())
+                : Optional.empty();
+    }
+
+    public Optional<Boolean> getBoolean(String key) {
+        return hasBoolean(key)
+                ? getPrimitive(key).map(GoodiePrimitive::getBoolean)
+                : Optional.empty();
+    }
+
+    public Optional<Byte> getByte(String key) {
+        return getNumber(key).map(Number::byteValue);
+    }
+
+    public Optional<Short> getShort(String key) {
+        return getNumber(key).map(Number::shortValue);
+    }
+
+    public Optional<Integer> getInteger(String key) {
+        return getNumber(key).map(Number::intValue);
+    }
+
+    public Optional<Long> getLong(String key) {
+        return getNumber(key).map(Number::longValue);
+    }
+
+    public Optional<Float> getFloat(String key) {
+        return getNumber(key).map(Number::floatValue);
+    }
+
+    public Optional<Double> getDouble(String key) {
+        return getNumber(key).map(Number::doubleValue);
+    }
+
+    public Optional<Number> getNumber(String key) {
+        return hasNumber(key)
+                ? getPrimitive(key).map(GoodiePrimitive::getNumber)
+                : Optional.empty();
+    }
+
+    public Optional<String> getString(String key) {
+        return hasString(key)
+                ? getPrimitive(key).map(GoodiePrimitive::getString)
+                : Optional.empty();
+    }
+
+    public Optional<Character> getCharacter(String key) {
+        return hasNumber(key)
+                ? getPrimitive(key).map(GoodiePrimitive::getCharacter)
+                : Optional.empty();
     }
 
     @Override
