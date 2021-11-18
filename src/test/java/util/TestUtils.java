@@ -3,7 +3,7 @@ package util;
 import net.programmer.igoodie.configuration.ConfiGoodie;
 import net.programmer.igoodie.configuration.ConfiGoodieOptions;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.serialization.GoodieSerializer;
+import net.programmer.igoodie.serialization.ConfiGoodieSerializer;
 import net.programmer.igoodie.util.GoodieTraverser;
 
 public class TestUtils {
@@ -21,7 +21,7 @@ public class TestUtils {
         System.out.println("\nFixed those:");
         confiGoodie.getFixesDone().forEach(System.out::println);
 
-        GoodieObject serialized = new GoodieSerializer().serializeFrom(confiGoodie);
+        GoodieObject serialized = new ConfiGoodieSerializer().serializeFrom(confiGoodie);
         System.out.println("\nSerialized back:");
         System.out.println(serialized);
     }

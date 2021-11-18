@@ -9,7 +9,7 @@ import net.programmer.igoodie.util.GoodieTraverser;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
 
-public class GoodieSerializer {
+public class ConfiGoodieSerializer {
 
     public GoodieObject serializeFrom(Object root) {
         GoodieObject goodieObject = new GoodieObject();

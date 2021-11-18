@@ -10,7 +10,7 @@ import net.programmer.igoodie.util.ReflectionUtilities;
 
 import java.lang.reflect.Field;
 
-public class GoodieDeserializer {
+public class ConfiGoodieDeserializer {
 
     public void deserializeInto(Object root, GoodieObject goodieObject) {
         new GoodieTraverser().traverseGoodieFields(root, true, (object, field, goodiePath) -> {

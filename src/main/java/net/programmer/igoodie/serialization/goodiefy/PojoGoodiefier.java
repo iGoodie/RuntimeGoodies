@@ -3,8 +3,8 @@ package net.programmer.igoodie.serialization.goodiefy;
 import net.programmer.igoodie.configuration.mixed.MixedGoodie;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.serialization.GoodieDeserializer;
-import net.programmer.igoodie.serialization.GoodieSerializer;
+import net.programmer.igoodie.serialization.ConfiGoodieDeserializer;
+import net.programmer.igoodie.serialization.ConfiGoodieSerializer;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
@@ -52,7 +52,7 @@ public class PojoGoodiefier extends DataGoodiefier<GoodieObject> {
             pojo = GoodieUtils.createNullaryInstance(targetClass);
         }
 
-        GoodieDeserializer deserializer = new GoodieDeserializer();
+        ConfiGoodieDeserializer deserializer = new ConfiGoodieDeserializer();
         deserializer.deserializeInto(pojo, goodie);
 
         return pojo;
@@ -65,7 +65,7 @@ public class PojoGoodiefier extends DataGoodiefier<GoodieObject> {
 
     @Override
     public @NotNull GoodieObject serializeValueToGoodie(Object value) {
-        return new GoodieSerializer().serializeFrom(value);
+        return new ConfiGoodieSerializer().serializeFrom(value);
     }
 
 }

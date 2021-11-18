@@ -4,7 +4,9 @@ import net.programmer.igoodie.configuration.validation.FixReason;
 import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.serialization.GoodieDeserializer;
+import net.programmer.igoodie.serialization.ConfiGoodieDeserializer;
+import net.programmer.igoodie.serialization.ConfiGoodieSerializer;
+import net.programmer.igoodie.serialization.Serializable;
 import net.programmer.igoodie.util.FileUtils;
 
 import java.io.File;
@@ -12,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
+public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> implements Serializable<GoodieObject> {
 
     private GoodieObject underlyingGoodieObject;
     private GoodieValidator underlyingValidator;
@@ -42,7 +44,6 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
         }
 
         F goodieFormat = getFormat();
-        GoodieDeserializer goodieDeserializer = new GoodieDeserializer();
 
         // Read goodie object from the external config format
         underlyingGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
@@ -52,7 +53,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
         underlyingValidator.validateAndFix();
 
         // Deserialize underlying goodie object into fields
-        goodieDeserializer.deserializeInto(this, underlyingGoodieObject);
+        deserialize(underlyingGoodieObject);
 
         // If changes are made, handle the modified goodie object
         if (underlyingValidator.changesMade()) {
@@ -75,6 +76,18 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> {
 
     protected <T> T defaultValue(Supplier<T> supplier) {
         return supplier.get();
+    }
+
+    /* ------------------------- */
+
+    @Override
+    public GoodieObject serialize() {
+        return new ConfiGoodieSerializer().serializeFrom(this);
+    }
+
+    @Override
+    public void deserialize(GoodieObject serialized) {
+        new ConfiGoodieDeserializer().deserializeInto(this, serialized);
     }
 
 }
