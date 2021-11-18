@@ -60,18 +60,36 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
             if (options.onFixed != null) {
                 options.onFixed.accept(underlyingGoodieObject);
 
-            } else if (options.externalConfigFile != null && options.renameInvalidConfig != null) {
-                String serializedGoodie = goodieFormat.writeToString(underlyingGoodieObject, true);
-                if (!FileUtils.isEmpty(options.externalConfigFile)) {
-                    String movePath = options.renameInvalidConfig.accept(options.externalConfigFile, underlyingGoodieObject);
-                    FileUtils.moveFile(options.externalConfigFile, new File(movePath));
-                    FileUtils.createFileIfAbsent(options.externalConfigFile);
+            } else if (options.externalConfigFile != null) {
+                if (options.renameInvalidConfig != null) {
+                    saveToFileBackingUp(options.externalConfigFile, options.renameInvalidConfig);
+                } else {
+                    saveToFile(options.externalConfigFile);
                 }
-                FileUtils.writeString(options.externalConfigFile, serializedGoodie, StandardCharsets.UTF_8);
             }
         }
 
         return (T) this;
+    }
+
+    public void saveToFileBackingUp(File file, ConfiGoodieOptions.FileNameSupplier backupFilePath) {
+        if (!FileUtils.isEmpty(file)) {
+            String movePath = backupFilePath.accept(file, underlyingGoodieObject);
+            FileUtils.moveFile(file, new File(movePath));
+            FileUtils.createFileIfAbsent(file);
+        }
+        saveToFile(file);
+    }
+
+    public void saveToFile(File file) {
+        GoodieObject goodieObject = serialize();
+        saveToFile(file, goodieObject);
+    }
+
+    public void saveToFile(File file, GoodieObject goodieObject) {
+        F goodieFormat = getFormat();
+        String serializedGoodie = goodieFormat.writeToString(goodieObject, true);
+        FileUtils.writeString(file, serializedGoodie, StandardCharsets.UTF_8);
     }
 
     protected <T> T defaultValue(Supplier<T> supplier) {

@@ -1,10 +1,10 @@
 package automated;
 
-import com.google.gson.JsonObject;
 import automated.data.UUIDs;
 import automated.data.User;
+import com.google.gson.JsonObject;
 import net.programmer.igoodie.configuration.ConfiGoodieOptions;
-import net.programmer.igoodie.legacy.GoodieValidator;
+import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
@@ -23,8 +23,8 @@ public class GoodieValidationTests {
         User user = new User();
 
         System.out.println("Before Fix: " + goodieObject);
-        GoodieValidator goodieValidator = new GoodieValidator();
-        goodieValidator.validateAndFix(user, goodieObject);
+        GoodieValidator goodieValidator = new GoodieValidator(user, goodieObject);
+        goodieValidator.validateAndFix();
         System.out.println("After Fix:  " + goodieObject);
     }
 

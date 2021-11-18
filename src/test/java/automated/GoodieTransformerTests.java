@@ -1,12 +1,11 @@
 package automated;
 
-import com.google.gson.JsonObject;
 import automated.data.User;
-import net.programmer.igoodie.legacy.GoodieValidator;
+import com.google.gson.JsonObject;
+import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.legacy.GoodieObjectifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;
@@ -29,18 +28,15 @@ public class GoodieTransformerTests {
         User fillableObject = new User();
 
         // Validate and fix the Goodie
-        GoodieValidator goodieValidator = new GoodieValidator();
-        goodieValidator.validateAndFix(fillableObject, goodieObject);
+        GoodieValidator goodieValidator = new GoodieValidator(fillableObject, goodieObject);
+        goodieValidator.validateAndFix();
         System.out.println("Is Fixed: " + goodieValidator.changesMade());
         System.out.println("Fixed Goodie: " + goodieObject);
 
-        Assertions.assertEquals(0f, goodieObject.getFloat("nonExistingScore"));
+        Assertions.assertTrue(goodieObject.getFloat("nonExistingScore").isPresent());
+        Assertions.assertEquals(0f, goodieObject.getFloat("nonExistingScore").get());
 
-        // Finally, fill the DTO
-        GoodieObjectifier objectifier = new GoodieObjectifier();
-        objectifier.fillFields(fillableObject, goodieObject);
-        System.out.println("Object:\t" + fillableObject);
-
+        fillableObject.deserialize(goodieObject);
         Assertions.assertEquals(200f, fillableObject.nonExistingScore);
     }
 

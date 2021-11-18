@@ -76,11 +76,7 @@ public class ArrayIndexAccessor extends GoodieQueryAccessor {
     }
 
     public void fillIndices(GoodieArray array) {
-        int fillCount = index - array.size() + 1;
-        if (fillCount <= 0) return;
-        for (int i = 0; i < fillCount; i++) {
-            array.add(GoodieNull.INSTANCE);
-        }
+        array.fillIndices(index, i -> GoodieNull.INSTANCE);
     }
 
     @Override

@@ -1,12 +1,11 @@
 package automated;
 
-import com.google.gson.JsonObject;
 import automated.data.User;
-import net.programmer.igoodie.legacy.GoodieValidator;
+import com.google.gson.JsonObject;
+import net.programmer.igoodie.configuration.validation.GoodieValidator;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.legacy.GoodieObjectifier;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;
 
@@ -17,7 +16,6 @@ public class GoodieObjectifierTests {
     @Test
     public void testFilling() throws IOException {
         GoodieFormat<JsonObject, GoodieObject> format = new GsonGoodieFormat();
-        GoodieValidator goodieValidator = new GoodieValidator();
 
         JsonObject jsonObject = format.readFromString(TestFiles.loadData("user.json"));
         System.out.println("JSON:\t" + jsonObject);
@@ -25,13 +23,13 @@ public class GoodieObjectifierTests {
         GoodieObject goodieObject = format.writeToGoodie(jsonObject);
         System.out.println("Goodie:\t" + goodieObject);
 
-        User fillableObject = new User();
+        User configGoodie = new User();
 
-        goodieValidator.validateAndFix(fillableObject, goodieObject);
+        GoodieValidator goodieValidator = new GoodieValidator(configGoodie, goodieObject);
+        goodieValidator.validateAndFix();
 
-        GoodieObjectifier objectifier = new GoodieObjectifier();
-        objectifier.fillFields(fillableObject, goodieObject);
-        System.out.println("Object:\t" + fillableObject);
+        configGoodie.deserialize(goodieObject);
+        System.out.println("Object:\t" + configGoodie);
     }
 
 }

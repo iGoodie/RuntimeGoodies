@@ -1,6 +1,7 @@
 package net.programmer.igoodie.goodies.runtime;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class GoodieArray extends GoodieElement implements List<GoodieElement> {
@@ -84,7 +85,16 @@ public class GoodieArray extends GoodieElement implements List<GoodieElement> {
 
     @Override
     public GoodieElement set(int index, GoodieElement element) {
+        fillIndices(index, i -> GoodieNull.INSTANCE);
         return elements.set(index, element);
+    }
+
+    public void fillIndices(int index, Function<Integer, GoodieElement> fillValue) {
+        int fillCount = index - this.size() + 1;
+        if (fillCount <= 0) return;
+        for (int i = 0; i < fillCount; i++) {
+            this.add(fillValue.apply(i));
+        }
     }
 
     @Override

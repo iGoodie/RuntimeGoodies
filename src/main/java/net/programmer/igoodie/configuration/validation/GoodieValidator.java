@@ -80,7 +80,7 @@ public class GoodieValidator {
             if (!goodie.isNull() && !dataGoodifier.canGenerateTypeFromGoodie(fieldType, goodie)) {
                 GoodieElement defaultValue = generateDefaultValue(dataGoodifier, object, field);
                 goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultValue);
-                markChanged(goodiePath, "Goodie type mismatch");
+                markChanged(goodiePath, "Goodie type mismatch. Expected type -> " + fieldType);
             }
 
             validateAndFix(fieldType, goodie, goodiePath);
@@ -96,11 +96,21 @@ public class GoodieValidator {
 
         // Field is a List - Validate each element (ignoring nullability)
         if (TypeUtilities.getBaseClass(type) == List.class) {
+            if (!goodie.isArray()) {
+                GoodieQuery.set(goodieToFix, goodiePath, new GoodieArray());
+                markChanged(goodiePath, "Goodie type mismatch. Expected type -> " + List.class);
+                return;
+            }
             validateAndFixArray(type, goodie.asArray(), goodiePath);
         }
 
         // Field is a Map - Validate each element (ignoring nullability)
         if (TypeUtilities.getBaseClass(type) == Map.class) {
+            if (!goodie.isObject()) {
+                GoodieQuery.set(goodieToFix, goodiePath, new GoodieObject());
+                markChanged(goodiePath, "Goodie type mismatch. Expected type -> " + Map.class);
+                return;
+            }
             validateAndFixMap(type, goodie.asObject(), goodiePath);
         }
     }
@@ -114,7 +124,7 @@ public class GoodieValidator {
 
             if (!goodieElement.isNull() && !dataGoodifier.canGenerateTypeFromGoodie(listType, goodieElement)) {
                 goodieArray.remove(i);
-                markChanged(goodiePath + "[" + i + "]", "Could not generate element for type -> " + listType);
+                markChanged(goodiePath + "[" + i + "]", "Goodie element type mismatched for type -> " + listType);
             }
 
             validateAndFix(listType, goodieElement, goodiePath + "[" + i + "]");
@@ -145,7 +155,7 @@ public class GoodieValidator {
             }
 
             if (!mapValue.isNull() && !valueGoodiefier.canGenerateTypeFromGoodie(valueType, mapValue)) {
-                markChanged(goodiePath + "." + mapKey, "Map value cannot be deserialized");
+                markChanged(goodiePath + "." + mapKey, "Goodie value type mismatched for type -> " + valueType);
                 return true;
             }
 
