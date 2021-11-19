@@ -21,7 +21,7 @@ public class ConfiGoodieDeserializer {
             ReflectionUtilities.setValue(object, field, value);
         });
 
-        // TODO: Virtualization
+        GoodieUtils.runVirtualizers(root, true);
     }
 
     private <G extends GoodieElement> Object deserializeWithGoodiefier(Field field, DataGoodiefier<G> dataGoodifier, GoodieElement goodieElement) {

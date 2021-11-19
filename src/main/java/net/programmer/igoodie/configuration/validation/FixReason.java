@@ -2,8 +2,8 @@ package net.programmer.igoodie.configuration.validation;
 
 public class FixReason {
 
-    private String goodiePath;
-    private String reason;
+    private final String goodiePath;
+    private final String reason;
 
     public FixReason(String goodiePath, String reason) {
         this.goodiePath = goodiePath;

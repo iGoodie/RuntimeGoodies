@@ -3,7 +3,6 @@ package net.programmer.igoodie.util;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
@@ -66,9 +65,9 @@ public final class ReflectionUtilities {
 
     /* ----------------------------- */
 
-    public static <A extends Annotation> List<Method> getMethodsWithAnnotation(Object object, Class<A> annotationType) {
+    public static <A extends Annotation> List<Method> getMethodsWithAnnotation(Class<?> clazz, Class<A> annotationType) {
         List<Method> methods = new LinkedList<>();
-        for (Method method : object.getClass().getMethods()) {
+        for (Method method : clazz.getMethods()) {
             if (method.getAnnotation(annotationType) != null)
                 methods.add(method);
         }

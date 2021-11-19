@@ -4,11 +4,13 @@ import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieNullable;
 import net.programmer.igoodie.configuration.validation.circularity.GoodieCircularityTest;
 import net.programmer.igoodie.exception.GoodieImplementationException;
+import net.programmer.igoodie.goodies.runtime.GoodieObject;
+import net.programmer.igoodie.serialization.ConfiGoodieSerializer;
+import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
 import net.programmer.igoodie.serialization.goodiefy.DataGoodiefier;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
+import java.util.List;
 
 public class GoodieUtils {
 
@@ -55,6 +57,36 @@ public class GoodieUtils {
             }
         }
         throw new GoodieImplementationException("Goodifier does not exist for type", targetType);
+    }
+
+    public static List<Method> getVirtualizerMethods(Class<?> confiGoodie) {
+        return ReflectionUtilities.getMethodsWithAnnotation(confiGoodie, GoodieVirtualizer.class);
+    }
+
+    public static void runVirtualizers(Object root, boolean enableGoodieFieldModify) {
+        for (Method virtualizerMethod : getVirtualizerMethods(root.getClass())) {
+            try {
+                if (!enableGoodieFieldModify) {
+                    GoodieObject before = new ConfiGoodieSerializer().serializeFrom(root);
+                    virtualizerMethod.invoke(root);
+                    GoodieObject after = new ConfiGoodieSerializer().serializeFrom(root);
+
+                    if (!before.toString().equals(after.toString())) {
+                        throw new GoodieImplementationException("Goodie Virtualizer methods MUST NOT modify Goodie Fields.", virtualizerMethod);
+                    }
+
+                } else {
+                    virtualizerMethod.invoke(root);
+                }
+
+            } catch (IllegalArgumentException e) {
+                throw new GoodieImplementationException("Virtualizer methods MUST accept no arguments", e, virtualizerMethod);
+            } catch (IllegalAccessException e) {
+                throw new GoodieImplementationException("Virtualizer methods MUST be public.", e, virtualizerMethod);
+            } catch (InvocationTargetException e) {
+                throw new GoodieImplementationException("Virtualizer methods MUST NOT throw an exception.", e, virtualizerMethod);
+            }
+        }
     }
 
 }
