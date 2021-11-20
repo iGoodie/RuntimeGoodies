@@ -201,7 +201,25 @@ public class GoodieValidator {
                 throw new GoodieImplementationException("Declared default value CANNOT be assigned to the field.", field);
             }
 
-            // TODO: Iterate through GoodieValidators
+            GoodieElement goodie = dataGoodifier.serializeValueToGoodie(declaredDefaultValue);
+
+            // Iterate existing validator annotations
+            for (Couple<Annotation, ValidatorLogic<Annotation>> couple : GoodieUtils.getValidators(field)) {
+                Annotation annotation = couple.getFirst();
+                ValidatorLogic<Annotation> validatorLogic = couple.getSecond();
+
+                try {
+                    validatorLogic.validateField(annotation, object, field);
+                    validatorLogic.validateAnnotationArgs(annotation);
+                } catch (GoodieImplementationException e) {
+                    throw new GoodieImplementationException(e.getCauseMessage(), field);
+                }
+
+                if (!validatorLogic.isValidGoodie(annotation, goodie) ||
+                        !validatorLogic.isValidValue(annotation, goodie)) {
+                    throw new GoodieImplementationException("Declared default value MUST satisfy annotated validators. @" + annotation.getClass().getSimpleName(), field);
+                }
+            }
         }
     }
 

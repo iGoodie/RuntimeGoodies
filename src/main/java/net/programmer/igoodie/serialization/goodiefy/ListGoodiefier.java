@@ -41,7 +41,7 @@ public class ListGoodiefier extends DataGoodiefier<GoodieArray> {
         List<?> listValue = (List<?>) value;
 
         for (Object element : listValue) {
-            if (!dataGoodifier.canAssignValueToType(listType, element)) {
+            if (element != null && !dataGoodifier.canAssignValueToType(listType, element)) {
                 return false;
             }
         }
