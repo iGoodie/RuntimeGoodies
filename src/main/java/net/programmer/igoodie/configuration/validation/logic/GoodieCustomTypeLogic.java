@@ -3,6 +3,7 @@ package net.programmer.igoodie.configuration.validation.logic;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieCustomType;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
@@ -22,19 +23,19 @@ public class GoodieCustomTypeLogic extends ValidatorLogic<GoodieCustomType> {
     }
 
     @Override
-    public boolean isValidGoodie(GoodieCustomType annotation, GoodieElement goodie) {
+    public boolean isValidGoodie(GoodieCustomType annotation, @NotNull GoodieElement goodie) {
         GoodieCustomType.Validator<?> validator = generateValidator(annotation);
         return validator.isValidGoodie(goodie);
     }
 
     @Override
-    public boolean isValidValue(GoodieCustomType annotation, GoodieElement goodie) {
+    public boolean isValidValue(GoodieCustomType annotation, @NotNull GoodieElement goodie) {
         GoodieCustomType.Validator<?> validator = generateValidator(annotation);
         return validator.isValidValue(goodie);
     }
 
     @Override
-    public GoodieElement fixedGoodie(GoodieCustomType annotation, Object object, Field field, GoodieElement goodie) {
+    public GoodieElement fixedGoodie(GoodieCustomType annotation, Object object, Field field, @NotNull GoodieElement goodie) {
         GoodieCustomType.Validator<?> validator = generateValidator(annotation);
         return validator.fixedGoodie(object, field, goodie);
     }

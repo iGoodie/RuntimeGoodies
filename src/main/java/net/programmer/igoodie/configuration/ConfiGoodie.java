@@ -16,15 +16,15 @@ import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> implements Serializable<GoodieObject> {
 
-    private GoodieObject underlyingGoodieObject;
-    private GoodieValidator underlyingValidator;
+    private GoodieObject lastReadGoodieObject;
+    private GoodieValidator validator;
 
-    public GoodieObject getUnderlyingGoodieObject() {
-        return underlyingGoodieObject;
+    public GoodieObject getLastReadGoodieObject() {
+        return lastReadGoodieObject;
     }
 
     public Collection<FixReason> getFixesDone() {
-        return underlyingValidator.getFixesDone();
+        return validator.getFixesDone();
     }
 
     public abstract F getFormat();
@@ -46,19 +46,19 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         F goodieFormat = getFormat();
 
         // Read goodie object from the external config format
-        underlyingGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
+        lastReadGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
 
         // Validate and fix loaded goodie object
-        underlyingValidator = new GoodieValidator(this, underlyingGoodieObject);
-        underlyingValidator.validateAndFix();
+        validator = new GoodieValidator(this, lastReadGoodieObject);
+        validator.validateAndFix();
 
         // Deserialize underlying goodie object into fields
-        deserialize(underlyingGoodieObject);
+        deserialize(lastReadGoodieObject);
 
         // If changes are made, handle the modified goodie object
-        if (underlyingValidator.changesMade()) {
+        if (validator.changesMade()) {
             if (options.onFixed != null) {
-                options.onFixed.accept(underlyingGoodieObject);
+                options.onFixed.accept(lastReadGoodieObject);
 
             } else if (options.externalConfigFile != null) {
                 if (options.renameInvalidConfig != null) {
@@ -74,7 +74,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
 
     public void saveToFileBackingUp(File file, ConfiGoodieOptions.FileNameSupplier backupFilePath) {
         if (!FileUtils.isEmpty(file)) {
-            String movePath = backupFilePath.accept(file, underlyingGoodieObject);
+            String movePath = backupFilePath.accept(file, lastReadGoodieObject);
             FileUtils.moveFile(file, new File(movePath));
             FileUtils.createFileIfAbsent(file);
         }

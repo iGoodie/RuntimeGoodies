@@ -4,6 +4,7 @@ import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
@@ -32,21 +33,19 @@ public class GoodieFloatLogic extends ValidatorLogic<GoodieFloat> {
     }
 
     @Override
-    public boolean isValidGoodie(GoodieFloat annotation, GoodieElement goodie) {
-        return goodie != null
-                && goodie.isPrimitive()
-                && goodie.asPrimitive().isNumber();
+    public boolean isValidGoodie(GoodieFloat annotation, @NotNull GoodieElement goodie) {
+        return goodie.isPrimitive() && goodie.asPrimitive().isNumber();
     }
 
     @Override
-    public boolean isValidValue(GoodieFloat annotation, GoodieElement goodie) {
+    public boolean isValidValue(GoodieFloat annotation, @NotNull GoodieElement goodie) {
         float value = goodie.asPrimitive().getNumber().floatValue();
         return value >= annotation.min()
                 && value <= annotation.max();
     }
 
     @Override
-    public GoodieElement fixedGoodie(GoodieFloat annotation, Object object, Field field, GoodieElement goodie) {
+    public GoodieElement fixedGoodie(GoodieFloat annotation, Object object, Field field, @NotNull GoodieElement goodie) {
         float defaultValue = (float) getDefaultValue(object, field);
         return GoodiePrimitive.from(defaultValue);
     }

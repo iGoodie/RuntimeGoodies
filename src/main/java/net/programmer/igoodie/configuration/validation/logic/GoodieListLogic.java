@@ -4,20 +4,15 @@ import net.programmer.igoodie.configuration.validation.annotation.GoodieList;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
-import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.util.TypeUtilities;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.LinkedList;
 
 public class GoodieListLogic extends ValidatorLogic<GoodieList> {
 
     @Override
-    public void validateAnnotationArgs(GoodieList annotation) throws GoodieImplementationException {
-        if (annotation.min() > annotation.max()) {
-            throw new GoodieImplementationException("'min' value cannot be more than `max` value");
-        }
-    }
+    public void validateAnnotationArgs(GoodieList annotation) throws GoodieImplementationException {}
 
     @Override
     public void validateField(GoodieList annotation, Object object, Field field) throws GoodieImplementationException {
@@ -32,64 +27,32 @@ public class GoodieListLogic extends ValidatorLogic<GoodieList> {
     }
 
     @Override
-    public boolean isValidGoodie(GoodieList annotation, GoodieElement goodie) {
-        return goodie != null
-                && goodie.isArray();
+    public boolean isValidGoodie(GoodieList annotation, @NotNull GoodieElement goodie) {
+        return goodie.isArray();
     }
 
     @Override
-    public boolean isValidValue(GoodieList annotation, GoodieElement goodie) {
+    public boolean isValidValue(GoodieList annotation, @NotNull GoodieElement goodie) {
         GoodieArray value = goodie.asArray();
 
-        if (!annotation.allowNull()) {
+        if (!annotation.allowNullElements()) {
             if (value.stream().anyMatch(GoodieElement::isNull)) {
                 return false;
             }
         }
 
-        if (annotation.length() >= 0) {
-            return value.size() != annotation.length();
-        }
-
-        return value.size() >= annotation.min()
-                && value.size() <= annotation.max();
+        return true;
     }
 
     @Override
-    public GoodieElement fixedGoodie(GoodieList annotation, Object object, Field field, GoodieElement goodie) {
-        GoodieArray value = goodie == null
-                ? GoodieElement.fromList(getDefaultValueOr(object, field, LinkedList::new))
-                : goodie.asArray().deepCopy();
+    public GoodieElement fixedGoodie(GoodieList annotation, Object object, Field field, @NotNull GoodieElement goodie) {
+        GoodieArray value = goodie.asArray().deepCopy();
 
-        if (!annotation.allowNull()) {
+        if (!annotation.allowNullElements()) {
             value.removeIf(GoodieElement::isNull);
         }
 
-        if (annotation.length() >= 0) {
-            if (value.size() != annotation.length()) {
-                ensureSize(value, annotation.length());
-            }
-        }
-
-        if (value.size() > annotation.max()) {
-            ensureSize(value, annotation.max());
-        } else if (value.size() < annotation.min()) {
-            ensureSize(value, annotation.min());
-        }
-
         return value;
-    }
-
-    private void ensureSize(GoodieArray array, int size) {
-        if (array.size() > size) {
-            while (array.size() != size) {
-                array.remove(array.size() - 1);
-            }
-        } else if (array.size() < size) {
-            while (array.size() != size) {
-                array.add(GoodieNull.INSTANCE);
-            }
-        }
     }
 
 }

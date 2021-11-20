@@ -5,6 +5,7 @@ import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
@@ -38,14 +39,12 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
     }
 
     @Override
-    public boolean isValidGoodie(GoodieString annotation, GoodieElement goodie) {
-        return goodie != null
-                && goodie.isPrimitive()
-                && goodie.asPrimitive().isString();
+    public boolean isValidGoodie(GoodieString annotation, @NotNull GoodieElement goodie) {
+        return goodie.isPrimitive() && goodie.asPrimitive().isString();
     }
 
     @Override
-    public boolean isValidValue(GoodieString annotation, GoodieElement goodie) {
+    public boolean isValidValue(GoodieString annotation, @NotNull GoodieElement goodie) {
         String value = goodie.asPrimitive().getString();
 
         if (!annotation.matches().isEmpty() && !value.matches(annotation.matches()))
@@ -60,7 +59,7 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
     }
 
     @Override
-    public GoodieElement fixedGoodie(GoodieString annotation, Object object, Field field, GoodieElement goodie) {
+    public GoodieElement fixedGoodie(GoodieString annotation, Object object, Field field, @NotNull GoodieElement goodie) {
         String defaultValue = (String) getDefaultValue(object, field);
         if (defaultValue == null) return GoodieNull.INSTANCE;
         return GoodiePrimitive.from(defaultValue);

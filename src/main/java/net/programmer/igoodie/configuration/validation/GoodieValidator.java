@@ -1,6 +1,7 @@
 package net.programmer.igoodie.configuration.validation;
 
 import net.programmer.igoodie.RuntimeGoodies;
+import net.programmer.igoodie.configuration.validation.logic.ValidatorLogic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
@@ -9,11 +10,9 @@ import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.query.GoodieQuery;
 import net.programmer.igoodie.serialization.goodiefy.DataGoodiefier;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
-import net.programmer.igoodie.util.GoodieTraverser;
-import net.programmer.igoodie.util.GoodieUtils;
-import net.programmer.igoodie.util.ReflectionUtilities;
-import net.programmer.igoodie.util.TypeUtilities;
+import net.programmer.igoodie.util.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -24,7 +23,7 @@ public class GoodieValidator {
     private final Map<String, FixReason> fixesDone = new HashMap<>();
 
     private final Object root;
-    private GoodieObject goodieToFix;
+    private final GoodieObject goodieToFix;
 
     public GoodieValidator(Object root, GoodieObject goodieToFix) {
         this.root = root;
@@ -85,7 +84,25 @@ public class GoodieValidator {
 
             validateAndFix(fieldType, goodie, goodiePath);
 
-            // TODO: Iterate through GoodieValidators
+            // Iterate existing validator annotations
+            for (Couple<Annotation, ValidatorLogic<Annotation>> couple : GoodieUtils.getValidators(field)) {
+                Annotation annotation = couple.getFirst();
+                ValidatorLogic<Annotation> validatorLogic = couple.getSecond();
+
+                try {
+                    validatorLogic.validateField(annotation, object, field);
+                    validatorLogic.validateAnnotationArgs(annotation);
+                } catch (GoodieImplementationException e) {
+                    throw new GoodieImplementationException(e.getCauseMessage(), field);
+                }
+
+                if (!validatorLogic.isValidGoodie(annotation, goodie) ||
+                        !validatorLogic.isValidValue(annotation, goodie)) {
+                    GoodieElement fixedGoodie = validatorLogic.fixedGoodie(annotation, object, field, goodie);
+                    goodie = GoodieQuery.set(goodieToFix, goodiePath, fixedGoodie);
+                    markChanged(goodiePath, "Did not satisfy following validator: @" + annotation.annotationType().getSimpleName());
+                }
+            }
         });
     }
 

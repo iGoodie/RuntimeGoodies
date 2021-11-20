@@ -3,13 +3,16 @@ package net.programmer.igoodie.util;
 import net.programmer.igoodie.RuntimeGoodies;
 import net.programmer.igoodie.configuration.validation.annotation.GoodieNullable;
 import net.programmer.igoodie.configuration.validation.circularity.GoodieCircularityTest;
+import net.programmer.igoodie.configuration.validation.logic.ValidatorLogic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.serialization.ConfiGoodieSerializer;
 import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
 import net.programmer.igoodie.serialization.goodiefy.DataGoodiefier;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.util.LinkedList;
 import java.util.List;
 
 public class GoodieUtils {
@@ -61,6 +64,21 @@ public class GoodieUtils {
 
     public static List<Method> getVirtualizerMethods(Class<?> confiGoodie) {
         return ReflectionUtilities.getMethodsWithAnnotation(confiGoodie, GoodieVirtualizer.class);
+    }
+
+    public static List<Couple<Annotation, ValidatorLogic<Annotation>>> getValidators(Field field) {
+        List<Couple<Annotation, ValidatorLogic<Annotation>>> annotations = new LinkedList<>();
+        for (Annotation annotation : field.getAnnotations()) {
+            Class<? extends Annotation> annotationType = annotation.annotationType();
+
+            @SuppressWarnings("unchecked")
+            ValidatorLogic<Annotation> validatorLogic = (ValidatorLogic<Annotation>) RuntimeGoodies.VALIDATORS.get(annotationType);
+
+            if (validatorLogic != null) {
+                annotations.add(new Couple<>(annotation, validatorLogic));
+            }
+        }
+        return annotations;
     }
 
     public static void runVirtualizers(Object root, boolean enableGoodieFieldModify) {

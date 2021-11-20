@@ -18,7 +18,7 @@ public class CredentialsConfig extends JsonConfiGoodie {
     List<String> moderatorsTwitch = Arrays.asList("iGoodie", "CoconutOrange");
 
     @Goodie
-    @GoodieList(allowNull = false)
+    @GoodieList(allowNullElements = false)
     List<Streamer> streamers = defaultValue(() -> {
         List<Streamer> streamers = new LinkedList<>();
         streamers.add(new Streamer());

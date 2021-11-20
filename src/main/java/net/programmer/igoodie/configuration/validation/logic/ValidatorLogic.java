@@ -6,6 +6,7 @@ import net.programmer.igoodie.registry.Registrable;
 import net.programmer.igoodie.util.ArrayAccessor;
 import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -28,17 +29,17 @@ public abstract class ValidatorLogic<A extends Annotation> implements Registrabl
 
     public abstract void validateField(A annotation, Object object, Field field) throws GoodieImplementationException;
 
-    public abstract boolean isValidGoodie(A annotation, GoodieElement goodie);
+    public abstract boolean isValidGoodie(A annotation, @NotNull GoodieElement goodie);
 
-    public abstract boolean isValidValue(A annotation, GoodieElement goodie);
+    public abstract boolean isValidValue(A annotation, @NotNull GoodieElement goodie);
 
-    public abstract GoodieElement fixedGoodie(A annotation, Object object, Field field, GoodieElement goodie);
+    public abstract GoodieElement fixedGoodie(A annotation, Object object, Field field, @NotNull GoodieElement goodie);
 
-    public Object getDefaultValue(Object object, Field field) {
+    protected Object getDefaultValue(Object object, Field field) {
         return getDefaultValueOr(object, field, () -> null);
     }
 
-    public <T> T getDefaultValueOr(Object object, Field field, Supplier<T> supplier) {
+    protected <T> T getDefaultValueOr(Object object, Field field, Supplier<T> supplier) {
         @SuppressWarnings("unchecked")
         T value = (T) ReflectionUtilities.getValue(object, field);
         return value == null ? supplier.get() : value;
