@@ -60,13 +60,13 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
     }
 
     public static JsonElement convert(GoodieElement goodieElement) {
-        if (goodieElement instanceof GoodieObject)
+        if (goodieElement.isObject())
             return convertObject((GoodieObject) goodieElement);
-        if (goodieElement instanceof GoodieArray)
+        if (goodieElement.isArray())
             return convertArray((GoodieArray) goodieElement);
-        if (goodieElement instanceof GoodiePrimitive)
+        if (goodieElement.isPrimitive())
             return convertPrimitive((GoodiePrimitive) goodieElement);
-        if (goodieElement instanceof GoodieNull)
+        if (goodieElement.isNull())
             return JsonNull.INSTANCE;
 
         return null; // <-- No corresponding Gson type exists
@@ -108,7 +108,7 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
     public String writeToString(JsonObject externalFormat, boolean pretty) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         if (pretty) gsonBuilder.setPrettyPrinting();
-        Gson gson = gsonBuilder.create();
+        Gson gson = gsonBuilder.serializeNulls().create();
         return gson.toJson(externalFormat);
     }
 

@@ -29,6 +29,8 @@ public abstract class ValidatorLogic<A extends Annotation> implements Registrabl
 
     public abstract void validateField(A annotation, Object object, Field field) throws GoodieImplementationException;
 
+    public abstract void validateDefaultValue(A annotation, Field field, @NotNull Object defaultValue) throws GoodieImplementationException;
+
     public abstract boolean isValidGoodie(A annotation, @NotNull GoodieElement goodie);
 
     public abstract boolean isValidValue(A annotation, @NotNull GoodieElement goodie);

@@ -39,6 +39,9 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
     }
 
     @Override
+    public void validateDefaultValue(GoodieString annotation, Field field, @NotNull Object defaultValue) throws GoodieImplementationException {}
+
+    @Override
     public boolean isValidGoodie(GoodieString annotation, @NotNull GoodieElement goodie) {
         return goodie.isPrimitive() && goodie.asPrimitive().isString();
     }

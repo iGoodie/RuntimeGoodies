@@ -1,6 +1,7 @@
 package net.programmer.igoodie.configuration.validation.circularity;
 
 import net.programmer.igoodie.serialization.annotation.Goodie;
+import net.programmer.igoodie.util.GoodieUtils;
 import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
 
@@ -29,7 +30,7 @@ public class GoodieCircularityTest {
             } else if (TypeUtilities.isMap(fieldType)) {
                 // TODO
 
-            } else if (isGoodieRoot(fieldType)) {
+            } else if (isGoodieRoot(fieldType) && !GoodieUtils.isFieldNullable(field)) {
                 Graph.Vertex<Class<?>> childVertex = classGraph.generateVertex(fieldType);
                 if (parent != null) classGraph.addEdge(parent, childVertex);
                 if (classGraph.hasCycle()) return;

@@ -68,7 +68,7 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
             if (!keyGoodiefier.canAssignValueToType(keyType, mapKey)) {
                 return false;
             }
-            if (!valueGoodiefier.canAssignValueToType(valueType, mapValue)) {
+            if (mapValue != null && !valueGoodiefier.canAssignValueToType(valueType, mapValue)) {
                 return false;
             }
         }

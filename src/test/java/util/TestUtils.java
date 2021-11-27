@@ -31,6 +31,9 @@ public class TestUtils {
         System.out.println("\nSerialized back:");
         System.out.println(serialized);
 
+        String serializedExternal = confiGoodie.getFormat().writeToString(serialized, true);
+        System.out.println(serializedExternal);
+
         consumer.accept(confiGoodie);
     }
 

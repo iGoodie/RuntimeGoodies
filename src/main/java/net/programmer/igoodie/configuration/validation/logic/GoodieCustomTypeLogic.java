@@ -23,6 +23,11 @@ public class GoodieCustomTypeLogic extends ValidatorLogic<GoodieCustomType> {
     }
 
     @Override
+    public void validateDefaultValue(GoodieCustomType annotation, Field field, @NotNull Object defaultValue) throws GoodieImplementationException {
+        // Should always be valid
+    }
+
+    @Override
     public boolean isValidGoodie(GoodieCustomType annotation, @NotNull GoodieElement goodie) {
         GoodieCustomType.Validator<?> validator = generateValidator(annotation);
         return validator.isValidGoodie(goodie);

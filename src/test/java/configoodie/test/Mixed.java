@@ -58,8 +58,8 @@ public class Mixed extends JsonConfiGoodie {
 
     @Test
     public void testEnums() {
-//        TestUtils.standardConfiGoodieTest(new Mixed(), "{}");
-//        TestUtils.standardConfiGoodieTest(new Mixed(), "{'type':'fish'}");
+        TestUtils.standardConfiGoodieTest(new Mixed(), "{}");
+        TestUtils.standardConfiGoodieTest(new Mixed(), "{'faveAnimal': { 'type':'fish' }}");
         TestUtils.standardConfiGoodieTest(new Mixed(), "{'faveAnimal': { 'type':'cat' }}");
     }
 

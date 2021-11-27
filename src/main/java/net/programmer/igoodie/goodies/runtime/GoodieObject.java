@@ -198,7 +198,7 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
     public GoodieObject deepCopy() {
         GoodieObject goodieObject = new GoodieObject();
         map.forEach((key, value) -> {
-            map.put(key, value.deepCopy());
+            goodieObject.put(key, value.deepCopy());
         });
         return goodieObject;
     }

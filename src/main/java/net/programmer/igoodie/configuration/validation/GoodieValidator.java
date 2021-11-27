@@ -222,6 +222,7 @@ public class GoodieValidator {
                 try {
                     validatorLogic.validateField(annotation, object, field);
                     validatorLogic.validateAnnotationArgs(annotation);
+                    validatorLogic.validateDefaultValue(annotation, field, declaredDefaultValue);
                 } catch (GoodieImplementationException e) {
                     throw new GoodieImplementationException(e.getCauseMessage(), field);
                 }

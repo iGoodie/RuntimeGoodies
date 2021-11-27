@@ -12,17 +12,21 @@ import java.lang.reflect.Field;
 public class GoodieListLogic extends ValidatorLogic<GoodieList> {
 
     @Override
-    public void validateAnnotationArgs(GoodieList annotation) throws GoodieImplementationException {}
+    public void validateAnnotationArgs(GoodieList annotation) throws GoodieImplementationException {
+        // Should be always valid
+    }
 
     @Override
     public void validateField(GoodieList annotation, Object object, Field field) throws GoodieImplementationException {
         if (!TypeUtilities.isList(field)) {
             throw new GoodieImplementationException("Field type MUST be a List<?>");
         }
-        if (getDefaultValue(object, field) != null) {
-            if (!TypeUtilities.isList(getDefaultValue(object, field).getClass())) {
-                throw new GoodieImplementationException("Default value MUST be a List<?>");
-            }
+    }
+
+    @Override
+    public void validateDefaultValue(GoodieList annotation, Field field, @NotNull Object defaultValue) throws GoodieImplementationException {
+        if (!TypeUtilities.isList(defaultValue.getClass())) {
+            throw new GoodieImplementationException("Default value MUST be a List<?>");
         }
     }
 
@@ -36,9 +40,7 @@ public class GoodieListLogic extends ValidatorLogic<GoodieList> {
         GoodieArray value = goodie.asArray();
 
         if (!annotation.allowNullElements()) {
-            if (value.stream().anyMatch(GoodieElement::isNull)) {
-                return false;
-            }
+            return value.stream().noneMatch(GoodieElement::isNull);
         }
 
         return true;

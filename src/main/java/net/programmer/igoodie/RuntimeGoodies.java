@@ -36,7 +36,8 @@ public class RuntimeGoodies {
             new GoodieFloatLogic(),
             new GoodieDoubleLogic(),
             new GoodieStringLogic(),
-            new GoodieListLogic()
+            new GoodieListLogic(),
+            new GoodieMapLogic()
     );
 
 }

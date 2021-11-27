@@ -115,7 +115,7 @@ public class ServerConfig extends JsonConfiGoodie {
     @Goodie
     DBConnection mysqlConnection = defaultValue(() -> {
         DBConnection connection = new DBConnection();
-        connection.ports = Arrays.asList("3000", "3001", "3002");
+        connection.ports = Arrays.asList(3000, 3001, 3002);
         return connection;
     }); // You can declare default values via your own supplier!
 
