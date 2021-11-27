@@ -78,13 +78,13 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
     }
 
     public Optional<GoodiePrimitive> getPrimitive(String key) {
-        return hasObject(key)
+        return hasPrimitive(key)
                 ? Optional.of(get(key).asPrimitive())
                 : Optional.empty();
     }
 
     public Optional<GoodieArray> getArray(String key) {
-        return hasObject(key)
+        return hasArray(key)
                 ? Optional.of(get(key).asArray())
                 : Optional.empty();
     }

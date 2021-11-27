@@ -50,7 +50,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
 
         // Validate and fix loaded goodie object
         validator = new GoodieValidator(this, lastReadGoodieObject);
-        validator.validateAndFix();
+        validator.validateAndFixFields();
 
         // Deserialize underlying goodie object into fields
         deserialize(lastReadGoodieObject);

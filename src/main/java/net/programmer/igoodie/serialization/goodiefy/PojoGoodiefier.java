@@ -20,6 +20,7 @@ public class PojoGoodiefier extends DataGoodiefier<GoodieObject> {
     @Override
     public boolean canGenerateForFieldType(Type fieldType) {
         Class<?> fieldClass = TypeUtilities.getBaseClass(fieldType);
+//        if (MixedGoodie.class.isAssignableFrom(fieldClass)) return true;
         List<Field> goodieFields = ReflectionUtilities.getFieldsWithAnnotation(fieldClass, Goodie.class);
         return goodieFields.size() > 0;
     }
@@ -65,7 +66,15 @@ public class PojoGoodiefier extends DataGoodiefier<GoodieObject> {
 
     @Override
     public @NotNull GoodieObject serializeValueToGoodie(Object value) {
-        return new ConfiGoodieSerializer().serializeFrom(value);
+        GoodieObject serialized = new ConfiGoodieSerializer().serializeFrom(value);
+
+        Class<?> valueClass = value.getClass();
+        if (MixedGoodie.class.isAssignableFrom(valueClass)) {
+            MixedGoodie<?> mixedGoodie = (MixedGoodie<?>) value;
+            mixedGoodie.serializeType(valueClass, serialized);
+        }
+
+        return serialized;
     }
 
 }

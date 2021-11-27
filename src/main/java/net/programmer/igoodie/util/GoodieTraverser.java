@@ -1,6 +1,7 @@
 package net.programmer.igoodie.util;
 
 import net.programmer.igoodie.RuntimeGoodies;
+import net.programmer.igoodie.configuration.mixed.MixedGoodie;
 import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
 
@@ -22,7 +23,7 @@ public class GoodieTraverser {
     }
 
     public void debugGoodieFields(Object object) {
-        traverseGoodieFields(object, (obj, field, goodiePath) -> {
+        traverseGoodieFields(object, true, (obj, field, goodiePath) -> {
             Object value = ReflectionUtilities.getValue(obj, field);
             System.out.println(goodiePath + " -> " + StringUtilities.sanitizeForPrint(value));
         });
@@ -33,10 +34,14 @@ public class GoodieTraverser {
     }
 
     public void traverseGoodieFields(Object object, boolean touchRoots, GoodieFieldConsumer consumer) {
-        traverseGoodieFields(object, consumer, "$", touchRoots);
+        traverseGoodieFields(object, touchRoots, consumer, "$");
     }
 
-    private void traverseGoodieFields(Object object, GoodieFieldConsumer consumer, String path, boolean touchRoots) {
+    public void traverseGoodieFields(Object object, boolean touchRoots, GoodieFieldConsumer consumer, String path) {
+        traverseGoodieFields(object, touchRoots, consumer, path, true);
+    }
+
+    public void traverseGoodieFields(Object object, boolean touchRoots, GoodieFieldConsumer consumer, String path, boolean touchMixedGoodieRootsOnly) {
         GoodieUtils.disallowCircularDependency(object);
 
         for (Field goodieField : ReflectionUtilities.getFieldsWithAnnotation(object, Goodie.class)) {
@@ -46,6 +51,11 @@ public class GoodieTraverser {
             String key = annotation.key().isEmpty() ? goodieField.getName() : annotation.key();
 
             Class<?> fieldType = goodieField.getType();
+
+            if (touchMixedGoodieRootsOnly && MixedGoodie.class.isAssignableFrom(fieldType)) {
+                consumer.consume(object, goodieField, path + "." + key);
+                return;
+            }
 
             GoodieUtils.disallowArrayGoodieFields(goodieField);
 
@@ -77,7 +87,7 @@ public class GoodieTraverser {
                 Object pojo = currentValue != null ? currentValue : GoodieUtils.createNullaryInstance(fieldType);
                 if (currentValue == null) ReflectionUtilities.setValue(object, goodieField, pojo);
                 if (touchRoots) consumer.consume(object, goodieField, path + "." + key);
-                traverseGoodieFields(pojo, consumer, path + "." + key, touchRoots);
+                traverseGoodieFields(pojo, touchRoots, consumer, path + "." + key, touchMixedGoodieRootsOnly);
             }
         }
     }

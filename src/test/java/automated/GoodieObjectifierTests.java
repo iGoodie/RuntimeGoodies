@@ -26,7 +26,7 @@ public class GoodieObjectifierTests {
         User configGoodie = new User();
 
         GoodieValidator goodieValidator = new GoodieValidator(configGoodie, goodieObject);
-        goodieValidator.validateAndFix();
+        goodieValidator.validateAndFixFields();
 
         configGoodie.deserialize(goodieObject);
         System.out.println("Object:\t" + configGoodie);

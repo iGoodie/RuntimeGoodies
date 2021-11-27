@@ -1,18 +1,26 @@
 package automated;
 
 import com.google.gson.JsonObject;
-import example.twitchspawn.configs.goodies.Streamer;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
+import net.programmer.igoodie.serialization.annotation.Goodie;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.UUID;
 
 public class GoodieFormatTests {
+
+    public static class Streamer {
+        @Goodie
+        String nickname;
+    }
 
     @Test
     public void testGSONFormat() throws IOException {

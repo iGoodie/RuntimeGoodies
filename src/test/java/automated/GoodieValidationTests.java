@@ -24,7 +24,7 @@ public class GoodieValidationTests {
 
         System.out.println("Before Fix: " + goodieObject);
         GoodieValidator goodieValidator = new GoodieValidator(user, goodieObject);
-        goodieValidator.validateAndFix();
+        goodieValidator.validateAndFixFields();
         System.out.println("After Fix:  " + goodieObject);
     }
 

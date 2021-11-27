@@ -6,6 +6,10 @@ import org.jetbrains.annotations.NotNull;
 
 public interface MixedGoodie<S extends MixedGoodie<S>> {
 
+    default S instantiateSelf(GoodieObject goodieObject) {
+        return null;
+    }
+
     default S instantiateDeserializedType(GoodieObject goodieObject) {
         Class<? extends S> type = deserializeType(goodieObject);
         return GoodieUtils.createNullaryInstance(type);
@@ -13,6 +17,6 @@ public interface MixedGoodie<S extends MixedGoodie<S>> {
 
     @NotNull Class<? extends S> deserializeType(GoodieObject goodieObject);
 
-    default void serializeType(GoodieObject goodieObject) {}
+    void serializeType(Class<?> mixedGoodieClass, GoodieObject goodieObject);
 
 }
