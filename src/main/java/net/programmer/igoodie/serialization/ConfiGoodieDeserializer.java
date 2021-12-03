@@ -25,7 +25,7 @@ public class ConfiGoodieDeserializer {
     }
 
     private <G extends GoodieElement> Object deserializeWithGoodiefier(Field field, DataGoodiefier<G> dataGoodifier, GoodieElement goodieElement) {
-        if (goodieElement.isNull()) return null;
+        if (goodieElement == null || goodieElement.isNull()) return null;
         G goodie = dataGoodifier.auxGoodieElement(goodieElement);
         return dataGoodifier.generateFromGoodie(field.getGenericType(), goodie);
     }

@@ -9,6 +9,7 @@ import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.query.GoodieQuery;
+import net.programmer.igoodie.serialization.annotation.Goodie;
 import net.programmer.igoodie.serialization.goodiefy.DataGoodiefier;
 import net.programmer.igoodie.serialization.stringify.DataStringifier;
 import net.programmer.igoodie.util.*;
@@ -163,6 +164,13 @@ public class GoodieValidator {
             if (!goodieElement.isNull() && !dataGoodifier.canGenerateTypeFromGoodie(listType, goodieElement)) {
                 goodieArray.remove(i);
                 markChanged(goodiePath + "[" + i + "]", "Goodie element type mismatched for type -> " + listType);
+            }
+
+            // Element is a Goodie POJO - Validate each field
+            if (ReflectionUtilities.getFieldsWithAnnotation(TypeUtilities.getBaseClass(listType), Goodie.class).size() > 0) {
+                GoodieTraverser goodieTraverser = new GoodieTraverser();
+                Object nullaryInstance = GoodieUtils.createNullaryInstance(TypeUtilities.getBaseClass(listType));
+                goodieTraverser.traverseGoodieFields(nullaryInstance, true, this::validateAndFixField, goodiePath + "[" + i + "]");
             }
 
             validateAndFixType(listType, goodieElement, goodiePath + "[" + i + "]");

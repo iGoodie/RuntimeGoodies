@@ -2,6 +2,7 @@ package net.programmer.igoodie.configuration;
 
 import net.programmer.igoodie.configuration.validation.FixReason;
 import net.programmer.igoodie.configuration.validation.GoodieValidator;
+import net.programmer.igoodie.exception.GoodieParseException;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.serialization.ConfiGoodieDeserializer;
@@ -38,7 +39,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ConfiGoodie<F>> T readConfig(ConfiGoodieOptions options) {
+    public <T extends ConfiGoodie<F>> T readConfig(ConfiGoodieOptions options) throws GoodieParseException {
         if (options.externalConfigText == null) {
             throw new IllegalArgumentException("Passed options do not contain any config data...");
         }
