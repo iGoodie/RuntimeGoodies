@@ -19,7 +19,7 @@ public class ServerConfig extends JsonConfiGoodie {
     Date launchDate; // Some values are converted from string!
 
     @Goodie
-    int port = 3000; // You can declare default values!
+    int port = 4001; // You can declare default values!
 
     @Goodie
     DBConnection mongodbConnection; // Other ConfiGoodies/POJOs can be nested too!

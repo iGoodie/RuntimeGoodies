@@ -16,8 +16,10 @@ public class Registry<I, T extends Registrable<I>> {
         }
     }
 
-    public T register(T item) {
-        return registry.put(item.getId(), item);
+    public <E extends T> E register(E item) {
+        @SuppressWarnings("unchecked")
+        E registeredItem = (E) registry.put(item.getId(), item);
+        return registeredItem;
     }
 
     public T get(I identity) {

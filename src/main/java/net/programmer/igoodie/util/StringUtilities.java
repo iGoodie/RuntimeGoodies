@@ -69,4 +69,10 @@ public class StringUtilities {
         return allUpper(phrase.replaceAll(" ", "_"));
     }
 
+    public static String replaceIndices(String text, int beginIndex, int endIndex, String replacement) {
+        String beginning = text.substring(0, beginIndex);
+        String ending = text.substring(endIndex + 1);
+        return beginning + replacement + ending;
+    }
+
 }
