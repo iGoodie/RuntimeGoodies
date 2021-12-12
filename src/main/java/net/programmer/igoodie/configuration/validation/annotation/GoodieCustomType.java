@@ -1,8 +1,8 @@
 package net.programmer.igoodie.configuration.validation.annotation;
 
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
-import net.programmer.igoodie.util.ArrayAccessor;
 import net.programmer.igoodie.util.TypeUtilities;
+import net.programmer.igoodie.util.accessor.ArrayAccessor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

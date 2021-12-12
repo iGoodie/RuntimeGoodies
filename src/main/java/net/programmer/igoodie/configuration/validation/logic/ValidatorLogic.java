@@ -3,9 +3,9 @@ package net.programmer.igoodie.configuration.validation.logic;
 import net.programmer.igoodie.exception.GoodieImplementationException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.registry.Registrable;
-import net.programmer.igoodie.util.ArrayAccessor;
 import net.programmer.igoodie.util.ReflectionUtilities;
 import net.programmer.igoodie.util.TypeUtilities;
+import net.programmer.igoodie.util.accessor.ArrayAccessor;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;

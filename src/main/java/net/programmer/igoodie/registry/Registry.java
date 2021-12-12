@@ -3,6 +3,7 @@ package net.programmer.igoodie.registry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class Registry<I, T extends Registrable<I>> {
 
@@ -10,6 +11,7 @@ public class Registry<I, T extends Registrable<I>> {
 
     public Registry() {}
 
+    @SafeVarargs
     public Registry(T... initialItems) {
         for (T initialItem : initialItems) {
             register(initialItem);
@@ -17,9 +19,8 @@ public class Registry<I, T extends Registrable<I>> {
     }
 
     public <E extends T> E register(E item) {
-        @SuppressWarnings("unchecked")
-        E registeredItem = (E) registry.put(item.getId(), item);
-        return registeredItem;
+        registry.put(item.getId(), item);
+        return item;
     }
 
     public T get(I identity) {
@@ -32,6 +33,10 @@ public class Registry<I, T extends Registrable<I>> {
 
     public Set<I> getKeys() {
         return registry.keySet();
+    }
+
+    public void forEach(Consumer<T> consumer) {
+        registry.values().forEach(consumer);
     }
 
     @Override

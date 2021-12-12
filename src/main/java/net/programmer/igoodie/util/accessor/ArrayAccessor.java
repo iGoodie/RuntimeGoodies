@@ -1,6 +1,6 @@
-package net.programmer.igoodie.util;
+package net.programmer.igoodie.util.accessor;
 
-public class ArrayAccessor<T> {
+public class ArrayAccessor<T> extends IndexAccessor<T> {
 
     private T[] array;
 
@@ -8,23 +8,19 @@ public class ArrayAccessor<T> {
         return array == null || index < 0 || index >= array.length;
     }
 
-    public T get(int index) {
-        return getOrDefault(index, null);
+    @Override
+    protected T unsafeGet(int index) {
+        return array[index];
     }
 
-    public T getOrDefault(int index, T defaultValue) {
-        return outOfBounds(index) ? defaultValue : array[index];
-    }
-
-    public boolean set(int index, T value) {
-        if (outOfBounds(index))
-            return false;
+    @Override
+    protected void unsafeSet(int index, T value) {
         array[index] = value;
-        return true;
     }
 
     /* ----------------------------------- */
 
+    @SafeVarargs
     public static <T> ArrayAccessor<T> of(T... array) {
         ArrayAccessor<T> accessor = new ArrayAccessor<>();
         accessor.array = array;
