@@ -1,8 +1,8 @@
 package net.programmer.igoodie.goodies.runtime;
 
-import net.programmer.igoodie.util.NumberUtilities;
-import net.programmer.igoodie.util.StringUtilities;
-import net.programmer.igoodie.util.TypeUtilities;
+import net.programmer.igoodie.goodies.util.NumberUtilities;
+import net.programmer.igoodie.goodies.util.StringUtilities;
+import net.programmer.igoodie.goodies.util.TypeUtilities;
 
 import java.util.Objects;
 

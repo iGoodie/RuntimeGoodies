@@ -1,11 +1,11 @@
 package example;
 
-import net.programmer.igoodie.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.configuration.validation.annotation.GoodieCustomType;
-import net.programmer.igoodie.configuration.validation.annotation.GoodieDouble;
-import net.programmer.igoodie.configuration.validation.annotation.GoodieInteger;
+import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieCustomType;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieDouble;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieInteger;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
-import net.programmer.igoodie.serialization.annotation.Goodie;
+import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 import org.junit.jupiter.api.Test;
 import util.TestUtils;
 

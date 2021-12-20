@@ -1,8 +1,8 @@
 package configoodie.test;
 
-import net.programmer.igoodie.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.serialization.annotation.Goodie;
-import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
+import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
+import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
+import net.programmer.igoodie.goodies.serialization.annotation.GoodieVirtualizer;
 import org.junit.jupiter.api.Test;
 import util.TestUtils;
 

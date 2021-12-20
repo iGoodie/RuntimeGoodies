@@ -1,7 +1,7 @@
 package net.programmer.igoodie.goodies.format;
 
 import com.google.gson.*;
-import net.programmer.igoodie.exception.GoodieParseException;
+import net.programmer.igoodie.goodies.exception.GoodieParseException;
 import net.programmer.igoodie.goodies.runtime.*;
 
 public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {

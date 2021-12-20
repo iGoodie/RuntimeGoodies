@@ -1,6 +1,6 @@
 package automated.transformers;
 
-import net.programmer.igoodie.configuration.transformation.GoodieTransformerLogic;
+import net.programmer.igoodie.goodies.configuration.transformation.GoodieTransformerLogic;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 import org.jetbrains.annotations.NotNull;

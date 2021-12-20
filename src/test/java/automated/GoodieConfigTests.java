@@ -1,14 +1,12 @@
 package automated;
 
 import automated.data.User;
-import net.programmer.igoodie.configuration.ConfiGoodieOptions;
+import net.programmer.igoodie.goodies.configuration.ConfiGoodieOptions;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
-import java.util.Date;
 
 public class GoodieConfigTests {
 

@@ -1,6 +1,6 @@
 package net.programmer.igoodie.goodies.format;
 
-import net.programmer.igoodie.exception.GoodieParseException;
+import net.programmer.igoodie.goodies.exception.GoodieParseException;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 
 public abstract class GoodieFormat<E, G extends GoodieElement> {

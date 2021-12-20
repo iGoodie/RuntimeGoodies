@@ -1,6 +1,6 @@
 package automated.data;
 
-import net.programmer.igoodie.serialization.annotation.Goodie;
+import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 
 public class Profession {
 

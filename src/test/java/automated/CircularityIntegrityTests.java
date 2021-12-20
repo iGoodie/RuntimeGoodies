@@ -1,8 +1,8 @@
 package automated;
 
-import net.programmer.igoodie.configuration.validation.circularity.GoodieCircularityTest;
-import net.programmer.igoodie.configuration.validation.circularity.Graph;
-import net.programmer.igoodie.serialization.annotation.Goodie;
+import net.programmer.igoodie.goodies.configuration.validation.circularity.GoodieCircularityTest;
+import net.programmer.igoodie.goodies.configuration.validation.circularity.Graph;
+import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
 package automated;
 
 import automated.data.User;
-import net.programmer.igoodie.util.GoodieTraverser;
+import net.programmer.igoodie.goodies.util.GoodieTraverser;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

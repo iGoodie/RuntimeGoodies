@@ -1,11 +1,11 @@
 package net.programmer.igoodie.goodies.runtime;
 
-import net.programmer.igoodie.RuntimeGoodies;
-import net.programmer.igoodie.query.GoodieQuery;
-import net.programmer.igoodie.serialization.stringify.DataStringifier;
-import net.programmer.igoodie.util.GoodieTraverser;
-import net.programmer.igoodie.util.ReflectionUtilities;
-import net.programmer.igoodie.util.TypeUtilities;
+import net.programmer.igoodie.goodies.RuntimeGoodies;
+import net.programmer.igoodie.goodies.query.GoodieQuery;
+import net.programmer.igoodie.goodies.serialization.stringify.DataStringifier;
+import net.programmer.igoodie.goodies.util.GoodieTraverser;
+import net.programmer.igoodie.goodies.util.ReflectionUtilities;
+import net.programmer.igoodie.goodies.util.TypeUtilities;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

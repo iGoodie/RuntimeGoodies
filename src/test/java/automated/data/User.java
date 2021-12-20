@@ -1,11 +1,11 @@
 package automated.data;
 
-import net.programmer.igoodie.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.configuration.transformation.GoodieTransformer;
-import net.programmer.igoodie.configuration.validation.annotation.GoodieFloat;
-import net.programmer.igoodie.configuration.validation.annotation.GoodieInteger;
-import net.programmer.igoodie.serialization.annotation.Goodie;
-import net.programmer.igoodie.serialization.annotation.GoodieVirtualizer;
+import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
+import net.programmer.igoodie.goodies.configuration.transformation.GoodieTransformer;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieFloat;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieInteger;
+import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
+import net.programmer.igoodie.goodies.serialization.annotation.GoodieVirtualizer;
 import automated.transformers.Add100Transformer;
 
 import java.util.List;

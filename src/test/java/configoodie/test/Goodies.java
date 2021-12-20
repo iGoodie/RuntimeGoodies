@@ -1,11 +1,11 @@
 package configoodie.test;
 
-import net.programmer.igoodie.configuration.JsonConfiGoodie;
+import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
 import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
-import net.programmer.igoodie.serialization.annotation.Goodie;
+import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 import org.junit.jupiter.api.Test;
 import util.TestUtils;
 

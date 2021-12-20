@@ -1,13 +1,13 @@
 package automated;
 
 import com.google.gson.JsonObject;
-import net.programmer.igoodie.exception.GoodieSyntaxException;
+import net.programmer.igoodie.goodies.exception.GoodieSyntaxException;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.format.GsonGoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
-import net.programmer.igoodie.query.GoodieQuery;
-import net.programmer.igoodie.query.GoodieQueryParser;
+import net.programmer.igoodie.goodies.query.GoodieQuery;
+import net.programmer.igoodie.goodies.query.GoodieQueryParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import util.TestFiles;

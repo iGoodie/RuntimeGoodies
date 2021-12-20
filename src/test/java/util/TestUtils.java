@@ -1,10 +1,10 @@
 package util;
 
-import net.programmer.igoodie.configuration.ConfiGoodie;
-import net.programmer.igoodie.configuration.ConfiGoodieOptions;
+import net.programmer.igoodie.goodies.configuration.ConfiGoodie;
+import net.programmer.igoodie.goodies.configuration.ConfiGoodieOptions;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.serialization.ConfiGoodieSerializer;
-import net.programmer.igoodie.util.GoodieTraverser;
+import net.programmer.igoodie.goodies.serialization.ConfiGoodieSerializer;
+import net.programmer.igoodie.goodies.util.GoodieTraverser;
 
 import java.util.function.Consumer;
 

@@ -1,9 +1,9 @@
 package configoodie.test;
 
-import net.programmer.igoodie.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.configuration.validation.annotation.GoodieNullable;
-import net.programmer.igoodie.exception.GoodieImplementationException;
-import net.programmer.igoodie.serialization.annotation.Goodie;
+import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieNullable;
+import net.programmer.igoodie.goodies.exception.GoodieImplementationException;
+import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import util.TestUtils;
