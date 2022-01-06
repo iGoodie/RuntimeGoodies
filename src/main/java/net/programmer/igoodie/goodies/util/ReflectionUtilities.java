@@ -1,7 +1,5 @@
 package net.programmer.igoodie.goodies.util;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -17,7 +15,7 @@ public final class ReflectionUtilities {
             field.setAccessible(true);
             field.set(object, value);
         } catch (IllegalAccessException e) {
-            throw new InternalException("Access error while setting value -> " + field);
+            throw new InternalError("Access error while setting value -> " + field);
         } catch (IllegalArgumentException e) {
             if (TypeUtilities.isNumeric(field.getType()) && TypeUtilities.isNumeric(value.getClass()))
                 setNumericValue(object, field, (Number) value);
@@ -47,7 +45,7 @@ public final class ReflectionUtilities {
             field.setAccessible(true);
             return field.get(object);
         } catch (IllegalAccessException e) {
-            throw new InternalException("Access error while getting value -> " + field);
+            throw new InternalError("Access error while getting value -> " + field);
         }
     }
 
