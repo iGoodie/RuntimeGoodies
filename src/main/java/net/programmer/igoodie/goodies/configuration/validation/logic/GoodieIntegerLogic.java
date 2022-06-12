@@ -23,7 +23,7 @@ public class GoodieIntegerLogic extends ValidatorLogic<GoodieInteger> {
             throw new GoodieImplementationException("Field type MUST be int");
         }
 
-        int defaultValue = (int) getDefaultValue(object, field);
+        int defaultValue = (int) getDeclaredDefaultValue(object, field);
         if (defaultValue < annotation.min()) {
             throw new GoodieImplementationException("Default value cannot be less than min value.");
         }
@@ -50,7 +50,7 @@ public class GoodieIntegerLogic extends ValidatorLogic<GoodieInteger> {
 
     @Override
     public GoodieElement fixedGoodie(GoodieInteger annotation, Object object, Field field, @NotNull GoodieElement goodie) {
-        int defaultValue = (int) getDefaultValue(object, field);
+        int defaultValue = (int) getDeclaredDefaultValue(object, field);
         return GoodiePrimitive.from(defaultValue);
     }
 

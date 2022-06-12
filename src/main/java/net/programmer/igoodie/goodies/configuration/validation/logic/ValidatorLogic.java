@@ -1,8 +1,8 @@
 package net.programmer.igoodie.goodies.configuration.validation.logic;
 
 import net.programmer.igoodie.goodies.exception.GoodieImplementationException;
-import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.registry.Registrable;
+import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.util.ReflectionUtilities;
 import net.programmer.igoodie.goodies.util.TypeUtilities;
 import net.programmer.igoodie.goodies.util.accessor.ArrayAccessor;
@@ -37,11 +37,11 @@ public abstract class ValidatorLogic<A extends Annotation> implements Registrabl
 
     public abstract GoodieElement fixedGoodie(A annotation, Object object, Field field, @NotNull GoodieElement goodie);
 
-    protected Object getDefaultValue(Object object, Field field) {
-        return getDefaultValueOr(object, field, () -> null);
+    protected Object getDeclaredDefaultValue(Object object, Field field) {
+        return getDeclaredDefaultValueOr(object, field, () -> null);
     }
 
-    protected <T> T getDefaultValueOr(Object object, Field field, Supplier<T> supplier) {
+    protected <T> T getDeclaredDefaultValueOr(Object object, Field field, Supplier<T> supplier) {
         @SuppressWarnings("unchecked")
         T value = (T) ReflectionUtilities.getValue(object, field);
         return value == null ? supplier.get() : value;

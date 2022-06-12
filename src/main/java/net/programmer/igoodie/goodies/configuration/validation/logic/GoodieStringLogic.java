@@ -24,7 +24,7 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
             throw new GoodieImplementationException("Field type MUST be String");
         }
 
-        String defaultValue = (String) getDefaultValue(object, field);
+        String defaultValue = (String) getDeclaredDefaultValue(object, field);
         if (defaultValue != null) {
             if (annotation.length() >= 0 && defaultValue.length() != annotation.length()) {
                 throw new GoodieImplementationException("Length of the default value should be equals to 'length' value.");
@@ -63,7 +63,7 @@ public class GoodieStringLogic extends ValidatorLogic<GoodieString> {
 
     @Override
     public GoodieElement fixedGoodie(GoodieString annotation, Object object, Field field, @NotNull GoodieElement goodie) {
-        String defaultValue = (String) getDefaultValue(object, field);
+        String defaultValue = (String) getDeclaredDefaultValue(object, field);
         if (defaultValue == null) return GoodieNull.INSTANCE;
         return GoodiePrimitive.from(defaultValue);
     }

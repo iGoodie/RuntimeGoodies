@@ -23,7 +23,7 @@ public class GoodieLongLogic extends ValidatorLogic<GoodieLong> {
             throw new GoodieImplementationException("Field type MUST be long");
         }
 
-        long defaultValue = (long) getDefaultValue(object, field);
+        long defaultValue = (long) getDeclaredDefaultValue(object, field);
         if (defaultValue < annotation.min()) {
             throw new GoodieImplementationException("Default value cannot be less than min value.");
         }
@@ -50,7 +50,7 @@ public class GoodieLongLogic extends ValidatorLogic<GoodieLong> {
 
     @Override
     public GoodieElement fixedGoodie(GoodieLong annotation, Object object, Field field, @NotNull GoodieElement goodie) {
-        long defaultValue = (long) getDefaultValue(object, field);
+        long defaultValue = (long) getDeclaredDefaultValue(object, field);
         return GoodiePrimitive.from(defaultValue);
     }
 
