@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
+@Deprecated
 public class GoodieEnumLogic extends ValidatorLogic<GoodieEnum> {
 
     @Override

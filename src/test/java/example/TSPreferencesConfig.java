@@ -1,7 +1,7 @@
 package example;
 
 import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieCustomType;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieCustomValidator;
 import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieDouble;
 import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieInteger;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
@@ -17,7 +17,7 @@ public class TSPreferencesConfig extends JsonConfiGoodie {
     MessageDisplay messageDisplay = MessageDisplay.TITLES;
 
     @Goodie
-    IndicatorDisplay indicatorDisplay = IndicatorDisplay.ENABLED;
+    IndicatorDisplay indicatorDisplay;
 
     @Goodie
     Enability autoStart = Enability.DISABLED;
@@ -27,10 +27,10 @@ public class TSPreferencesConfig extends JsonConfiGoodie {
     double notificationVolume;
 
     @Goodie
-    @GoodieCustomType(NotificationPitchValidator.class)
+    @GoodieCustomValidator(NotificationPitchValidator.class)
     Double notificationPitch;
 
-    public static class NotificationPitchValidator extends GoodieCustomType.Validator<Double> {
+    public static class NotificationPitchValidator extends GoodieCustomValidator.Validator<Double> {
         @Override
         public boolean isValidGoodie(GoodieElement goodie) {
             return goodie.isPrimitive()
@@ -74,7 +74,7 @@ public class TSPreferencesConfig extends JsonConfiGoodie {
 
     @Test
     public void test() {
-        TestUtils.standardConfiGoodieTest(new TSPreferencesConfig(), "{}");
+        TestUtils.standardConfiGoodieTest(new TSPreferencesConfig(), "{'indicatorDisplay': 1}");
     }
 
 }

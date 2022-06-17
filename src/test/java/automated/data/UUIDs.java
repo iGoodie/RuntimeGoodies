@@ -1,9 +1,9 @@
 package automated.data;
 
-import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieCustomType;
-import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 import automated.validators.DateCustomValidator;
+import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieCustomValidator;
+import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 
 import java.util.Date;
 import java.util.UUID;
@@ -11,7 +11,7 @@ import java.util.UUID;
 public class UUIDs extends JsonConfiGoodie {
 
     @Goodie
-    @GoodieCustomType(DateCustomValidator.class)
+    @GoodieCustomValidator(DateCustomValidator.class)
     private Date date;
 
     @Goodie

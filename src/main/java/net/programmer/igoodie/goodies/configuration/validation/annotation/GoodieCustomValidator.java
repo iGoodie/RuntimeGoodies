@@ -13,7 +13,7 @@ import java.lang.reflect.Type;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GoodieCustomType {
+public @interface GoodieCustomValidator {
 
     Class<? extends Validator<?>> value();
 
@@ -32,6 +32,8 @@ public @interface GoodieCustomType {
 
         public abstract boolean isValidValue(GoodieElement goodie);
 
+        // TODO: Make this optional to implement
+        // By default, it should fix a goodie with either the declared default or primitive default value
         public abstract GoodieElement fixedGoodie(Object object, Field field, GoodieElement goodie);
 
     }

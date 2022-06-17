@@ -1,6 +1,6 @@
 package automated.validators;
 
-import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieCustomType;
+import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieCustomValidator;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodiePrimitive;
 import net.programmer.igoodie.goodies.serialization.stringify.DateStringifier;
@@ -8,7 +8,7 @@ import net.programmer.igoodie.goodies.serialization.stringify.DateStringifier;
 import java.lang.reflect.Field;
 import java.util.Date;
 
-public class DateCustomValidator extends GoodieCustomType.Validator<Date> {
+public class DateCustomValidator extends GoodieCustomValidator.Validator<Date> {
 
     @Override
     public boolean isValidGoodie(GoodieElement goodie) {

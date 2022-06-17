@@ -27,7 +27,7 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
         DataGoodiefier<?> valueGoodiefier = GoodieUtils.findDataGoodifier(valueType);
 
         if (keyType != String.class && keyStringifier == null) {
-            throw new GoodieImplementationException("", fieldType);
+            throw new GoodieImplementationException("Non-serializable Map key type", fieldType);
         }
 
         valueGoodiefier.validateFieldDeclaration(valueType);

@@ -22,6 +22,12 @@ public class RuntimeGoodies {
             new PojoGoodiefier()
     ));
 
+    /**
+     * Registry that holds <strong>Data Stringifiers</strong> acknowledged by the internal Goodie De/Serializers.
+     * <br><br>
+     * Data Stringifiers define a way to transform a runtime entity into String, and vice versa
+     * in order to be able to store them as <strong>GoodiePrimitives</strong>
+     */
     public static Registry<Class<?>, DataStringifier<?>> DATA_STRINGIFIERS = new Registry<>(
             new DateStringifier(),
             new InstantStringifier(),
@@ -29,6 +35,9 @@ public class RuntimeGoodies {
             new RandomStringifier()
     );
 
+    /**
+     * Registry that holds Validators acknowledged by the internal Goodie De/Serializers.
+     */
     public static Registry<Class<?>, ValidatorLogic<? extends Annotation>> VALIDATORS = new Registry<>(
             new GoodieCustomTypeLogic(),
             new GoodieIntegerLogic(),

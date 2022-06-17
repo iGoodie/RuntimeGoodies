@@ -38,7 +38,6 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         return readConfig(new ConfiGoodieOptions().useText(externalText));
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends ConfiGoodie<F>> T readConfig(ConfiGoodieOptions options) throws GoodieParseException {
         if (options.externalConfigText == null) {
             throw new IllegalArgumentException("Passed options do not contain any config data...");
@@ -60,17 +59,24 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         if (validator.changesMade()) {
             if (options.onFixed != null) {
                 options.onFixed.accept(lastReadGoodieObject);
-
-            } else if (options.externalConfigFile != null) {
-                if (options.renameInvalidConfig != null) {
-                    saveToFileBackingUp(options.externalConfigFile, options.renameInvalidConfig);
-                } else {
-                    saveToFile(options.externalConfigFile);
-                }
+            } else {
+                defaultOnFixed(options);
             }
         }
 
-        return (T) this;
+        @SuppressWarnings("unchecked")
+        T thisConfig = (T) this;
+        return thisConfig;
+    }
+
+    private void defaultOnFixed(ConfiGoodieOptions options) {
+        if (options.externalConfigFile != null) {
+            if (options.renameInvalidConfig != null) {
+                saveToFileBackingUp(options.externalConfigFile, options.renameInvalidConfig);
+            } else {
+                saveToFile(options.externalConfigFile);
+            }
+        }
     }
 
     public void saveToFileBackingUp(File file, ConfiGoodieOptions.FileNameSupplier backupFilePath) {
@@ -93,7 +99,28 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         FileUtils.writeString(file, serializedGoodie, StandardCharsets.UTF_8);
     }
 
-    protected <T> T defaultValue(Supplier<T> supplier) {
+    public boolean isDirty() {
+        GoodieObject currentGoodie = serialize();
+        return !currentGoodie.toString().equals(lastReadGoodieObject.toString());
+    }
+
+    /**
+     * Used while implementing your own ConfiGoodie. <br/>
+     * When the default value is hard to write as a one-liner, use this protected method to generate <br/>
+     * <br/>
+     * Example Usage:
+     * <pre> {@code
+     * @Goodie
+     * List<String> myListStuff = defaultValue(() -> {
+     *   List<String> value = new LinkedList<>();
+     *   value.add("A");
+     *   value.add("B");
+     *   value.add("C");
+     *   return value;
+     * })
+     * }</pre>
+     */
+    protected final <T> T defaultValue(Supplier<T> supplier) {
         return supplier.get();
     }
 
