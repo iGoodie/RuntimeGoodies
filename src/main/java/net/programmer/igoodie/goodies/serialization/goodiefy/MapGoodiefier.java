@@ -26,7 +26,7 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
         DataStringifier<?> keyStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
         DataGoodiefier<?> valueGoodiefier = GoodieUtils.findDataGoodifier(valueType);
 
-        if (keyType != String.class && keyStringifier == null) {
+        if (keyType != String.class && !TypeUtilities.getBaseClass(keyType).isEnum() && keyStringifier == null) {
             throw new GoodieImplementationException("Non-serializable Map key type", fieldType);
         }
 
@@ -47,7 +47,7 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
         DataGoodiefier<?> keyGoodiefier = GoodieUtils.findDataGoodifier(keyType);
         DataGoodiefier<?> valueGoodiefier = GoodieUtils.findDataGoodifier(valueType);
 
-        if (keyType != String.class) {
+        if (keyType != String.class && !TypeUtilities.getBaseClass(keyType).isEnum()) {
             DataStringifier<?> keyStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
             if (keyStringifier == null) {
                 throw new GoodieImplementationException("Key type of Maps MUST be either String or a stringifiable type (e.g UUID)", targetType);
@@ -100,7 +100,12 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
             Object key = entry.getKey();
             GoodieElement value = entry.getValue();
 
-            if (keyType != String.class) {
+            if (TypeUtilities.getBaseClass(keyType).isEnum()) {
+                @SuppressWarnings("unchecked")
+                Class<Enum<?>> enumType = (Class<Enum<?>>) TypeUtilities.getBaseClass(keyType);
+                key = generateFromEnumType(enumType, ((String) key));
+
+            } else if (keyType != String.class) {
                 key = generateFromStringifier(keyType, ((String) key));
             }
 
@@ -109,6 +114,15 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
         }
 
         return map;
+    }
+
+    private @NotNull <E extends Enum<?>> Object generateFromEnumType(Class<E> type, String string) {
+        for (E enumConstant : type.getEnumConstants()) {
+            if (enumConstant.name().equalsIgnoreCase(string)) {
+                return enumConstant;
+            }
+        }
+        throw new InternalError();
     }
 
     private @NotNull Object generateFromStringifier(Type type, String string) {

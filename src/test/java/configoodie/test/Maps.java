@@ -14,6 +14,13 @@ import java.util.UUID;
 
 public class Maps extends JsonConfiGoodie {
 
+    enum StateEnum {
+        PRISTINE,
+        LOADING,
+        DONE,
+        ERROR
+    }
+
     public static class InvalidMaps extends JsonConfiGoodie {
         @Goodie
         Map<String, Map<Object, Integer>> invalid;
@@ -24,6 +31,9 @@ public class Maps extends JsonConfiGoodie {
 
     @Goodie
     Map<String, Integer> numbers;
+
+    @Goodie
+    Map<StateEnum, UUID> enumKeys;
 
     @Goodie
     Map<UUID, Random> stringifiables;
@@ -41,6 +51,7 @@ public class Maps extends JsonConfiGoodie {
     public void testMaps() {
         TestUtils.standardConfiGoodieTest(new Maps(), "{" +
                 "'numbers':{'A':1, 'B':2}," +
+                "'enumKeys': {'PRISTINE':'123e4567-e89b-12d3-a456-426614174000'}," +
                 "'intBucket': {'123e4567-e89b-12d3-a456-426614174000': [1, 2, 3]}," +
                 "'complex': {0: {'A':null, 'B':2}, 1: {'A':1, 'B':2}}," +
                 "'complex2': {0: {'A':[1], 'B':[2,2]}, 1: {'A':[3,3,3], 'B':[4,4,4,4]}}" +

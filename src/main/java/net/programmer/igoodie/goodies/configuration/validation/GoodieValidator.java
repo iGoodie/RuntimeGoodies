@@ -4,11 +4,11 @@ import net.programmer.igoodie.goodies.RuntimeGoodies;
 import net.programmer.igoodie.goodies.configuration.mixed.MixedGoodie;
 import net.programmer.igoodie.goodies.configuration.validation.logic.ValidatorLogic;
 import net.programmer.igoodie.goodies.exception.GoodieImplementationException;
+import net.programmer.igoodie.goodies.query.GoodieQuery;
 import net.programmer.igoodie.goodies.runtime.GoodieArray;
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
 import net.programmer.igoodie.goodies.runtime.GoodieNull;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
-import net.programmer.igoodie.goodies.query.GoodieQuery;
 import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 import net.programmer.igoodie.goodies.serialization.goodiefy.DataGoodiefier;
 import net.programmer.igoodie.goodies.serialization.stringify.DataStringifier;
@@ -183,7 +183,7 @@ public class GoodieValidator {
         DataStringifier<?> keyStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
         DataGoodiefier<?> valueGoodiefier = GoodieUtils.findDataGoodifier(valueType);
 
-        if (keyType != String.class && keyStringifier == null) {
+        if (keyType != String.class && !TypeUtilities.getBaseClass(keyType).isEnum() && keyStringifier == null) {
             throw new GoodieImplementationException("Key type of Maps MUST be either String or a stringifiable type (e.g UUID)", targetType);
         }
 
@@ -191,7 +191,13 @@ public class GoodieValidator {
             String mapKey = entry.getKey();
             GoodieElement mapValue = entry.getValue();
 
-            if (keyType != String.class) {
+            if (TypeUtilities.getBaseClass(keyType).isEnum()) {
+                if (TypeUtilities.getEnumConstant(((Class<?>) keyType), mapKey) == null) {
+                    markChanged(goodiePath + "." + mapKey, "Invalid enum constant");
+                    return true;
+                }
+
+            } else if (keyType != String.class) {
                 try {
                     keyStringifier.objectify(mapKey);
                 } catch (Exception ignored) {

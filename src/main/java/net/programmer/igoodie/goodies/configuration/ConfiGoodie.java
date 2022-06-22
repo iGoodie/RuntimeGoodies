@@ -17,11 +17,11 @@ import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> implements Serializable<GoodieObject> {
 
-    private GoodieObject lastReadGoodieObject;
+    private GoodieObject lastAppliedGoodieObject;
     private GoodieValidator validator;
 
-    public GoodieObject getLastReadGoodieObject() {
-        return lastReadGoodieObject;
+    public GoodieObject getLastAppliedGoodieObject() {
+        return lastAppliedGoodieObject;
     }
 
     public Collection<FixReason> getFixesDone() {
@@ -46,19 +46,19 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         F goodieFormat = getFormat();
 
         // Read goodie object from the external config format
-        lastReadGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
+        lastAppliedGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
 
         // Validate and fix loaded goodie object
-        validator = new GoodieValidator(this, lastReadGoodieObject);
+        validator = new GoodieValidator(this, lastAppliedGoodieObject);
         validator.validateAndFixFields();
 
         // Deserialize underlying goodie object into fields
-        deserialize(lastReadGoodieObject);
+        deserialize(lastAppliedGoodieObject);
 
         // If changes are made, handle the modified goodie object
         if (validator.changesMade()) {
             if (options.onFixed != null) {
-                options.onFixed.accept(lastReadGoodieObject);
+                options.onFixed.accept(lastAppliedGoodieObject);
             } else {
                 defaultOnFixed(options);
             }
@@ -81,7 +81,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
 
     public void saveToFileBackingUp(File file, ConfiGoodieOptions.FileNameSupplier backupFilePath) {
         if (!FileUtils.isEmpty(file)) {
-            String movePath = backupFilePath.accept(file, lastReadGoodieObject);
+            String movePath = backupFilePath.accept(file, lastAppliedGoodieObject);
             FileUtils.moveFile(file, new File(movePath));
             FileUtils.createFileIfAbsent(file);
         }
@@ -101,7 +101,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
 
     public boolean isDirty() {
         GoodieObject currentGoodie = serialize();
-        return !currentGoodie.toString().equals(lastReadGoodieObject.toString());
+        return !currentGoodie.toString().equals(lastAppliedGoodieObject.toString());
     }
 
     /**

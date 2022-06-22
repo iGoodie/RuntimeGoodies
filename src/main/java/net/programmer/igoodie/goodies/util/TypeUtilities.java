@@ -1,6 +1,7 @@
 package net.programmer.igoodie.goodies.util;
 
 import net.programmer.igoodie.goodies.runtime.GoodieElement;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -172,6 +173,19 @@ public final class TypeUtilities {
 
     public static boolean isGoodie(Field field) {
         return isGoodie(field.getType());
+    }
+
+    /* -------------------------- */
+
+    public static @Nullable Enum<?> getEnumConstant(Class<?> enumClass, String string) {
+        for (Object constant : enumClass.getEnumConstants()) {
+            Enum<?> enumConstant = (Enum<?>) constant;
+            if (enumConstant.name().equalsIgnoreCase(string)) {
+                return enumConstant;
+            }
+        }
+
+        return null;
     }
 
     /* -------------------------- */
