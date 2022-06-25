@@ -60,8 +60,7 @@ public class RuntimeGoodies {
             new GoodieDoubleLogic(),
             new GoodieStringLogic(),
             new GoodieListLogic(),
-            new GoodieMapLogic(),
-            new GoodieEnumLogic()
+            new GoodieMapLogic()
     );
 
 }
