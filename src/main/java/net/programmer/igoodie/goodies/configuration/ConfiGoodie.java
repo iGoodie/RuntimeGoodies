@@ -66,7 +66,6 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
 
         // If changes are made, handle the modified goodie object
         if (!getFixesDone().isEmpty()) {
-            System.out.println(getFixesDone());
             handleChanges(options);
         }
 
