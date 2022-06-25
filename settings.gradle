@@ -1,2 +1,5 @@
 rootProject.name = 'RuntimeGoodies'
 
+include 'RuntimeGoodies-json'
+project(":RuntimeGoodies-json").projectDir = new File("json")
+
