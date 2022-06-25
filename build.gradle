@@ -38,5 +38,5 @@ subprojects {
 
 dependencies {
     testImplementation "com.google.code.gson:gson:${gsonVersion}"
-    testImplementation project(":RuntimeGoodies-json")
+    testImplementation project(":json")
 }

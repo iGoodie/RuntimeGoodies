@@ -1,5 +1,4 @@
-rootProject.name = 'RuntimeGoodies'
+rootProject.name = 'core'
 
-include 'RuntimeGoodies-json'
-project(":RuntimeGoodies-json").projectDir = new File("json")
+include 'json'
 
