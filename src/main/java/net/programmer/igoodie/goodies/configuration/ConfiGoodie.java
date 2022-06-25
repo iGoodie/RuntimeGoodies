@@ -101,7 +101,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
 
     public boolean isDirty() {
         GoodieObject currentGoodie = serialize();
-        return !currentGoodie.toString().equals(lastAppliedGoodieObject.toString());
+        return !currentGoodie.equals(lastAppliedGoodieObject);
     }
 
     /**

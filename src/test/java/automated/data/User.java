@@ -1,12 +1,10 @@
 package automated.data;
 
 import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.goodies.configuration.transformation.GoodieTransformer;
 import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieFloat;
 import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieInteger;
 import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 import net.programmer.igoodie.goodies.serialization.annotation.GoodieVirtualizer;
-import automated.transformers.Add100Transformer;
 
 import java.util.List;
 import java.util.Map;
@@ -29,8 +27,6 @@ public class User extends JsonConfiGoodie {
 
     @Goodie
     @GoodieFloat
-    @GoodieTransformer(Add100Transformer.class)
-    @GoodieTransformer(Add100Transformer.class)
     public float nonExistingScore;
 
     @Goodie

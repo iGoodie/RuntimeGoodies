@@ -205,7 +205,21 @@ public class GoodieObject extends GoodieElement implements Map<String, GoodieEle
 
     @Override
     public String toString() {
-        return "g" + map.toString();
+        return "g" + map;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GoodieObject that = (GoodieObject) o;
+        return map.equals(that.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return map.hashCode();
     }
 
 }

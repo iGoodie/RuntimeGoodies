@@ -151,4 +151,18 @@ public class GoodieArray extends GoodieElement implements List<GoodieElement> {
                 .collect(Collectors.joining(", ")) + "]";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GoodieArray that = (GoodieArray) o;
+        return elements.equals(that.elements);
+    }
+
+    @Override
+    public int hashCode() {
+        return elements.hashCode();
+    }
+
 }
