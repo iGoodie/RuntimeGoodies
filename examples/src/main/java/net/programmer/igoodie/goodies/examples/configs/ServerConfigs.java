@@ -14,4 +14,14 @@ public class ServerConfigs extends JsonConfiGoodie {
     @Goodie
     long seed;
 
+    @Override
+    public String toString() {
+        return "ServerConfigs{" +
+                "address='" + address + '\'' +
+                ", sub='" + sub + '\'' +
+                ", port=" + port +
+                ", seed=" + seed +
+                '}';
+    }
+
 }

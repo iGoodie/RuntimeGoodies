@@ -1,6 +1,4 @@
-plugins {
-    id 'java'
-}
+apply plugin: "java"
 
 group 'net.programmer.igoodie'
 version '1.1.0'
@@ -10,13 +8,11 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-String gsonVersion = '2.8.6'
-
 dependencies {
     implementation 'org.jetbrains:annotations:22.0.0'
 
-    implementation 'com.github.iGoodie.RuntimeGoodies:core:master-SNAPSHOT'
-    implementation 'com.github.iGoodie.RuntimeGoodies:json:master-SNAPSHOT'
+    implementation 'com.github.iGoodie.RuntimeGoodies:core:6044fdcd16'
+    implementation 'com.github.iGoodie.RuntimeGoodies:json:6044fdcd16'
 }
 
 test {
