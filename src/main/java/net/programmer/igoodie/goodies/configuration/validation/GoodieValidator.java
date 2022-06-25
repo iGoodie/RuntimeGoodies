@@ -180,7 +180,7 @@ public class GoodieValidator {
     public void validateAndFixMap(Type targetType, GoodieObject goodieObject, String goodiePath) {
         Type keyType = TypeUtilities.getMapKeyType(targetType);
         Type valueType = TypeUtilities.getMapValueType(targetType);
-        DataStringifier<?> keyStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
+        DataStringifier<?> keyStringifier = RuntimeGoodies.KEY_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
         DataGoodiefier<?> valueGoodiefier = GoodieUtils.findDataGoodifier(valueType);
 
         if (keyType != String.class && !TypeUtilities.getBaseClass(keyType).isEnum() && keyStringifier == null) {

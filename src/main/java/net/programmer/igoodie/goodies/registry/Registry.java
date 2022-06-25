@@ -1,5 +1,6 @@
 package net.programmer.igoodie.goodies.registry;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,7 @@ public class Registry<I, T extends Registrable<I>> {
 
     @SafeVarargs
     public Registry(T... initialItems) {
+        this();
         for (T initialItem : initialItems) {
             register(initialItem);
         }
@@ -33,6 +35,14 @@ public class Registry<I, T extends Registrable<I>> {
 
     public Set<I> getKeys() {
         return registry.keySet();
+    }
+
+    public Collection<T> getValues() {
+        return registry.values();
+    }
+
+    public Set<Map.Entry<I, T>> getEntries() {
+        return registry.entrySet();
     }
 
     public void forEach(Consumer<T> consumer) {

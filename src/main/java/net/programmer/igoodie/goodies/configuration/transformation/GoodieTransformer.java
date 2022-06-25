@@ -5,6 +5,7 @@ import java.lang.annotation.*;
 @Repeatable(GoodieTransformer.List.class)
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated
 public @interface GoodieTransformer {
 
     Class<? extends GoodieTransformerLogic> value();

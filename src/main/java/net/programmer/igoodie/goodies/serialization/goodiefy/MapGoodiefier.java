@@ -23,7 +23,7 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
         Type[] typeArguments = ((ParameterizedType) fieldType).getActualTypeArguments();
         Type keyType = typeArguments[0];
         Type valueType = typeArguments[1];
-        DataStringifier<?> keyStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
+        DataStringifier<?> keyStringifier = RuntimeGoodies.KEY_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
         DataGoodiefier<?> valueGoodiefier = GoodieUtils.findDataGoodifier(valueType);
 
         if (keyType != String.class && !TypeUtilities.getBaseClass(keyType).isEnum() && keyStringifier == null) {
@@ -48,7 +48,7 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
         DataGoodiefier<?> valueGoodiefier = GoodieUtils.findDataGoodifier(valueType);
 
         if (keyType != String.class && !TypeUtilities.getBaseClass(keyType).isEnum()) {
-            DataStringifier<?> keyStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
+            DataStringifier<?> keyStringifier = RuntimeGoodies.KEY_STRINGIFIERS.get(TypeUtilities.getBaseClass(keyType));
             if (keyStringifier == null) {
                 throw new GoodieImplementationException("Key type of Maps MUST be either String or a stringifiable type (e.g UUID)", targetType);
             }
@@ -126,7 +126,7 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
     }
 
     private @NotNull Object generateFromStringifier(Type type, String string) {
-        DataStringifier<?> dataStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(TypeUtilities.getBaseClass(type));
+        DataStringifier<?> dataStringifier = RuntimeGoodies.KEY_STRINGIFIERS.get(TypeUtilities.getBaseClass(type));
         try {
             return dataStringifier.objectify(string);
         } catch (Exception e) {
@@ -153,7 +153,7 @@ public class MapGoodiefier extends DataGoodiefier<GoodieObject> {
             Object mapKey = entry.getKey();
             Object mapValue = entry.getValue();
 
-            DataStringifier<?> keyStringifier = RuntimeGoodies.DATA_STRINGIFIERS.get(mapKey.getClass());
+            DataStringifier<?> keyStringifier = RuntimeGoodies.KEY_STRINGIFIERS.get(mapKey.getClass());
             String serializedKey = serializeWithStringifier(keyStringifier, mapKey);
 
             if (mapValue == null) {

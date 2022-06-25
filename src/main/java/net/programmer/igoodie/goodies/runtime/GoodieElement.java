@@ -68,8 +68,8 @@ public abstract class GoodieElement {
         GoodieObject goodieObject = new GoodieObject();
         map.forEach((key, value) -> {
             @SuppressWarnings("unchecked")
-            DataStringifier<K> dataStringifier = (DataStringifier<K>) RuntimeGoodies.DATA_STRINGIFIERS.get(key.getClass());
-            goodieObject.put(dataStringifier == null ? key.toString() : dataStringifier.stringify(key), from(value));
+            DataStringifier<K> keyStringifier = (DataStringifier<K>) RuntimeGoodies.KEY_STRINGIFIERS.get(key.getClass());
+            goodieObject.put(keyStringifier == null ? key.toString() : keyStringifier.stringify(key), from(value));
         });
         return goodieObject;
     }

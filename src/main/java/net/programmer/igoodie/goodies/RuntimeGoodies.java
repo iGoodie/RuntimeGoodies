@@ -1,9 +1,11 @@
 package net.programmer.igoodie.goodies;
 
 import net.programmer.igoodie.goodies.configuration.validation.logic.*;
+import net.programmer.igoodie.goodies.registry.ExtensionalRegistry;
 import net.programmer.igoodie.goodies.registry.Registry;
 import net.programmer.igoodie.goodies.serialization.goodiefy.*;
 import net.programmer.igoodie.goodies.serialization.stringify.*;
+import net.programmer.igoodie.goodies.serialization.stringify.key.NumberStringifier;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -33,6 +35,18 @@ public class RuntimeGoodies {
             new InstantStringifier(),
             new UUIDStringifier(),
             new RandomStringifier()
+    );
+
+    /**
+     * Registry that holds <strong>Data Stringifiers</strong> that are used to De/Serialize keys in Map-like data
+     */
+    public static Registry<Class<?>, DataStringifier<?>> KEY_STRINGIFIERS = new ExtensionalRegistry<>(DATA_STRINGIFIERS,
+            new NumberStringifier<>(Byte.class, Byte::parseByte),
+            new NumberStringifier<>(Short.class, Short::parseShort),
+            new NumberStringifier<>(Integer.class, Integer::parseInt),
+            new NumberStringifier<>(Long.class, Long::parseLong),
+            new NumberStringifier<>(Float.class, Float::parseFloat),
+            new NumberStringifier<>(Double.class, Double::parseDouble)
     );
 
     /**

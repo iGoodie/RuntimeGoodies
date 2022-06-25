@@ -1,7 +1,6 @@
 package example;
 
 import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
-import net.programmer.igoodie.goodies.configuration.validation.annotation.GoodieEnum;
 import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 import org.junit.jupiter.api.Test;
 import util.TestUtils;
@@ -17,7 +16,6 @@ public class TSNewClientCredentialsTest extends JsonConfiGoodie {
     String twitchNickname;
 
     @Goodie
-    @GoodieEnum(Platform.class)
     Platform platform = Platform.STREAMELEMENTS;
 
     @Goodie
