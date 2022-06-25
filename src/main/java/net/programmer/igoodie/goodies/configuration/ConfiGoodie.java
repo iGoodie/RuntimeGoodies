@@ -12,23 +12,32 @@ import net.programmer.igoodie.goodies.util.FileUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> implements Serializable<GoodieObject> {
 
     private GoodieObject lastAppliedGoodieObject;
     private GoodieValidator validator;
+    private List<FixReason> generalFixesDone;
 
     public GoodieObject getLastAppliedGoodieObject() {
         return lastAppliedGoodieObject;
     }
 
     public Collection<FixReason> getFixesDone() {
-        return validator.getFixesDone();
+        List<FixReason> fixesDone = new LinkedList<>();
+        fixesDone.addAll(generalFixesDone);
+        fixesDone.addAll(validator.getFixesDone());
+        return fixesDone;
     }
 
     public abstract F getFormat();
+
+    /* -- Config Readers ------------------------------- */
 
     public <T extends ConfiGoodie<F>> T readConfig(File file) {
         return readConfig(new ConfiGoodieOptions().useFile(file));
@@ -43,10 +52,10 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
             throw new IllegalArgumentException("Passed options do not contain any config data...");
         }
 
-        F goodieFormat = getFormat();
+        generalFixesDone = new ArrayList<>();
 
         // Read goodie object from the external config format
-        lastAppliedGoodieObject = goodieFormat.readGoodieFromString(options.externalConfigText);
+        lastAppliedGoodieObject = readGoodieObject(options);
 
         // Validate and fix loaded goodie object
         validator = new GoodieValidator(this, lastAppliedGoodieObject);
@@ -56,17 +65,33 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         deserialize(lastAppliedGoodieObject);
 
         // If changes are made, handle the modified goodie object
-        if (validator.changesMade()) {
-            if (options.onFixed != null) {
-                options.onFixed.accept(lastAppliedGoodieObject);
-            } else {
-                defaultOnFixed(options);
-            }
+        if (!getFixesDone().isEmpty()) {
+            System.out.println(getFixesDone());
+            handleChanges(options);
         }
 
         @SuppressWarnings("unchecked")
         T thisConfig = (T) this;
         return thisConfig;
+    }
+
+    private GoodieObject readGoodieObject(ConfiGoodieOptions options) {
+        try {
+            F goodieFormat = getFormat();
+            return goodieFormat.readGoodieFromString(options.externalConfigText);
+
+        } catch (GoodieParseException exception) {
+            generalFixesDone.add(new FixReason("$", FixReason.Action.RESET_TO_DEFAULT_SCHEME, exception.getMessage()));
+            return new GoodieObject(); // Discard malformed config data
+        }
+    }
+
+    private void handleChanges(ConfiGoodieOptions options) {
+        if (options.onFixed != null) {
+            options.onFixed.accept(lastAppliedGoodieObject);
+        } else {
+            defaultOnFixed(options);
+        }
     }
 
     private void defaultOnFixed(ConfiGoodieOptions options) {
@@ -78,6 +103,8 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
             }
         }
     }
+
+    /* -- File Savers ------------------------------- */
 
     public void saveToFileBackingUp(File file, ConfiGoodieOptions.FileNameSupplier backupFilePath) {
         if (!FileUtils.isEmpty(file)) {
@@ -104,6 +131,8 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         return !currentGoodie.equals(lastAppliedGoodieObject);
     }
 
+    /* -- Implementation Helpers ------------------------------- */
+
     /**
      * Used while implementing your own ConfiGoodie. <br/>
      * When the default value is hard to write as a one-liner, use this protected method to generate <br/>
@@ -124,7 +153,7 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         return supplier.get();
     }
 
-    /* ------------------------- */
+    /* -- Serializers ------------------------------- */
 
     @Override
     public GoodieObject serialize() {

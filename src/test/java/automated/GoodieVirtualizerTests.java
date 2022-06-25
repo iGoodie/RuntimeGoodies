@@ -12,7 +12,7 @@ public class GoodieVirtualizerTests {
     public static class ShouldNotCrash extends JsonConfiGoodie {
 
         @Goodie
-        int value;
+        int value = 10;
 
         int valuePlus100;
 
@@ -42,8 +42,8 @@ public class GoodieVirtualizerTests {
         Assertions.assertDoesNotThrow(
                 () -> new ShouldNotCrash().readConfig("{}"));
 
-        ShouldNotCrash shouldNotCrash = new ShouldNotCrash().readConfig("{}");
-        Assertions.assertEquals(100, shouldNotCrash.valuePlus100);
+        ShouldNotCrash shouldNotCrash = new ShouldNotCrash().readConfig("{");
+        Assertions.assertEquals(shouldNotCrash.value + 100, shouldNotCrash.valuePlus100);
     }
 
 }

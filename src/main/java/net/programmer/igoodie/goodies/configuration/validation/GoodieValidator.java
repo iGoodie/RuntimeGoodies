@@ -21,7 +21,6 @@ import java.util.*;
 
 public class GoodieValidator {
 
-    private boolean changesMade = false;
     private final Set<String> pathsTraversed = new HashSet<>();
     private final Map<String, FixReason> fixesDone = new HashMap<>();
 
@@ -34,7 +33,7 @@ public class GoodieValidator {
     }
 
     public boolean changesMade() {
-        return changesMade;
+        return !getFixesDone().isEmpty();
     }
 
     public Collection<FixReason> getFixesDone() {
@@ -68,7 +67,7 @@ public class GoodieValidator {
         // Missing value - Initialize with null value
         if (goodie == null) {
             goodie = GoodieQuery.set(goodieToFix, goodiePath, GoodieNull.INSTANCE);
-            markChanged(goodiePath, "Value was missing");
+            markChanged(goodiePath, FixReason.Action.SET_NULL, "Value was missing");
         }
 
         // Unexpected nullability flag - Throw exception
@@ -80,14 +79,14 @@ public class GoodieValidator {
         if (goodie.isNull() && !GoodieUtils.isFieldNullable(field)) {
             GoodieElement defaultValue = generateDefaultValue(dataGoodifier, object, field);
             goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultValue);
-            markChanged(goodiePath, "Nullability violation");
+            markChanged(goodiePath, FixReason.Action.SET_DEFAULT_VALUE, "Nullability violation");
         }
 
         // Goodie type mismatch - Replace with default goodie
         if (!goodie.isNull() && !dataGoodifier.canGenerateTypeFromGoodie(fieldType, goodie)) {
             GoodieElement defaultValue = generateDefaultValue(dataGoodifier, object, field);
             goodie = GoodieQuery.set(goodieToFix, goodiePath, defaultValue);
-            markChanged(goodiePath, "Goodie type mismatch. Expected type -> " + fieldType);
+            markChanged(goodiePath, FixReason.Action.SET_DEFAULT_VALUE, "Goodie type mismatch. Expected type -> " + fieldType);
         }
 
         validateAndFixType(fieldType, goodie, goodiePath);
@@ -108,7 +107,7 @@ public class GoodieValidator {
                     !validatorLogic.isValidValue(annotation, goodie)) {
                 GoodieElement fixedGoodie = validatorLogic.fixedGoodie(annotation, object, field, goodie);
                 goodie = GoodieQuery.set(goodieToFix, goodiePath, fixedGoodie);
-                markChanged(goodiePath, "Did not satisfy following validator: @" + annotation.annotationType().getSimpleName());
+                markChanged(goodiePath, FixReason.Action.SET_VALIDATED_VALUE, "Did not satisfy following validator: @" + annotation.annotationType().getSimpleName());
             }
         }
 
@@ -125,7 +124,7 @@ public class GoodieValidator {
         if (TypeUtilities.getBaseClass(type) == List.class) {
             if (!goodie.isArray()) {
                 GoodieQuery.set(goodieToFix, goodiePath, new GoodieArray());
-                markChanged(goodiePath, "Goodie type mismatch. Expected type -> " + List.class);
+                markChanged(goodiePath, FixReason.Action.SET_DEFAULT_VALUE, "Goodie type mismatch. Expected type -> " + List.class);
                 return;
             }
             validateAndFixArray(type, goodie.asArray(), goodiePath);
@@ -135,7 +134,7 @@ public class GoodieValidator {
         if (TypeUtilities.getBaseClass(type) == Map.class) {
             if (!goodie.isObject()) {
                 GoodieQuery.set(goodieToFix, goodiePath, new GoodieObject());
-                markChanged(goodiePath, "Goodie type mismatch. Expected type -> " + Map.class);
+                markChanged(goodiePath, FixReason.Action.SET_DEFAULT_VALUE, "Goodie type mismatch. Expected type -> " + Map.class);
                 return;
             }
             validateAndFixMap(type, goodie.asObject(), goodiePath);
@@ -145,7 +144,7 @@ public class GoodieValidator {
         if (MixedGoodie.class.isAssignableFrom(TypeUtilities.getBaseClass(type))) {
             if (!goodie.isObject()) {
                 GoodieQuery.set(goodieToFix, goodiePath, new GoodieObject());
-                markChanged(goodiePath, "Goodie type mismatch. Expected type -> " + type);
+                markChanged(goodiePath, FixReason.Action.SET_DEFAULT_VALUE, "Goodie type mismatch. Expected type -> " + type);
             }
             MixedGoodie<?> nullaryInstance = (MixedGoodie<?>) GoodieUtils.createNullaryInstance(TypeUtilities.getBaseClass(type));
             MixedGoodie<?> mixedObject = nullaryInstance.instantiateDeserializedType(goodie.asObject());
@@ -163,7 +162,7 @@ public class GoodieValidator {
 
             if (!goodieElement.isNull() && !dataGoodifier.canGenerateTypeFromGoodie(listType, goodieElement)) {
                 goodieArray.remove(i);
-                markChanged(goodiePath + "[" + i + "]", "Goodie element type mismatched for type -> " + listType);
+                markChanged(goodiePath + "[" + i + "]", FixReason.Action.REMOVE, "Goodie element type mismatched for type -> " + listType);
             }
 
             // Element is a Goodie POJO - Validate each field
@@ -193,7 +192,7 @@ public class GoodieValidator {
 
             if (TypeUtilities.getBaseClass(keyType).isEnum()) {
                 if (TypeUtilities.getEnumConstant(((Class<?>) keyType), mapKey) == null) {
-                    markChanged(goodiePath + "." + mapKey, "Invalid enum constant");
+                    markChanged(goodiePath + "." + mapKey, FixReason.Action.REMOVE, "Invalid enum constant");
                     return true;
                 }
 
@@ -201,13 +200,13 @@ public class GoodieValidator {
                 try {
                     keyStringifier.objectify(mapKey);
                 } catch (Exception ignored) {
-                    markChanged(goodiePath + "." + mapKey, "Map key cannot be deserialized");
+                    markChanged(goodiePath + "." + mapKey, FixReason.Action.REMOVE, "Map key cannot be deserialized");
                     return true;
                 }
             }
 
             if (!mapValue.isNull() && !valueGoodiefier.canGenerateTypeFromGoodie(valueType, mapValue)) {
-                markChanged(goodiePath + "." + mapKey, "Goodie value type mismatched for type -> " + valueType);
+                markChanged(goodiePath + "." + mapKey, FixReason.Action.REMOVE, "Goodie value type mismatched for type -> " + valueType);
                 return true;
             }
 
@@ -251,9 +250,8 @@ public class GoodieValidator {
 
     /* ---------------------------- */
 
-    private void markChanged(String goodiePath, String reason) {
-        fixesDone.putIfAbsent(goodiePath, new FixReason(goodiePath, reason));
-        changesMade = true;
+    private void markChanged(String goodiePath, FixReason.Action action, String reason) {
+        fixesDone.putIfAbsent(goodiePath, new FixReason(goodiePath, action, reason));
     }
 
     private GoodieElement generateDefaultValue(DataGoodiefier<?> dataGoodifier, Object object, Field field) {
