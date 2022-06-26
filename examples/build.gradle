@@ -11,8 +11,9 @@ repositories {
 dependencies {
     implementation 'org.jetbrains:annotations:22.0.0'
 
-    implementation 'com.github.iGoodie.RuntimeGoodies:core:6044fdcd16'
-    implementation 'com.github.iGoodie.RuntimeGoodies:json:6044fdcd16'
+    implementation 'com.github.iGoodie.RuntimeGoodies:core:1.2.0'
+    implementation 'com.github.iGoodie.RuntimeGoodies:json:1.2.0'
+    implementation 'com.github.iGoodie.RuntimeGoodies:toml:1.2.0'
 }
 
 test {
