@@ -239,7 +239,7 @@ public final class TypeUtilities {
 
     public static Type getMapKeyType(Type mapType) {
         if (!(mapType instanceof ParameterizedType)) {
-            throw new IllegalArgumentException("Expected a Map<?, ?> type");
+            throw new IllegalArgumentException("Expected a Map<?, ?> type, found -> " + mapType);
         }
         ParameterizedType parameterizedType = (ParameterizedType) mapType;
         return parameterizedType.getActualTypeArguments()[0]; // Map <[KeyType], [ValueType]>

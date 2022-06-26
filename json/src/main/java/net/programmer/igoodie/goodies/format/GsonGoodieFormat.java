@@ -61,11 +61,11 @@ public class GsonGoodieFormat extends GoodieFormat<JsonObject, GoodieObject> {
 
     public static JsonElement convert(GoodieElement goodieElement) {
         if (goodieElement.isObject())
-            return convertObject((GoodieObject) goodieElement);
+            return convertObject(goodieElement.asObject());
         if (goodieElement.isArray())
-            return convertArray((GoodieArray) goodieElement);
+            return convertArray(goodieElement.asArray());
         if (goodieElement.isPrimitive())
-            return convertPrimitive((GoodiePrimitive) goodieElement);
+            return convertPrimitive(goodieElement.asPrimitive());
         if (goodieElement.isNull())
             return JsonNull.INSTANCE;
 

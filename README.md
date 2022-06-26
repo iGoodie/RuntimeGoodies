@@ -64,6 +64,7 @@ replaced by the default value and saved)*
 It comes with a few modules to support following formats:
 
 - <a href="https://www.json.org/json-en.html">JSON</a> (module: `com.github.iGoodie.RuntimeGoodies:json:<version-here>`)
+- <a href="https://toml.io/en/v0.4.0">TOML 0.4.0</a> (module: `com.github.iGoodie.RuntimeGoodies:toml:<version-here>`)
 
 Out of the box, it comes with a built-in way to universally represent entities during runtime called Goodies. Goodies
 are serializable in any format desired. They have a very similar structure

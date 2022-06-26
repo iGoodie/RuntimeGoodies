@@ -1,0 +1,3 @@
+dependencies {
+    implementation "com.moandjiezana.toml:toml4j:${tomlVersion}"
+}
