@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class RuntimeGoodies {
 
@@ -62,5 +63,13 @@ public class RuntimeGoodies {
             new GoodieListLogic(),
             new GoodieMapLogic()
     );
+
+    public static Set<Class<?>> getAcceptedTypes() {
+        return DATA_STRINGIFIERS.getKeys();
+    }
+
+    public static Set<Class<?>> getAcceptedKeyTypes() {
+        return KEY_STRINGIFIERS.getKeys();
+    }
 
 }

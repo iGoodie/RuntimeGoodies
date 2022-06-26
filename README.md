@@ -55,15 +55,20 @@
 
 # Description
 
-RuntimeGoodies is a library developed with Java 8 to solve a fundamental problem: reading & maintaining program
-configurations. It attempts to load external config files into
+RuntimeGoodies is a Java 8+ library that aims to solve a fundamental problem: reading & maintaining program
+configurations. It attemps to load external config files into
 declared <a href="https://en.wikipedia.org/wiki/Plain_old_Java_object">
-POJO<a/>s with its custom annotations and validators. It even fixes the configs when necessary.
+POJO<a/>s with its custom annotations and validators. It even fixes the config when necessary *(e.g an empty field is
+replaced by the default value and saved)*
+
+It comes with a few modules to support following formats:
+
+- <a href="https://www.json.org/json-en.html">JSON</a> (module: `com.github.iGoodie.RuntimeGoodies:json:<version-here>`)
 
 Out of the box, it comes with a built-in way to universally represent entities during runtime called Goodies. Goodies
-are serializable in any format desired (with built-in [Google's GSON](https://github.com/google/gson) converters). They
-have a very similar structure to <a href="https://www.json.org/json-en.html">JSON<a/> elements. Goodies do not exist
-outside the runtime, they are in-memory only.
+are serializable in any format desired. They have a very similar structure
+to <a href="https://www.json.org/json-en.html">JSON<a/> elements. Goodies do not exist outside the runtime, they are
+in-memory only.
 
 # How to Use?
 
@@ -85,7 +90,8 @@ allprojects {
 
 ```groovy
 dependencies {
-    implementation 'com.github.iGoodie:RuntimeGoodies:<version-here>'
+    implementation 'com.github.iGoodie.RuntimeGoodies:core:<version-here>'
+    implementation 'com.github.iGoodie.RuntimeGoodies:json:<version-here>' // Format of choice, see supported formats above
 }
 ```
 
