@@ -1,7 +1,7 @@
 package net.programmer.igoodie.goodies.examples.configs;
 
 import net.programmer.igoodie.goodies.configuration.TomlConfiGoodie;
-import net.programmer.igoodie.goodies.examples.entries.StreamerCredential;
+import net.programmer.igoodie.goodies.examples.configs.entries.StreamerCredential;
 import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 
 import java.util.LinkedList;

@@ -1,4 +1,4 @@
-package net.programmer.igoodie.goodies.examples.entries;
+package net.programmer.igoodie.goodies.examples.configs.entries;
 
 import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
 

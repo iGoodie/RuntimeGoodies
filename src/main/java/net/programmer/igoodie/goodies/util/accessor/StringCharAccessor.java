@@ -18,7 +18,7 @@ public class StringCharAccessor extends IndexAccessor<Character> {
 
     @Override
     protected void unsafeSet(int index, Character value) {
-        StringUtilities.replaceIndices(string, index, index, String.valueOf(value));
+        this.string = StringUtilities.replaceIndices(string, index, index, String.valueOf(value));
     }
 
     /* ----------------------------------- */
