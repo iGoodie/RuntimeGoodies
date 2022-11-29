@@ -1,5 +1,7 @@
 package net.programmer.igoodie.goodies.util.accessor;
 
+import java.util.Optional;
+
 public abstract class IndexAccessor<T> {
 
     public abstract boolean outOfBounds(int index);
@@ -8,12 +10,10 @@ public abstract class IndexAccessor<T> {
 
     protected abstract void unsafeSet(int index, T value);
 
-    public T get(int index) {
-        return getOrDefault(index, null);
-    }
-
-    public T getOrDefault(int index, T defaultValue) {
-        return outOfBounds(index) ? defaultValue : unsafeGet(index);
+    public Optional<T> get(int index) {
+        if (outOfBounds(index))
+            return Optional.empty();
+        return Optional.ofNullable(unsafeGet(index));
     }
 
     public boolean set(int index, T value) {

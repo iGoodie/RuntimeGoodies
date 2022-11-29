@@ -40,6 +40,11 @@ public class StringUtilities {
         return text.substring(left, text.length() - right);
     }
 
+    public static String stripPrefix(String text, String prefix) {
+        if (!text.startsWith(prefix)) return text;
+        return shrink(text, prefix.length(), 0);
+    }
+
     public static String[] splitWords(String sentence) {
         return sentence.split("\\s+");
     }

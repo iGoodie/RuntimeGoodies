@@ -20,7 +20,7 @@ public abstract class ValidatorLogic<A extends Annotation> implements Registrabl
     public Class<A> getId() {
         Type[] genericTypes = TypeUtilities.getSuperGenericTypes(this);
         if (genericTypes == null) throw new InternalError();
-        Type type = ArrayAccessor.of(genericTypes).get(0);
+        Type type = ArrayAccessor.of(genericTypes).get(0).orElse(null);
         if (!(type instanceof Class)) throw new InternalError();
         return (Class<A>) type;
     }

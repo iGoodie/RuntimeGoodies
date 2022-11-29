@@ -1,6 +1,10 @@
 package net.programmer.igoodie.goodies.version;
 
-import java.util.Arrays;
+import net.programmer.igoodie.goodies.util.accessor.ListAccessor;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -14,22 +18,24 @@ public class SemanticVersion {
     // < 1.0.0-rc.1  < 1.0.0
 
     protected int major, minor, patch; // 1.2.3
-    protected String[] preRelease; // -beta.2
-    protected String[] buildMetadata; // +sha899d8g79f87
+    protected List<String> preRelease; // -beta.2
+    protected List<String> buildMetadata; // +sha899d8g79f87
 
     public SemanticVersion(String expression) {
         this(new SemanticVersionParser(expression).parse());
     }
 
     public SemanticVersion(SemanticVersion version) {
-        this(version.major, version.minor, version.patch, version.preRelease, version.buildMetadata);
+        this(version.major, version.minor, version.patch,
+                new ArrayList<>(version.preRelease),
+                new ArrayList<>(version.buildMetadata));
     }
 
     public SemanticVersion(int major, int minor, int patch) {
-        this(major, minor, patch, new String[0], new String[0]);
+        this(major, minor, patch, new ArrayList<>(), new ArrayList<>());
     }
 
-    public SemanticVersion(int major, int minor, int patch, String[] preRelease, String[] buildMetadata) {
+    public SemanticVersion(int major, int minor, int patch, List<String> preRelease, List<String> buildMetadata) {
         this.major = major;
         this.minor = minor;
         this.patch = patch;
@@ -49,20 +55,22 @@ public class SemanticVersion {
         return patch;
     }
 
-    public String[] getPreRelease() {
-        return preRelease;
+    public List<String> getPreRelease() {
+        return Collections.unmodifiableList(preRelease);
     }
 
-    public String[] getBuildMetadata() {
-        return buildMetadata;
+    public List<String> getBuildMetadata() {
+        return Collections.unmodifiableList(buildMetadata);
     }
 
     public SemanticVersionPart diff(SemanticVersion version) {
         if (version.major != this.major) return SemanticVersionPart.MAJOR;
         if (version.minor != this.minor) return SemanticVersionPart.MINOR;
         if (version.patch != this.patch) return SemanticVersionPart.PATCH;
-        if (!Arrays.equals(version.preRelease, this.preRelease)) return SemanticVersionPart.PRE_RELEASE;
-        if (!Arrays.equals(version.buildMetadata, this.buildMetadata)) return SemanticVersionPart.BUILD_METADATA;
+        if (version.preRelease.equals(this.preRelease))
+            return SemanticVersionPart.PRE_RELEASE;
+        if (version.buildMetadata.equals(this.buildMetadata))
+            return SemanticVersionPart.BUILD_METADATA;
         return null;
     }
 
@@ -86,11 +94,18 @@ public class SemanticVersion {
         return this.equals(version) || this.lessThan(version);
     }
 
+    public boolean isAlpha() {
+        return ListAccessor.of(preRelease).get(0).orElse("")
+                .equalsIgnoreCase("ALPHA");
+    }
+
+    public boolean isBeta() {
+        return ListAccessor.of(preRelease).get(0).orElse("")
+                .equalsIgnoreCase("BETA");
+    }
+
     public SemanticVersion stripMeta() {
-        SemanticVersion version = new SemanticVersion(this);
-        version.preRelease = new String[0];
-        version.buildMetadata = new String[0];
-        return version;
+        return new SemanticVersion(this.major, this.minor, this.patch);
     }
 
     public SemanticVersion nextMajor() {
@@ -107,19 +122,25 @@ public class SemanticVersion {
 
     public SemanticVersion nextPatch() {
         SemanticVersion version = this.stripMeta();
-        version.patch++;
+        if (!this.isBeta() && !this.isAlpha()) version.patch++;
         return version;
+    }
+
+    public boolean satisfies(String expression) {
+        // TODO: Create Npm satisfying thingy
+        // E.g version.satisfies("1.1.1 || 1.2.3 - 2.0.0");
+        return false;
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(major).append(".").append(minor).append(".").append(patch);
 
-        if (preRelease.length != 0) {
+        if (preRelease.size() != 0) {
             builder.append("-").append(String.join(".", preRelease));
         }
 
-        if (buildMetadata.length != 0) {
+        if (buildMetadata.size() != 0) {
             builder.append("+").append(String.join(".", buildMetadata));
         }
 
@@ -127,19 +148,20 @@ public class SemanticVersion {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (this == other) return true;
-        if (other == null || getClass() != other.getClass()) return false;
-        SemanticVersion that = (SemanticVersion) other;
-        return major == that.major && minor == that.minor && patch == that.patch && Arrays.equals(preRelease, that.preRelease) && Arrays.equals(buildMetadata, that.buildMetadata);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SemanticVersion that = (SemanticVersion) o;
+        return major == that.major
+                && minor == that.minor
+                && patch == that.patch
+                && Objects.equals(preRelease, that.preRelease)
+                && Objects.equals(buildMetadata, that.buildMetadata);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(major, minor, patch);
-        result = 31 * result + Arrays.hashCode(preRelease);
-        result = 31 * result + Arrays.hashCode(buildMetadata);
-        return result;
+        return Objects.hash(major, minor, patch, preRelease, buildMetadata);
     }
 
 }

@@ -23,7 +23,7 @@ public @interface GoodieCustomValidator {
         public Class<T> getFieldType() {
             Type[] genericTypes = TypeUtilities.getSuperGenericTypes(this);
             if (genericTypes == null) throw new InternalError();
-            Type type = ArrayAccessor.of(genericTypes).get(0);
+            Type type = ArrayAccessor.of(genericTypes).get(0).orElse(null);
             if (!(type instanceof Class)) throw new InternalError();
             return (Class<T>) type;
         }
