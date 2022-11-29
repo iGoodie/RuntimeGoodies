@@ -1,5 +1,8 @@
 package net.programmer.igoodie.goodies.version;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,16 +29,16 @@ public class SemanticVersionParser {
         int minor = Integer.parseInt(matcher.group("minor"));
         int patch = Integer.parseInt(matcher.group("patch"));
 
-        String[] preRelease = new String[0];
+        List<String> preRelease = new ArrayList<>();
         String preReleaseGroup = matcher.group("prerelease");
         if (!preReleaseGroup.isEmpty()) {
-            preRelease = preReleaseGroup.split("\\.");
+            Collections.addAll(preRelease, preReleaseGroup.split("\\."));
         }
 
-        String[] buildMetadata = new String[0];
+        List<String> buildMetadata = new ArrayList<>();
         String buildMetadataGroup = matcher.group("buildmetadata");
         if (!buildMetadataGroup.isEmpty()) {
-            buildMetadata = buildMetadataGroup.split("\\.");
+            Collections.addAll(buildMetadata, buildMetadataGroup.split("\\."));
         }
 
         return new SemanticVersion(major, minor, patch, preRelease, buildMetadata);
