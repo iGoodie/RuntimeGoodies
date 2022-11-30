@@ -1,6 +1,7 @@
 package net.programmer.igoodie.goodies.util.accessor;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ListAccessor<T> extends IndexAccessor<T> {
@@ -19,6 +20,17 @@ public class ListAccessor<T> extends IndexAccessor<T> {
     @Override
     protected void unsafeSet(int index, T value) {
         list.set(index, value);
+    }
+
+    public int size() {
+        return list.size();
+    }
+
+    public List<T> subList(int from, int to) {
+        if (list.size() == 0) return Collections.emptyList();
+        int fromIndex = Math.max(from, 0);
+        int toIndex = Math.min(to, list.size() - 1);
+        return Collections.unmodifiableList(list.subList(fromIndex, toIndex));
     }
 
     /* ----------------------------------- */

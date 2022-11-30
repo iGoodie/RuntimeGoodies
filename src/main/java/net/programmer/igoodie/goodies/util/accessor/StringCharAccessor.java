@@ -21,6 +21,10 @@ public class StringCharAccessor extends IndexAccessor<Character> {
         this.string = StringUtilities.replaceIndices(string, index, index, String.valueOf(value));
     }
 
+    public String getString() {
+        return string;
+    }
+
     /* ----------------------------------- */
 
     public static StringCharAccessor of(String string) {
