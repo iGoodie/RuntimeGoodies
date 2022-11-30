@@ -41,7 +41,7 @@ public class ListAccessor<T> extends IndexAccessor<T> {
     public List<T> subList(int from, int to) {
         if (list.size() == 0) return Collections.emptyList();
         int fromIndex = Math.max(from, 0);
-        int toIndex = Math.min(to, list.size() - 1);
+        int toIndex = Math.min(to, list.size());
         return Collections.unmodifiableList(list.subList(fromIndex, toIndex));
     }
 
