@@ -20,6 +20,13 @@ import java.util.function.Supplier;
 
 public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> implements Serializable<GoodieObject> {
 
+    public enum State {
+        PRISTINE,
+        LOADING,
+        READY
+    }
+
+    private State state = State.PRISTINE;
     private GoodieObject lastAppliedGoodieObject;
     private GoodieValidator validator;
     private List<FixReason> generalFixesDone;
@@ -35,22 +42,41 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         return fixesDone;
     }
 
+    public State getState() {
+        return state;
+    }
+
     public abstract F getFormat();
 
     /* -- Config Readers ------------------------------- */
 
+    private GoodieObject readGoodieObject(ConfiGoodieOptions options) {
+        try {
+            F goodieFormat = getFormat();
+            return goodieFormat.readGoodieFromString(options.externalConfigText);
+
+        } catch (GoodieParseException exception) {
+            generalFixesDone.add(new FixReason("$", FixReason.Action.RESET_TO_DEFAULT_SCHEME, exception.getMessage()));
+            return new GoodieObject(); // Discard malformed config data
+        }
+    }
+
     public <T extends ConfiGoodie<F>> T readConfig(File file) {
-        return readConfig(new ConfiGoodieOptions().useFile(file));
+        return readConfig(ConfiGoodieOptions.fromFile(file));
     }
 
     public <T extends ConfiGoodie<F>> T readConfig(String externalText) {
-        return readConfig(new ConfiGoodieOptions().useText(externalText));
+        return readConfig(ConfiGoodieOptions.fromText(externalText));
     }
 
     public <T extends ConfiGoodie<F>> T readConfig(ConfiGoodieOptions options) throws GoodieParseException {
+        options.externalConfigFetcher.run();
+
         if (options.externalConfigText == null) {
             throw new IllegalArgumentException("Passed options do not contain any config data...");
         }
+
+        state = State.LOADING;
 
         generalFixesDone = new ArrayList<>();
 
@@ -65,67 +91,32 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         deserialize(lastAppliedGoodieObject);
 
         // If changes are made, handle the modified goodie object
-        if (!getFixesDone().isEmpty()) {
-            handleChanges(options);
+        if (!getFixesDone().isEmpty() && options.onFixed != null) {
+            options.onFixed.accept(options, lastAppliedGoodieObject, this);
         }
+
+        state = State.READY;
 
         @SuppressWarnings("unchecked")
         T thisConfig = (T) this;
         return thisConfig;
     }
 
-    private GoodieObject readGoodieObject(ConfiGoodieOptions options) {
-        try {
-            F goodieFormat = getFormat();
-            return goodieFormat.readGoodieFromString(options.externalConfigText);
-
-        } catch (GoodieParseException exception) {
-            generalFixesDone.add(new FixReason("$", FixReason.Action.RESET_TO_DEFAULT_SCHEME, exception.getMessage()));
-            return new GoodieObject(); // Discard malformed config data
-        }
-    }
-
-    private void handleChanges(ConfiGoodieOptions options) {
-        if (options.onFixed != null) {
-            options.onFixed.accept(lastAppliedGoodieObject);
-        } else {
-            defaultOnFixed(options);
-        }
-    }
-
-    private void defaultOnFixed(ConfiGoodieOptions options) {
-        if (options.externalConfigFile != null) {
-            if (options.renameInvalidConfig != null) {
-                saveToFileBackingUp(options.externalConfigFile, options.renameInvalidConfig);
-            } else {
-                saveToFile(options.externalConfigFile);
-            }
-        }
-    }
-
     /* -- File Savers ------------------------------- */
-
-    public void saveToFileBackingUp(File file, ConfiGoodieOptions.FileNameSupplier backupFilePath) {
-        if (!FileUtils.isEmpty(file)) {
-            String movePath = backupFilePath.accept(file, lastAppliedGoodieObject);
-            FileUtils.moveFile(file, new File(movePath));
-            FileUtils.createFileIfAbsent(file);
-        }
-        saveToFile(file);
-    }
 
     public void saveToFile(File file) {
         GoodieObject goodieObject = serialize();
         saveToFile(file, goodieObject);
     }
 
-    public void saveToFile(File file, GoodieObject goodieObject) {
+    private void saveToFile(File file, GoodieObject goodieObject) {
         F goodieFormat = getFormat();
         String serializedGoodie = goodieFormat.writeToString(goodieObject, true);
         FileUtils.writeString(file, serializedGoodie, StandardCharsets.UTF_8);
     }
 
     public boolean isDirty() {
+        if (state == State.PRISTINE) return false;
         GoodieObject currentGoodie = serialize();
         return !currentGoodie.equals(lastAppliedGoodieObject);
     }

@@ -53,9 +53,9 @@ public class ConfigReloadingTest {
     private static void initialize() {
         theConfig = new TheConfig();
 
-        theConfig = theConfig.readConfig(new ConfiGoodieOptions()
-                .useText(serializedData)
-                .onFixed(ConfigReloadingTest::serializeToVariable));
+        theConfig = theConfig.readConfig(ConfiGoodieOptions
+                .fromText(serializedData)
+                .onFixed((options, fixedGoodie, confiGoodie) -> serializeToVariable(fixedGoodie)));
     }
 
     private static void serializeToVariable(GoodieObject fixedGoodie) {

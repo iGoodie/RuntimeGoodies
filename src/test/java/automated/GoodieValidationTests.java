@@ -35,9 +35,9 @@ public class GoodieValidationTests {
         GoodieObject goodieObject = gsonFormat.readGoodieFromString(TestFiles.loadData("uuids.json"));
         System.out.println("Goodie Object: " + goodieObject);
 
-        ConfiGoodieOptions options = new ConfiGoodieOptions()
-                .useText(TestFiles.loadData("uuids.json"))
-                .onFixed(fixedGoodie -> {
+        ConfiGoodieOptions options = ConfiGoodieOptions
+                .fromText(TestFiles.loadData("uuids.json"))
+                .onFixed((opts, fixedGoodie, confiGoodie) -> {
                     System.out.println("Fixed Goodie: " + fixedGoodie);
                 });
 

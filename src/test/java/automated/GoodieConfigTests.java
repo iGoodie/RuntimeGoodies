@@ -20,10 +20,9 @@ public class GoodieConfigTests {
     public void testViaFile() throws IOException {
         String configPath = System.getenv("APPDATA") + File.separator + ".igoodie/RuntimeGoodies/config.json";
 
-        ConfiGoodieOptions options = new ConfiGoodieOptions()
-                .useFile(new File(configPath))
-                .moveInvalidConfigs((invalidConfigFile, fixedGoodie) ->
-                        String.format("%s.%d.invalid", invalidConfigFile.getPath(), System.currentTimeMillis()));
+        ConfiGoodieOptions options = ConfiGoodieOptions.fromFile(new File(configPath))
+                .onFixed(ConfiGoodieOptions.FixHandlers.renameInvalidConfig((invalidConfigFile, fixedGoodie) ->
+                        String.format("%s.%d.invalid", invalidConfigFile.getPath(), System.currentTimeMillis())));
 
         User user = new User().readConfig(options);
         System.out.println(user);

@@ -15,9 +15,8 @@ public class TestUtils {
     }
 
     public static <T extends ConfiGoodie<?>> void standardConfiGoodieTest(T confiGoodie, String text, Consumer<T> consumer) {
-        confiGoodie.readConfig(new ConfiGoodieOptions()
-                .useText(text)
-                .onFixed(fixedGoodie -> {
+        confiGoodie.readConfig(ConfiGoodieOptions.fromText(text)
+                .onFixed((options, fixedGoodie, config) -> {
                     System.out.println("Fixed into:\n" + fixedGoodie);
                 }));
 
