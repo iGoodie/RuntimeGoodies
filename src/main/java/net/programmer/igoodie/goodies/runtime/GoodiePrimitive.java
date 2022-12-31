@@ -28,7 +28,14 @@ public class GoodiePrimitive extends GoodieElement {
     }
 
     public GoodiePrimitive(Number number) {
-        this.value = NumberUtilities.fitToLargestDatatype(Objects.requireNonNull(number));
+        boolean isBuiltInType = number instanceof Byte
+                || number instanceof Short
+                || number instanceof Integer
+                || number instanceof Long
+                || number instanceof Float
+                || number instanceof Double;
+        this.value = isBuiltInType ? number
+                : NumberUtilities.fitToLargestDatatype(Objects.requireNonNull(number));
     }
 
     public GoodiePrimitive(String string) {

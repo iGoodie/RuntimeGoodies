@@ -10,7 +10,7 @@ allprojects {
     println "Configuring - ${name}"
 
     sourceCompatibility = 1.8
-    archivesBaseName = "$name"
+    archivesBaseName = "${name}"
 
     repositories {
         mavenCentral()
