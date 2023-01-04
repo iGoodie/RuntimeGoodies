@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class GoodieQueryParser {
 
-    private static Pattern FIELD_PATTERN = Pattern.compile("\\.(?<field>\\w+)");
+    private static Pattern FIELD_PATTERN = Pattern.compile("\\.(?<field>[\\w]+)");
     private static Pattern INDEX_PATTERN = Pattern.compile("\\[(?<index>\\d+)]");
 
     String query;
