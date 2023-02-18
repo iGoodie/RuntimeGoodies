@@ -4,7 +4,6 @@ import net.programmer.igoodie.goodies.configuration.JsonConfiGoodie;
 import net.programmer.igoodie.goodies.configuration.mixed.MixedGoodie;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 import net.programmer.igoodie.goodies.serialization.annotation.Goodie;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import util.TestUtils;
 
@@ -21,7 +20,7 @@ public class Mixed extends JsonConfiGoodie {
         String name;
 
         @Override
-        public @NotNull Class<? extends Animal> deserializeType(GoodieObject goodieObject) {
+        public Class<? extends Animal> deserializeType(GoodieObject goodieObject) {
             String type = goodieObject.getString("type").orElse("animal");
 
             switch (type) {
