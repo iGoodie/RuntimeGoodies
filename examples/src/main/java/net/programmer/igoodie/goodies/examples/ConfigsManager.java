@@ -10,7 +10,6 @@ import net.programmer.igoodie.goodies.examples.configs.UsersConfig;
 import net.programmer.igoodie.goodies.format.GoodieFormat;
 import net.programmer.igoodie.goodies.runtime.GoodieObject;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,9 +32,9 @@ public class ConfigsManager {
 
         System.out.println("Configs are loaded successfully");
 
-        List<Collection<FixReason>> fixesDone = REGISTRY.stream()
+        List<FixReason> fixesDone = REGISTRY.stream()
                 .map(ConfiGoodieHolder::get)
-                .map(ConfiGoodie::getFixesDone)
+                .flatMap(confiGoodie -> confiGoodie.getFixesDone().stream())
                 .collect(Collectors.toList());
 
         if (!fixesDone.isEmpty()) {
@@ -44,7 +43,7 @@ public class ConfigsManager {
         }
 
         System.out.println("\nConfigs look like:");
-        REGISTRY.forEach(System.out::println);
+        REGISTRY.stream().map(ConfiGoodieHolder::get).forEach(System.out::println);
 
         System.out.println("\nConfigs serialize to:");
         REGISTRY.forEach(wrapper -> {
