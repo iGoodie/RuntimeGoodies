@@ -155,4 +155,20 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
         new ConfiGoodieDeserializer().deserializeInto(this, serialized);
     }
 
+    /* -- Instancing Helpers ------------------------------- */
+
+    public static <F extends GoodieFormat<?, GoodieObject>, C extends ConfiGoodie<F>> ConfiGoodieHolder<C> readConfig(Class<C> configClass, File file) {
+        return readConfig(configClass, ConfiGoodieOptions.fromFile(file));
+    }
+
+    public static <F extends GoodieFormat<?, GoodieObject>, C extends ConfiGoodie<F>> ConfiGoodieHolder<C> readConfig(Class<C> configClass, String externalText) {
+        return readConfig(configClass, ConfiGoodieOptions.fromText(externalText));
+    }
+
+    public static <F extends GoodieFormat<?, GoodieObject>, C extends ConfiGoodie<F>> ConfiGoodieHolder<C> readConfig(Class<C> configClass, ConfiGoodieOptions options) {
+        ConfiGoodieHolder<C> holder = new ConfiGoodieHolder<>(configClass);
+        holder.get().readConfig(options);
+        return holder;
+    }
+
 }

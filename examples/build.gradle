@@ -11,11 +11,22 @@ repositories {
 dependencies {
     implementation 'org.jetbrains:annotations:22.0.0'
 
-    implementation 'com.github.iGoodie.RuntimeGoodies:core:1.2.0'
-    implementation 'com.github.iGoodie.RuntimeGoodies:json:1.2.0'
-    implementation 'com.github.iGoodie.RuntimeGoodies:toml:1.2.0'
+//    implementation 'com.github.iGoodie.RuntimeGoodies:core:1.2.0'
+//    implementation 'com.github.iGoodie.RuntimeGoodies:json:1.2.0'
+//    implementation 'com.github.iGoodie.RuntimeGoodies:toml:1.2.0'
+
+    implementation files("../build/classes")
+    implementation files("../json/build/classes")
+    implementation files("../toml/build/classes")
+
 }
 
 test {
     useJUnitPlatform()
+}
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it)}
+    }
 }
