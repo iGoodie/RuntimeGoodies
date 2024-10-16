@@ -5,16 +5,17 @@ allprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
     apply plugin: "java"
-
-    println "Configuring - ${name}"
-
-    sourceCompatibility = 1.8
-    archivesBaseName = "${name}"
+    apply plugin: "java-library"
 
     java {
         withJavadocJar()
         withSourcesJar()
     }
+
+    println "Configuring - ${name}"
+
+    sourceCompatibility = 1.8
+    archivesBaseName = "${name}"
 
     repositories {
         mavenCentral()
