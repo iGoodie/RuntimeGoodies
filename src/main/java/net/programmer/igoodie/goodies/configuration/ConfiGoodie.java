@@ -124,9 +124,9 @@ public abstract class ConfiGoodie<F extends GoodieFormat<?, GoodieObject>> imple
     /* -- Implementation Helpers ------------------------------- */
 
     /**
-     * Used while implementing your own ConfiGoodie. <br/>
-     * When the default value is hard to write as a one-liner, use this protected method to generate <br/>
-     * <br/>
+     * Used while implementing your own ConfiGoodie.
+     * When the default value is hard to write as a one-liner, use this protected method to generate
+     * <p>
      * Example Usage:
      * <pre> {@code
      * @Goodie

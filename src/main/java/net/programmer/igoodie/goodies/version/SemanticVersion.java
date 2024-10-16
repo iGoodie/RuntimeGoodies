@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * SemVer2.0.0 implementation <br/>
+ * SemVer2.0.0 implementation
  * See <a href="https://semver.org/">SemVer.org</a> for all the rules
  */
 public class SemanticVersion {

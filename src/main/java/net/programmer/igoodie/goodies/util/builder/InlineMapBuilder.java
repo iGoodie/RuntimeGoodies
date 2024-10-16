@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * Examplar usage: <br/>
+ * Examplar usage:
  *
  * <pre>{@code
  *  public static final Map<String, Integer> MY_MAP = InlineMapBuilder.<String, Integer>of(HashMap::new)
