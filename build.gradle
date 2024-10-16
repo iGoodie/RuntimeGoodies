@@ -11,6 +11,11 @@ allprojects {
     sourceCompatibility = 1.8
     archivesBaseName = "${name}"
 
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
     repositories {
         mavenCentral()
     }
